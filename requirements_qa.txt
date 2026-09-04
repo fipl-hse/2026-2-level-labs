@@ -1,0 +1,3 @@
+git+https://github.com/fipl-hse/quality-control.git@7527360
+spacy==3.8.7
+
