@@ -1,0 +1,65 @@
+{
+    "labs": [],
+    "addons": [
+        {
+            "name": "admin_utils"
+        },
+        {
+            "name": "seminars"
+        }
+    ],
+    "repository": {
+        "admins": [
+            "demid5111",
+            "EIzharikov",
+            "NovIrina",
+            "sofianurtdinova",
+            "AnPruch",
+            "Evgraff2005",
+            "notBlueSpaceThinker",
+            "kaizerova-a"
+        ],
+        "pr_name_example": "Laboratory work #1, Name Surname - 25FPL1",
+        "pr_name_regex": "Laboratory work #\\d, \\w+ \\w+ - 2\\dFPL\\d"
+    },
+    "stubs_config": {
+        "accepted_modules": {
+            "pathlib": [
+                "Path"
+            ],
+            "typing": [
+                "*"
+            ]
+        },
+        "specific_file_rules": {}
+    },
+    "newline_config": [
+        "venv",
+        "\\.venv",
+        "\\.git",
+        "\\.idea",
+        "\\.coverage",
+        "\\.mypy_cache",
+        "\\.pytest_cache",
+        "__pycache__",
+        "build",
+        "tmp",
+        "intersphinx",
+        "test_tmp",
+        "dist",
+        "1_raw\\.txt$",
+        "__init__\\.cpython-310\\.pyc$",
+        "test_params\\.cpython-310\\.pyc$",
+        "\\.jpg$",
+        "\\.png$",
+        "\\.pkl$",
+        "\\.udpipe$",
+        "\\.zip$"
+    ],
+    "doc_sync_config": [],
+    "prohibited_modules": [
+        "collections",
+        "itertools",
+        "os"
+    ]
+}
