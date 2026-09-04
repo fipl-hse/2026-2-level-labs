@@ -1,5 +1,14 @@
 {
-    "labs": [],
+    "labs": [
+        {
+            "name": "lab_1_classify_profile",
+            "coverage": 100,
+            "stubs": [
+                "main.py",
+                "start.py"
+            ]
+        }
+    ],
     "addons": [
         {
             "name": "admin_utils"

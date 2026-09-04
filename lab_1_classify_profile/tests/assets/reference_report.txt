@@ -1,0 +1,14 @@
+Unknown language stats
+======================
+Popular words: ['happy', 'man']
+Max length word: 'happy'
+Min length word: 'man'
+Average token length: 4.0
+
+Language scores
+---------------
+es: MSE 0.00160  Top-N Score 0.20000
+de: MSE 0.00180  Top-N Score 0.40000
+ru: MSE 0.00200  Top-N Score 0.40000
+fr: MSE 0.00200  Top-N Score 0.20000
+en: MSE 0.00220  Top-N Score 0.22000
