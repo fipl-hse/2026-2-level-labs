@@ -56,6 +56,9 @@ def test_detect_language_by_top_n_ideal() -> None:
     actual = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 2)
     assert "en" == actual
 
+    actual = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 2)
+    assert "en" == actual
+
 
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark6

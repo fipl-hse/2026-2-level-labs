@@ -50,7 +50,7 @@ def test_collect_profiles_ideal() -> None:
 
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark10
-def test_preprocess_profile_ideal_complex() -> None:
+def test_collect_profile_ideal_complex() -> None:
     """
     Ideal input scenario with corrupted and valid profiles
     """
@@ -85,7 +85,7 @@ def test_preprocess_profile_ideal_complex() -> None:
 
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark10
-def test_preprocess_profile_bad_input_type() -> None:
+def test_collect_profile_bad_input_type() -> None:
     """
     Bad input scenario
     """
@@ -98,7 +98,7 @@ def test_preprocess_profile_bad_input_type() -> None:
 
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark10
-def test_preprocess_profile_bad_input_elements() -> None:
+def test_collect_profile_bad_input_elements() -> None:
     """
     Bad input scenario, invalid element type in sequence
     """

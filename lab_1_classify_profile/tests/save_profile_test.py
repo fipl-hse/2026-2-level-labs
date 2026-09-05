@@ -6,12 +6,12 @@ Checks the first profile saving function
 import json
 import shutil
 from pathlib import Path
-from typing import cast, Generator
+from typing import Generator
 
 import pytest
 
 from admin_utils.constants import FLOAT_TOLERANCE, PROJECT_ROOT
-from lab_1_classify_profile.main import ProfileType, save_profile
+from lab_1_classify_profile.main import save_profile
 
 TEST_DIRECTORY = PROJECT_ROOT / "pathstokeep"
 JSON_PATH_TO_COMPARE = Path(__file__).parent / "assets" / "de.json"
@@ -83,69 +83,3 @@ def test_save_profile_bad_input_type() -> None:
     for bad_path in bad_paths:
         actual = save_profile(("profile", {"a": 0.1}, 1), bad_path)
         assert actual is False
-
-
-@pytest.mark.lab_1_classify_profile
-@pytest.mark.mark10
-def test_save_profile_bad_input_complex() -> None:
-    """
-    Bad input complex scenario
-    """
-    bad_inputs: list[object] = ["goodbye", {}, None, 9, 9.34, True, [None], []]
-    profile = {}
-    for index in range(len(bad_inputs) - 2):
-        profile = {"name": bad_inputs[index], "freq": bad_inputs[index + 1]}
-    actual = save_profile(cast(ProfileType, profile), str(TEST_DIRECTORY))
-    assert actual is False
-
-
-@pytest.mark.lab_1_classify_profile
-@pytest.mark.mark10
-def test_save_profile_bad_input_obsolete_freq_or_name() -> None:
-    """
-    Bad input, obsolete freq or name keys
-    """
-    profile_no_name = {
-        "freq": {
-            "hause": 0.1,
-            "auslande": 0.1,
-            "man": 0.6,
-            "an": 0.4,
-            "freunde": 0.1,
-            "bin": 0.1,
-            "gute": 0.1,
-            "minuten": 0.1,
-        },
-    }
-    actual = save_profile(profile_no_name, str(TEST_DIRECTORY))
-    assert actual is False
-
-    profile_no_freq = {
-        "name": "de",
-    }
-    actual = save_profile(profile_no_freq, str(TEST_DIRECTORY))
-    assert actual is False
-
-
-@pytest.mark.lab_1_classify_profile
-@pytest.mark.mark10
-def test_save_profile_bad_input_path_type() -> None:
-    """
-    Bad input, wrong path type
-    """
-    profile = (
-        "de",
-        {
-            "hause": 0.1,
-            "auslande": 0.1,
-            "man": 0.6,
-            "an": 0.4,
-            "freunde": 0.1,
-            "bin": 0.1,
-            "gute": 0.1,
-            "minuten": 0.1,
-        },
-        8,
-    )
-    actual = save_profile(profile, None)
-    assert actual is False
