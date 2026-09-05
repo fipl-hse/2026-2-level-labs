@@ -63,7 +63,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     Returns:
         Sequence[str] | None: Sequence of the most common words.
-        Returns None in case of incorrect input types.
+        Returns None in case of incorrect input types or non-positive top_n.
     """
 
 
@@ -147,7 +147,8 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
     Returns:
         float | None: The score
-        Returns None in case of incorrect input types.
+        Returns None in case of incorrect input types or mismatched length.
+        In case of empty inputs, returns 0.0.
     """
 
 
@@ -155,7 +156,7 @@ def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
 ) -> float | None:
     """
-    Compares profiles and calculates the distance using symbols.
+    Compares two language profiles using the MSE metric.
 
     Args:
         unknown_profile (ProfileType): Unknown profile
@@ -164,8 +165,7 @@ def compare_profiles_by_mse(
 
     Returns:
         float | None: The distance between the profiles.
-        In case of corrupt input arguments or lack of keys 'name' and
-        'freq' in arguments, None is returned.
+        In case of corrupt input arguments or invalid profile structure, None is returned.
     """
 
 
