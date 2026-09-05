@@ -54,6 +54,20 @@ def test_calculate_frequencies_bad_input() -> None:
 @pytest.mark.mark6
 @pytest.mark.mark8
 @pytest.mark.mark10
+def test_calculate_frequencies_empty_input() -> None:
+    """
+    Calculate frequencies empty tokens check
+    """
+    actual = calculate_frequencies([])
+    assert isinstance(actual, dict)
+    assert len(actual) == 0
+
+
+@pytest.mark.lab_1_classify_profile
+@pytest.mark.mark4
+@pytest.mark.mark6
+@pytest.mark.mark8
+@pytest.mark.mark10
 def test_calculate_frequencies_return_value() -> None:
     """
     Calculate frequencies return values check

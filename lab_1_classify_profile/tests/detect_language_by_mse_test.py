@@ -69,7 +69,7 @@ def test_detect_language_by_mse_ideal() -> None:
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_detect_language_by_ms_german_ideal() -> None:
+def test_detect_language_by_mse_german_ideal() -> None:
     """
     Ideal scenario with german profile
     """
@@ -183,3 +183,16 @@ def test_detect_language_by_mse_bad_input() -> None:
         assert detect_language_by_mse(bad_profile, en_profile, de_profile) is None
         assert detect_language_by_mse(unknown_profile, bad_profile, de_profile) is None
         assert detect_language_by_mse(unknown_profile, en_profile, bad_profile) is None
+
+
+def test_detect_language_by_mse_same_mse() -> None:
+    """
+    Languages have the same MSE value scenario.
+    """
+    unknown_profile = ("unknown", {"hola": 0.5, "hi": 0.5}, 2)
+
+    en_profile = ("en", {"hi": 1.0}, 1)
+
+    es_profile = ("es", {"hola": 1.0}, 1)
+
+    assert detect_language_by_mse(unknown_profile, es_profile, en_profile) == "en"

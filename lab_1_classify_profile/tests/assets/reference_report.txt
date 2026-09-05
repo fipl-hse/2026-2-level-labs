@@ -3,7 +3,7 @@ Unknown language stats
 Popular words: ['happy', 'man']
 Max length word: 'happy'
 Min length word: 'man'
-Average token length: 4.0
+Average token length: 4.00000
 
 Language scores
 ---------------

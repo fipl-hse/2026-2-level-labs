@@ -88,60 +88,29 @@ def test_calculate_mse_bad_input_length() -> None:
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_calculate_mse_bad_input_predicted() -> None:
+def test_calculate_mse_bad_input() -> None:
     """
     Bad input scenario
     """
-    predicted_value = "0.0"
+    bad_inputs = [None, 0.42, 1, "calculate", {}, ["int", None, 13]]
 
-    actual_value = [
+    proper_input = [
         0.1666,
         0.1666,
         0.0333,
-        0.1333,
-        0.0,
-        0.0666,
-        0.0666,
-        0.0333,
-        0.0333,
-        0.1,
-        0.0666,
-        0.0,
-        0.0666,
-        0.0666,
     ]
 
-    expected = None
-    actual = calculate_mse(predicted_value, actual_value)
-    assert expected == actual
+    for bad_input in bad_inputs:
+        assert calculate_mse(bad_input, proper_input) is None
+        assert calculate_mse(proper_input, bad_input) is None
+        assert calculate_mse(bad_input, bad_input) is None
 
 
 @pytest.mark.lab_1_classify_profile
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_calculate_mse_bad_input_actual() -> None:
+def test_calculate_mse_empty_input() -> None:
     """
     Bad input scenario
     """
-    predicted_value = [
-        0.1538,
-        0.0,
-        0.0,
-        0.0769,
-        0.0769,
-        0.0769,
-        0.0,
-        0.0,
-        0.0769,
-        0.0769,
-        0.0769,
-        0.1538,
-        0.2307,
-        0.0,
-    ]
-
-    actual_value = {}
-
-    expected = None
-    actual = calculate_mse(predicted_value, actual_value)
-    assert expected == actual
+    assert 0.0 == pytest.approx(calculate_mse([], []), abs=FLOAT_TOLERANCE)

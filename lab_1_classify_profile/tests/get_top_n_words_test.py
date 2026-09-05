@@ -30,11 +30,11 @@ def test_get_top_n_words_same_frequency() -> None:
     """
     Get top number of words with the same frequency check
     """
-    expected = ["happy", "man"]
-    actual = get_top_n_words({"happy": 2, "man": 2}, 2)
+    expected = ["happy", "hello", "man"]
+    actual = get_top_n_words({"happy": 0.2, "man": 0.2, "hello": 0.2}, 3)
     assert expected == actual
     expected = ["happy"]
-    actual = get_top_n_words({"happy": 2, "man": 2}, 1)
+    actual = get_top_n_words({"man": 0.2, "happy": 0.2, "hello": 0.2}, 1)
     assert expected == actual
 
 
@@ -91,8 +91,7 @@ def test_get_top_n_words_incorrect_numbers() -> None:
     """
     Get top number of words using incorrect number of words parameter
     """
-    expected = []
     actual = get_top_n_words({}, -1)
-    assert expected == actual
-    actual = get_top_n_words({"happy": 2}, 0)
-    assert expected == actual
+    assert actual is None
+    actual = get_top_n_words({"happy": 0.2}, 0)
+    assert actual is None
