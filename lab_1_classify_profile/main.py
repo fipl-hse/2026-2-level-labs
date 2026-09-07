@@ -2,7 +2,7 @@
 Lab 1.
 
 Language detection
-"""
+"""privet
 
 # pylint:disable=unused-argument
 from typing import Sequence
