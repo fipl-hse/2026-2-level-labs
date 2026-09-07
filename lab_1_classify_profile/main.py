@@ -137,6 +137,7 @@ def detect_language_by_top_n(
 # Mark 8
 
 
+privet
 def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float | None:
     """
     Calculates mean squared error between predicted and actual values.
