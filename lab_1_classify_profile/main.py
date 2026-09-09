@@ -15,60 +15,51 @@ ProfileType = tuple[str, FreqDictType, int]
 
 
 def tokenize(text: str) -> Sequence[str] | None:
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation and other symbols from words
+    text = text.lower()
 
-    Args:
-       text (str): Text
+    for char in text:
+        if not(char.isalpha()) and char != " ":
+            text = text.replace(char, "")
 
-    Returns:
-        Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
-        Returns None if input text is not a string.
-    """
+    tokens = text.split()
 
+    return tokens
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
-    """
-    Removes stop words
+    for stop_word in stop_words:
+        while stop_word in tokens:
+            tokens.remove(stop_word)
 
-    Args:
-        tokens (Sequence[str]): Sequence of tokens
-        stop_words (Sequence[str]): Sequence of stop words (can be empty)
-    Returns:
-        Sequence[str] | None: Sequence of tokens without stop words.
-        Returns None in case of incorrect input types.
-    """
-
+    return tokens
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
-    """
-    Calculates frequencies of given tokens
+    freq_dict = FreqDictType()
+    for token in tokens:
+        if token not in freq_dict:
+            freq_dict[token] = 1
+        else:
+            freq_dict[token] += 1
 
-    Args:
-        tokens (Sequence[str]): Sequence of tokens
-    Returns:
-        dict[str, float] | None: Dictionary with frequencies.
-        Returns None in case of incorrect input types.
-    """
+    for k in freq_dict.keys():
+        freq_dict[k] /= len(freq_dict)
+
+    return freq_dict
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
-    """
-    Finds the most common words
+    sorted_dict = dict(sorted(freq_dict.items(), key=lambda item: (item[1], item[0])))
+    top_n_words = []
 
-    Args:
-        freq_dict (dict[str, float]): Dictionary with frequencies
-        top_n (int): Number of the most common words
+    i = 0
+    for k in sorted_dict.keys():
+        i += 1
+        if i <= top_n:
+            top_n_words.append(k)
+        else:
+            break
 
-    Returns:
-        Sequence[str] | None: Sequence of the most common words.
-        Returns None in case of incorrect input types or non-positive top_n.
-    """
-
-
+    return top_n_words
 # Mark 6.
-
 
 def create_language_profile(
     language: str, text: str, stop_words: Sequence[str]
@@ -264,5 +255,3 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
-
-print("print")
