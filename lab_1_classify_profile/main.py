@@ -38,7 +38,6 @@ def tokenize(text: str) -> Sequence[str] | None:
             if char.isalpha():
                 clean_word += char
 
-        # including last word
         if clean_word:
             tokenized_text.append(clean_word)
 
