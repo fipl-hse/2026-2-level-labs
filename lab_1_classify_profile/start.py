@@ -20,7 +20,6 @@ def main() -> None:
         en_text = file.read()
     #result = None
     #assert result, "Detection result is None"
-    print(stopwords)
     tokenized_de_text = tokenize(de_text)
     cleaned_de_tokens = remove_stop_words(tokenized_de_text, stopwords)
     freq_dict = calculate_frequencies(cleaned_de_tokens)
