@@ -32,11 +32,9 @@ def tokenize(text: str) -> Sequence[str] | None:
         text = text.lower()
         tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
         tokens = "".join(tokens).split()
-
     	return tokens
 
-    else:
-        return None
+	return None
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
