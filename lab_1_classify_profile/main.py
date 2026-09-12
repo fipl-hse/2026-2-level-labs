@@ -32,7 +32,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         cleaned_text = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
         cleaned_text = "".join(cleaned_text).split()
 
-        return cleaned_text
+    return cleaned_text
 
     else:
         return None
