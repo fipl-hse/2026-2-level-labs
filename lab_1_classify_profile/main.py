@@ -17,23 +17,23 @@ ProfileType = tuple[str, FreqDictType, int]
 
 def tokenize(text: str) -> Sequence[str] | None:
 
-    """
+   """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
 
     Args:
-    text (str): Text
+       text (str): Text
 
     Returns:
-    Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
-    Returns None if input text is not a string.
+        Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
+        Returns None if input text is not a string.
     """
-	if isinstance(text, str):
-		text = text.lower()
-		tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
-		tokens = "".join(tokens).split()
-		return tokens
-	return None
+    if isinstance(text, str):
+        text = text.lower()
+        tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
+        tokens = "".join(tokens).split()
+        return tokens
+    return None
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -46,13 +46,13 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-	if isinstance(tokens, Sequence[str]):
-		for token in tokens:
-			for word in stop_words:
-				if token == word and word != "":
-					tokens.remove(token)
-		return tokens
-	return None
+    if isinstance(tokens, Sequence[str]):
+        for token in tokens:
+            for word in stop_words:
+                if token == word and word != "":
+                    tokens.remove(token)
+        return tokens
+    return None
 
 
 
