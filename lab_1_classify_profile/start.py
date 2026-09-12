@@ -23,6 +23,7 @@ def main() -> None:
     cleaned_de_text = tokenize(de_text)
     cleaned_unknown_text = tokenize(unknown_text)
     cleaned_en_text = tokenize(en_text)
+    remove_stop_words(stopwords)
 
 if __name__ == "__main__":
     main()
