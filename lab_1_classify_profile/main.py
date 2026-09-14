@@ -26,7 +26,13 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
+    tokens = []
+    for word in text.split():
+        cleaned = re.sub(r'[^a-zA-ZёЁäöüßÄÖÜ]', '', word)
+        if cleaned:
+            tokens.append(cleaned.lower())
 
+    return tokens
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
