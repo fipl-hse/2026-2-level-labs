@@ -7,12 +7,12 @@ Language detection
 # pylint:disable=unused-argument
 from typing import Sequence
 
-FreqDictType = dict[str, float]
+FreqDictTypмe = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
 ProfileType = tuple[str, FreqDictType, int]
 "Language profile of a text. Contains language name, frequency dictionary and number of tokens."
 # Mark 4.
-
+fbg
 
 def tokenize(text: str) -> Sequence[str] | None:
     """
