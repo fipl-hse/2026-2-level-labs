@@ -11,10 +11,10 @@ FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
 ProfileType = tuple[str, FreqDictType, int]
 "Language profile of a text. Contains language name, frequency dictionary and number of tokens."
-# Mark 4.
+# Mark 4.kji
 
 
-def tokenize(text: str) -> Sequence[str] | None:
+def tokenize(text: str) -> jjjSequence[str] | None:
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
