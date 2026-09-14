@@ -2,7 +2,7 @@
 Lab 1.
 
 Language detection
-"""
+""" # privet
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -12,7 +12,6 @@ FreqDictType = dict[str, float]
 ProfileType = tuple[str, FreqDictType, int]
 "Language profile of a text. Contains language name, frequency dictionary and number of tokens."
 # Mark 4.
-
 
 def tokenize(text: str) -> Sequence[str] | None:
     """
@@ -27,6 +26,22 @@ def tokenize(text: str) -> Sequence[str] | None:
         Returns None if input text is not a string.
     """
 
+    if not isinstance(text, str):
+        return None
+
+
+    tokenized_text = []
+
+    for word in text.lower().split():
+        clean_word = ''
+        for char in word:
+            if char.isalpha():
+                clean_word += char
+
+        if clean_word:
+            tokenized_text.append(clean_word)
+
+    return tokenized_text
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -39,7 +54,18 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+    if not all(isinstance(word, str) and word.isalpha() for word in stop_words) or tokens is None:
+        return None
 
+    stop_words_set =set(stop_words) # for optimization
+
+    filtered_tokens = []
+
+    for token in tokens:
+        if token not in stop_words_set:
+            filtered_tokens.append(token)
+
+    return filtered_tokens
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
@@ -51,6 +77,20 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if tokens is None: return None
+
+    total_n = len(tokens)
+    if total_n == 0:
+        return {}
+
+    tokens_set = set(tokens)
+    tokens_freq = {}
+
+    for token in tokens_set:
+        n = tokens.count(token)
+        tokens_freq[token] = n / total_n
+
+    return tokens_freq
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -65,6 +105,17 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
+        return None
+
+    if top_n < 0:
+        return None
+
+    sorted_freq_dict = sorted(freq_dict.items(), key = lambda item: (-item[1],item))
+
+
+    return [word for word, freq in sorted_freq_dict[:top_n]]
+
 
 
 # Mark 6.
@@ -127,6 +178,7 @@ def detect_language_by_top_n(
         profile_1 (ProfileType): Profile for comparison
         profile_2 (ProfileType): Another profile for comparison
         top_n (int): Number of the most common words
+
 
     Returns:
         str | None: Unknown profile language.
