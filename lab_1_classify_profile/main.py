@@ -132,6 +132,19 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(stop_words, Sequence):
+        return None
+    if not isinstance(text,str):
+        return None
+    if not isinstance(language,str):
+        return None
+    tokens=tokenize(text)
+    cleaned_tokens=remove_stop_words(tokens,stop_words)
+    counts=calculate_frequencies(cleaned_tokens)
+    if counts is None:
+        return None
+    else:
+        return (language, counts, len(counts))
 
 
 def check_profile(profile: ProfileType) -> bool:
