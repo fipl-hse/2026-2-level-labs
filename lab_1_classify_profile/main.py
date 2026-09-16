@@ -46,14 +46,20 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-    if isinstance(tokens, Sequence[str]):
-        for token in tokens:
-            for word in stop_words:
-                if token == word and word != "":
-                    tokens.remove(token)
-        return tokens
-    return None
+    if not isinstance (tokens, list):
+        return None
+    for token in tokens:
+        if not isinstance (token, str):
+            return None
 
+    if not isinstance(stop_words, list):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
+
+    tokens = [token for token in tokens if token not in stop_words]
+    return tokens
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -66,6 +72,23 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if not isinstance (tokens, list):
+        return None
+    for token in tokens:
+        if not isinstance (token, str):
+            return None
+
+    freq_dict = {}
+    for token in tokens:
+        if token in freq_dict:
+            freq_dict[token] += 1.0
+        else:
+            freq_dict[token] = 1.0
+
+    for token in freq_dict:
+        freq_dict[token] = freq_dict[token]/len(tokens)
+
+    return freq_dict
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -80,6 +103,17 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict):
+        return None
+    for key, value in freq_dict.items():
+        if not isinstance(key, str) or not isinstance(value, float):
+            return None
+
+    max_value = 0
+    most_freq = list(freq_dict.keys())
+    while top_n > 0:
+
+
 
 
 # Mark 6.
