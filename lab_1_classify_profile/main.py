@@ -15,29 +15,30 @@ ProfileType = tuple[str, FreqDictType, int]
 
 
 def tokenize(text: str) -> Sequence[str] | None:
-   """
+    """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
 
     Args:
-       text (str): Text
+        text (str): Text
 
     Returns:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
-   if not isinstance(text, str):
+
+    if not isinstance(text, str):
         return None
 
-   tokens = []
-   for word in text.lower().split():
+    tokens = []
+    for word in text.lower().split():
         token = ''
         for letter in word:
             if letter.isalpha():
                 token = token + letter
         if token:
             tokens.append(token)
-   return tokens
+    return tokens
 
 
 
@@ -116,8 +117,8 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     items = sorted(items, key=lambda item: (-item[1], item[0])) #descending sorting
 
     result = []
-    for word, freq in items[:top_n]:
-        result.append(word)
+    for item in items[:top_n]:
+        result.append(item[0])
     return result
 
 
