@@ -33,12 +33,13 @@ def tokenize(text: str) -> Sequence[str] | None:
     text = text.lower()
 
     for char in text:
-        if not(char.isalpha()) and char != " ":
+        if not (char.isalpha()) and char != " ":
             text = text.replace(char, "")
 
     tokens = text.split()
 
     return tokens
+
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -59,6 +60,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
             tokens.remove(stop_word)
 
     return tokens
+
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
@@ -100,7 +102,8 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     if not isinstance(freq_dict, dict[str, float]) or not isinstance(top_n, int) or top_n <= 0:
         return None
 
-    sorted_dict = dict(sorted(freq_dict.items(), key=lambda item: (item[1], item[0])))
+    sorted_dict = dict(
+        sorted(freq_dict.items(), key=lambda item: (item[1], item[0])))
     top_n_words = []
 
     i = 0
@@ -113,6 +116,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     return top_n_words
 # Mark 6.
+
 
 def create_language_profile(
     language: str, text: str, stop_words: Sequence[str]
@@ -129,6 +133,7 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+
 
 def check_profile(profile: ProfileType) -> bool:
     """
