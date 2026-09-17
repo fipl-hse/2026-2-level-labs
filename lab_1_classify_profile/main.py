@@ -26,6 +26,21 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
+ if not isinstance(text, str):
+        return None
+
+    tokens = []
+    current_word = ''
+    for char in text:
+        if char.isalpha():
+            current_word += char.lower()
+        elif current_word:
+            tokens.append(current_word)
+            current_word = ''
+    if current_word:
+        tokens.append(current_word)
+
+    return tokens
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
