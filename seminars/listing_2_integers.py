@@ -218,7 +218,7 @@ def fibonacci(n: int) -> int:
 
     if n!=0:
         while count <= n:
-            suuma += fibonacci
+            summa += fibonacci
             fibonacci += 1
             count+=1
         return summa
