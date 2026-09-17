@@ -6,7 +6,6 @@ Language detection
 
 # pylint:disable=unused-argument
 from typing import Sequence
-print('Message')
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
 ProfileType = tuple[str, FreqDictType, int]
@@ -28,6 +27,7 @@ def tokenize(text: str) -> Sequence[str] | None:
     """
 
 
+
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
     Removes stop words
@@ -39,6 +39,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
