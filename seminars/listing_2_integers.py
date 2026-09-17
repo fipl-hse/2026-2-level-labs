@@ -1,3 +1,4 @@
+import math
 """
 Programming 2026.
 
@@ -58,9 +59,8 @@ def add_numbers(a: int, b: int) -> int:
     Returns:
         int: Sum of a and b
     """
-    # student implementation goes here
-
-
+    return a + b
+print(add_numbers(2, 3))
 # add_numbers(2, 3) → 5
 # add_numbers(-5, 10) → 5
 # add_numbers(0, 0) → 0
@@ -79,7 +79,10 @@ def average(a: float, b: float, c: float) -> float:
     Returns:
         float: Average value of the three numbers
     """
-    # student implementation goes here
+    return (a + b + c) / 3
+av = average(10, 20, 30)
+print(av)
+
 
 
 # average(1, 2, 3) → 2.0
@@ -98,7 +101,12 @@ def is_even(n: int) -> bool:
     Returns:
         bool: True if n is even, False otherwise
     """
-    # student implementation goes here
+    if n % 2 == 0:
+        return True
+    else:
+        return False
+print(is_even(2))
+print(is_even(3))
 
 
 # is_even(2) → True
@@ -118,7 +126,10 @@ def area_of_circle(radius: float) -> float:
     Returns:
         float: Area of the circle
     """
-    # student implementation goes here
+    pi = 3.14
+    return 3.14 * radius**2
+print(area_of_circle(1))
+print(area_of_circle(0))
 
 
 # area_of_circle(1) → 3.14159...
@@ -137,7 +148,6 @@ def factorial(n: int) -> int:
     Returns:
         int: Factorial of n
     """
-    # student implementation goes here
 
 
 # factorial(0) → 1
