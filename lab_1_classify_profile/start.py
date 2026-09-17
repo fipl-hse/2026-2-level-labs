@@ -4,6 +4,14 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 
+from lab_1_classify_profile.main import (
+    tokenize,
+    remove_stop_words,
+    calculate_frequencies,
+    get_top_n_words,
+    create_language_profile,
+    detect_language_by_top_n,
+)
 
 def main() -> None:
     """
@@ -17,7 +25,18 @@ def main() -> None:
         stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
-    result = None
+
+    tokens_de = tokenize(de_text)
+    tokens_de_clean = remove_stop_words(tokens_de, stopwords)
+    freq_de = calculate_frequencies(tokens_de_clean)
+    top_7_de = get_top_n_words(freq_de, 7)
+    print("Top-7 DE:", top_7_de)
+    en_profile = create_language_profile("en", en_text, stopwords)
+    de_profile = create_language_profile("de", de_text, stopwords)
+    unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
+    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    print("Detected language:", result)
+
     assert result, "Detection result is None"
 
 
