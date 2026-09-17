@@ -54,7 +54,13 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+        if not isinstance(tokens, (list, tuple)) or not all(isinstance(token, str) for token in tokens):
+        return None
 
+    if not isinstance(stop_words, (list, tuple)):
+        return tokens
+
+    return [token for token in tokens if token not in stop_words]
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
