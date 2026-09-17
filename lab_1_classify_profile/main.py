@@ -159,6 +159,18 @@ def create_language_profile(
             return None
 
     tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    cleared_tokens = remove_stop_words(tokens, stop_words)
+    if cleared_tokens is None:
+        return None
+
+    freq_dict = calculate_frequencies(cleared_tokens)
+    if freq_dict is None:
+        return None
+
+    tokens = tokenize(text)
     cleared_tokens = remove_stop_words(tokens, stop_words)
     freq_dict = calculate_frequencies(cleared_tokens)
 
@@ -216,7 +228,12 @@ def compare_profiles_by_top_n(
         return None
 
     unknown_top_most_common = get_top_n_words(unknown_profile[1], top_n)
-    to_compare_top_most_common = get_top_n_words(unknown_profile[1], top_n)
+    if unknown_top_most_common is None:
+        return None
+
+    to_compare_top_most_common = get_top_n_words(profile_to_compare[1], top_n)
+    if to_compare_top_most_common is None:
+        return None
 
     intersection = 0
 
@@ -244,21 +261,33 @@ def detect_language_by_top_n(
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(top_n, int) or not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+    if (
+        not isinstance(top_n, int)
+        or not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
         return None
 
-    lang_1_probability = compare_profiles_by_mse(unknown_profile, profile_1)
-    lang_2_probability = compare_profiles_by_mse(unknown_profile, profile_2)
+    lang_1_probability = compare_profiles_by_top_n(
+        unknown_profile, profile_1, top_n)
+    if lang_1_probability is None:
+        return None
+
+    lang_2_probability = compare_profiles_by_top_n(
+        unknown_profile, profile_2, top_n)
+    if lang_2_probability is None:
+        return None
+
     if lang_1_probability > lang_2_probability:
         return profile_1[0]
-    elif lang_1_probability < lang_2_probability:
+    if lang_1_probability < lang_2_probability:
         return profile_2[0]
-    elif profile_1[0] < profile_2[0]:
+    if profile_1[0] < profile_2[0]:
         return profile_1[0]
-    else:
-        return profile_2[0]
+    return profile_2[0]
 
-        # Mark 8
+    # Mark 8
 
 
 def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float | None:
