@@ -1,21 +1,21 @@
-# """
-# Programming 2026.
+"""
+Programming 2026.
 
-# Seminar 2.
-# Integers and float data.
-# """
+Seminar 2.
+Integers and float data.
+"""
 
-# # pylint: disable=invalid-name, unused-argument, redefined-outer-name
+# pylint: disable=invalid-name, unused-argument, redefined-outer-name
 
-# # Common information about numbers
-# #
-# # integers (int) are whole numbers (positive, negative, or zero)
-# # floating-point numbers (float) represent decimal values
-# # numbers are immutable
-# # numbers are not iterable
-# # arithmetic operations can be applied: +, -, *, /, //, %, **
+# Common information about numbers
+#
+# integers (int) are whole numbers (positive, negative, or zero)
+# floating-point numbers (float) represent decimal values
+# numbers are immutable
+# numbers are not iterable
+# arithmetic operations can be applied: +, -, *, /, //, %, **
 
-# # Create numbers
+# Create numbers
 # a = 10  # int
 # b = 3.5  # float
 # print(a, b)
@@ -85,7 +85,7 @@ def average(a: float, b: float, c: float) -> float:
     n_numbers = 3
     sum_numbers = a + b + c
     average_numbers = sum_numbers / n_numbers
-    return(average_numbers)
+    return average_numbers
 
 # print(average(1, 2, 3))
 # print(average(10, 20, 30))
@@ -104,10 +104,7 @@ def is_even(n: int) -> bool:
         bool: True if n is even, False otherwise
     """
     # student implementation goes here
-    if n % 2 == 0:
-        return True
-    else:
-        return False
+    return n % 2 == 0
 
 # print(is_even(2))
 # print(is_even(3))
@@ -148,10 +145,7 @@ def factorial(n: int) -> int:
     """
     # student implementation goes here
     fact = 1
-    if n <= 1:
-        fact = 1
-
-    else:
+    if n > 1:
         for num in range(2, n + 1):
             fact *= num
     return fact
@@ -220,16 +214,16 @@ def fibonacci(n: int) -> int:
     # student implementation goes here
     if n == 0:
         return 0
-    else:
-        f0 = 0
-        f1 = 1
-        i = 1
-        while i < n:
-            f2 = f0 + f1
-            f0 = f1
-            f1 = f2
-            i += 1
-        return f1
+
+    f0 = 0
+    f1 = 1
+    i = 1
+    while i < n:
+        f2 = f0 + f1
+        f0 = f1
+        f1 = f2
+        i += 1
+    return f1
 
 # print(fibonacci(0))
 # print(fibonacci(1))
@@ -248,15 +242,4 @@ def is_prime(n: int) -> bool:
     Returns:
         bool: True if n is prime, False otherwise
     """
-    # student implementation goes here
-    # import math
-    # if n <= 1:
-    #     return False
-    # for i in range(2, int(math.sqrt(n)) + 1):
-    #     if n % i ==0:
-    #         return False
-    # return True
 
-# is_prime(2) → True
-# is_prime(15) → False
-# is_prime(17) → True
