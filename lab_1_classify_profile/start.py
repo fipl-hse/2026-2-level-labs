@@ -9,8 +9,6 @@ from main import (
     tokenize,
 )
 
-# pylint: disable=unused-variable, duplicate-code
-
 
 def main() -> None:
     """
