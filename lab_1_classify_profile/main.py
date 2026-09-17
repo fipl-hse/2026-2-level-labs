@@ -52,12 +52,18 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(tokens, Sequence[str]) or not isinstance(stop_words, Sequence[str]):
+    if not isinstance(tokens, list) or not isinstance(stop_words, list):
         return None
 
-    for stop_word in stop_words:
-        while stop_word in tokens:
-            tokens.remove(stop_word)
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
+
+    for i in stop_words:
+        if not isinstance(i, str):
+            return None
+
+    tokens = [token for token in tokens if token not in stop_words]
 
     return tokens
 
@@ -73,15 +79,22 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(tokens, Sequence[str]):
+    if not isinstance(tokens, list):
         return None
 
-    freq_dict = FreqDictType()
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
+
+    freq_dict = dict()
     for token in tokens:
-        freq_dict[token] = 1 if token in freq_dict else freq_dict[token] + 1
+        if token in freq_dict.keys():
+            freq_dict[token] += 1
+        else:
+            freq_dict[token] = 1
 
     for k in freq_dict.keys():
-        freq_dict[k] /= len(freq_dict)
+        freq_dict[k] /= len(tokens)
 
     return freq_dict
 
@@ -99,11 +112,15 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Returns None in case of incorrect input types or non-positive top_n.
     """
 
-    if not isinstance(freq_dict, dict[str, float]) or not isinstance(top_n, int) or top_n <= 0:
+    if not isinstance(freq_dict, dict) or not isinstance(top_n, int) or top_n <= 0:
         return None
 
+    for k, v in freq_dict.items():
+        if not isinstance(k, str) or not isinstance(v, float):
+            return None
+
     sorted_dict = dict(
-        sorted(freq_dict.items(), key=lambda item: (item[1], item[0])))
+        sorted(freq_dict.items(), key=lambda item: (-item[1], item[0])))
     top_n_words = []
 
     i = 0
