@@ -151,6 +151,21 @@ def create_language_profile(
         Returns None in case of incorrect input types.
     """
 
+    if not isinstance(language, str) or not isinstance(text, str) or not isinstance(stop_words, list):
+        return None
+
+    for i in stop_words:
+        if not isinstance(i, str):
+            return None
+
+    tokens = tokenize(text)
+    cleared_tokens = remove_stop_words(tokens, stop_words)
+    freq_dict = calculate_frequencies(cleared_tokens)
+
+    lang_prof = (language, freq_dict, len(freq_dict))
+
+    return lang_prof
+
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -163,6 +178,23 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+
+    if not isinstance(profile, tuple):
+        return False
+
+    if len(profile) != 3:
+        return False
+
+    language, freq_dict, length = profile
+
+    if not isinstance(language, str) or not isinstance(freq_dict, dict) or not isinstance(length, int):
+        return False
+
+    for k, v in freq_dict.items():
+        if not isinstance(k, str) or not isinstance(v, float):
+            return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
