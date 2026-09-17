@@ -212,6 +212,20 @@ def compare_profiles_by_top_n(
         Returns None in case of incorrect input types.
     """
 
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare) or not isinstance(top_n, int):
+        return None
+
+    unknown_top_most_common = get_top_n_words(unknown_profile[1], top_n)
+    to_compare_top_most_common = get_top_n_words(unknown_profile[1], top_n)
+
+    intersection = 0
+
+    for word in unknown_top_most_common:
+        if word in to_compare_top_most_common:
+            intersection += 1
+
+    return intersection / top_n
+
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
