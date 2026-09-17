@@ -2,7 +2,7 @@
 Lab 1.
 
 Language detection
-"""privet
+"""
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -26,7 +26,19 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
-
+    text = text.lower()
+    words = []
+    current_word = ""
+    for symbol in text:
+        if symbol.isalpha():
+            current_word = current_word + symbol
+        else:
+            if current_word != "":
+                words.append(current_word)
+                current_word = ""
+    if current_word != "":
+        words.append(current_word)
+    return words
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -39,6 +51,13 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+    if not stop_words:
+        return tokens
+    result = []
+    for token in tokens:
+        if token not in stop_words:
+            result.append(token)
+    return result
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -51,7 +70,9 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-
+    frequencies = {}
+    for token in tokens:
+        frequencies[token] = frequencies.get(token, 0) + 1
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
     """
@@ -65,6 +86,17 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if n <= 0:
+        return None
+
+    def by_frequency(word: str) -> float:
+        return frequencies[word]
+
+    words = list(frequencies.keys())
+    words.sort()
+    words.sort(key=by_frequency, reverse=True)
+    return words[:n]
+
 
 
 # Mark 6.
