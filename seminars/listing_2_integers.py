@@ -60,6 +60,8 @@ def add_numbers(a: int, b: int) -> int:
     """
     # student implementation goes here
 
+    return a + b
+add_numbers(2,3)
 
 # add_numbers(2, 3) → 5
 # add_numbers(-5, 10) → 5
@@ -80,7 +82,9 @@ def average(a: float, b: float, c: float) -> float:
         float: Average value of the three numbers
     """
     # student implementation goes here
-
+    return (a+b+c)/3
+av = (10,20,30)
+print(av)
 
 # average(1, 2, 3) → 2.0
 # average(10, 20, 30) → 20.0
