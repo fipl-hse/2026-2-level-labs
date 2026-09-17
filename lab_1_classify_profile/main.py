@@ -28,6 +28,22 @@ def tokenize(text: str) -> Sequence[str] | None:
     """
 
 
+    if not isinstance(text, str):
+        return None
+
+    words = text.lower().split()
+    tokens = []
+    for word in words:
+        token = ''
+        for char in word:
+            if char.isalpha():
+                token += char
+        if token:
+            tokens.append(token)
+    return tokens
+
+
+
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
     Removes stop words
@@ -39,6 +55,25 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+
+
+    if not isinstance(tokens, Sequence) or isinstance(tokens, str):
+        return None
+
+    if not all(isinstance(token, str) for token in tokens):
+        return None
+
+    if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
+        return None
+
+    if not all(isinstance(word, str) for word in stop_words):
+        return None
+
+    tokens_without_stop_words = []
+    for token in tokens:
+        if token not in stop_words:
+            tokens_without_stop_words.append(token)
+    return tokens_without_stop_words
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -53,6 +88,24 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
 
 
+    if not isinstance(tokens, Sequence) or isinstance(tokens, str):
+        return None
+
+    if not all(isinstance(token, str) for token in tokens):
+        return None
+
+    length = len(tokens)
+    if length == 0:
+        return {}
+
+    freq = {}
+    for token in tokens:
+        if token not in freq:
+            freq[token] = 0
+        freq[token] += 1 / length
+
+    return freq
+
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
     """
     Finds the most common words
@@ -65,6 +118,19 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+
+
+    if not isinstance(top_n, int):
+        return None
+    if top_n <= 0:
+        return None
+
+    if not isinstance(freq_dict, dict):
+        return None
+
+    sorted_words = sorted(freq_dict.keys(), key=lambda x: (-freq_dict[x], x))
+    return sorted_words[:top_n]
+
 
 
 # Mark 6.
@@ -87,6 +153,31 @@ def create_language_profile(
     """
 
 
+    if not isinstance(language, str):
+        return None
+    if not isinstance(text, str):
+        return None
+    if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
+        return None
+
+    tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    tokens = remove_stop_words(tokens, stop_words)
+    if tokens is None:
+        return None
+
+    freq = calculate_frequencies(tokens)
+    if freq is None:
+        return None
+
+    n_words = len(freq)
+    profile = (language, freq, n_words)
+
+    return profile
+
+
 def check_profile(profile: ProfileType) -> bool:
     """
     Checks profile structure
@@ -98,6 +189,23 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+
+
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
+
+    language, freq, n_words = profile
+    if (not isinstance(language, str)
+        or not isinstance(freq, dict)
+        or not isinstance(n_words, int)):
+        return False
+
+    if (not all(isinstance(key, str) and isinstance(value, float)
+                for key, value in freq.items()) or
+                n_words != len(freq)):
+        return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
@@ -114,6 +222,9 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+
+
+
 
 
 def detect_language_by_top_n(
