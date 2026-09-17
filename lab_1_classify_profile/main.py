@@ -244,8 +244,21 @@ def detect_language_by_top_n(
         Returns None in case of incorrect input types.
     """
 
+    if not isinstance(top_n, int) or not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+        return None
 
-# Mark 8
+    lang_1_probability = compare_profiles_by_mse(unknown_profile, profile_1)
+    lang_2_probability = compare_profiles_by_mse(unknown_profile, profile_2)
+    if lang_1_probability > lang_2_probability:
+        return profile_1[0]
+    elif lang_1_probability < lang_2_probability:
+        return profile_2[0]
+    elif profile_1[0] < profile_2[0]:
+        return profile_1[0]
+    else:
+        return profile_2[0]
+
+        # Mark 8
 
 
 def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float | None:
