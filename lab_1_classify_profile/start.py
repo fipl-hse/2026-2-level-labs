@@ -2,15 +2,20 @@
 Language detection starter.
 """
 
-from main import (
-    calculate_frequencies,
-    get_top_n_words,
-    remove_stop_words,
-    tokenize,
-)
+# pylint: disable=unused-variable, duplicate-code
 
 
 def main() -> None:
+    """
+    Launches an implementation.
+    """
+    from main import (
+        calculate_frequencies,
+        get_top_n_words,
+        remove_stop_words,
+        tokenize,
+    )
+
     with open("lab_1_classify_profile/assets/texts/de.txt", "r", encoding="utf-8") as file:
         de_text = file.read()
     with open("lab_1_classify_profile/assets/texts/unknown.txt", "r", encoding="utf-8") as file:
@@ -23,7 +28,8 @@ def main() -> None:
     tokens = tokenize(de_text)
     cleared_tokens = remove_stop_words(tokens, stopwords)
     freq_dict = calculate_frequencies(cleared_tokens)
-    top_most_popular = get_top_n_words(freq_dict, 7)
+    result = get_top_n_words(freq_dict, 7)
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
