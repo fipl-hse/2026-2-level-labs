@@ -2,7 +2,7 @@
 Lab 1.
 
 Language detection
-"""
+"""privet
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -15,6 +15,16 @@ ProfileType = tuple[str, FreqDictType, int]
 
 
 def tokenize(text: str) -> Sequence[str] | None:
+    if not isinstance(text, str):
+        return None
+    import re
+    words = text.split()
+    word_list = []
+    for word in words:
+        delete_non_letters = re.sub(r'[^a-zA-Zа-яА-ЯёЁßäöüÄÖÜ]', '', word)
+        if delete_non_letters:
+            word_list.append(delete_non_letters.lower())
+    return word_list
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
@@ -29,6 +39,20 @@ def tokenize(text: str) -> Sequence[str] | None:
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    if not isinstance(stop_words, (list, tuple)):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
+    if not stop_words:
+        return tokens
+    stop_set = set(stop_words)
+    return [token for token in tokens if token not in stop_set]
     """
     Removes stop words
 
@@ -51,6 +75,22 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    if len(tokens) == 0:
+        return {}
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+
+    total = len(tokens)
+    freq_dict: dict[str, float] = {}
+    for token in tokens:
+        freq_dict[token] = freq_dict.get(token, 0) + 1
+
+    for token in freq_dict:
+        freq_dict[token] /= total
+    return freq_dict
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -65,6 +105,15 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool):
+        return None
+    if top_n <= 0:
+        return None
+    for key, value in freq_dict.items():
+        if not isinstance(key, str) or not isinstance(value, (int, float)):
+            return None
 
 
 # Mark 6.
