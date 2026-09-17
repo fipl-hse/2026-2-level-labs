@@ -79,8 +79,9 @@ def average(a: float, b: float, c: float) -> float:
     Returns:
         float: Average value of the three numbers
     """
-    # student implementation goes here
-
+    return (a + b + c)/3
+av = average(10, 20, 30)
+print(av)
 
 # average(1, 2, 3) → 2.0
 # average(10, 20, 30) → 20.0
@@ -137,7 +138,10 @@ def factorial(n: int) -> int:
     Returns:
         int: Factorial of n
     """
-    # student implementation goes here
+    for i in range (n):
+
+fact = factorial(0)
+print(fact)
 
 
 # factorial(0) → 1
