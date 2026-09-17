@@ -65,6 +65,7 @@ def add_numbers(a: int, b: int) -> int:
 # add_numbers(-5, 10) → 5
 # add_numbers(0, 0) → 0
 
+    return a + b
 
 # Task 2:
 def average(a: float, b: float, c: float) -> float:
@@ -80,7 +81,7 @@ def average(a: float, b: float, c: float) -> float:
         float: Average value of the three numbers
     """
     # student implementation goes here
-
+    return (a + b + c) / 3
 
 # average(1, 2, 3) → 2.0
 # average(10, 20, 30) → 20.0
@@ -105,6 +106,7 @@ def is_even(n: int) -> bool:
 # is_even(3) → False
 # is_even(0) → True
 # is_even(-4) → True
+    return n % 2 == 0
 
 
 # Task 4:
@@ -139,6 +141,10 @@ def factorial(n: int) -> int:
     """
     # student implementation goes here
 
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
 
 # factorial(0) → 1
 # factorial(1) → 1
