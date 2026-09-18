@@ -59,11 +59,12 @@ def add_numbers(a: int, b: int) -> int:
         int: Sum of a and b
     """
     # student implementation goes here
+    c = a+b
+    return c
 
-
-# add_numbers(2, 3) → 5
-# add_numbers(-5, 10) → 5
-# add_numbers(0, 0) → 0
+print(add_numbers(2, 3)) #→ 5
+print(add_numbers(-5, 10)) #→ 5
+print(add_numbers(0, 0)) #→ 0
 
 
 # Task 2:
