@@ -26,6 +26,22 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
+    if not isinstance(text, str):
+        return None
+
+    words = text.split()
+    result = []
+
+    for word in words:
+        new_word = ""
+
+        for symbol in word:
+            if symbol.isalpha():
+                new_word += symbol.lower()
+        if new_word:
+            result.append(new_word)
+    return result
+
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
@@ -39,6 +55,28 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    if not isinstance(stop_words, (list, tuple)):
+        return None
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    for stop_word in stop_words:
+        if not isinstance(stop_word, str):
+            return None
+
+    result = []
+
+    for token in tokens:
+        if token not in stop_words:
+            result.append(token)
+    return result
+
+
+
+
+
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -51,6 +89,29 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(tokens, (list, tuple)):
+        return None
+
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+
+    if len(tokens) == 0:
+        return None
+    frequences = {}
+
+    for token in tokens:
+        if token not in frequences:
+            frequences[token] = 1
+        else:
+            frequences[token] += 1
+
+    total_num = len(tokens)
+
+    for token in frequences:
+        frequences[token] = frequences[token] / total_num
+    return frequences
+
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
