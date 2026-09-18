@@ -22,7 +22,6 @@ def main() -> None:
     cleaned_de_text = remove_stop_words(tokenized_de_text, stopwords)
     freq_dict = calculate_frequencies(cleaned_de_text)
     top_words = get_top_n_words(freq_dict, 7)
-    print(top_words)
 
     #result = None
     #assert result, "Detection result is None"

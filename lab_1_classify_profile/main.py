@@ -108,26 +108,18 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     if not isinstance(top_n, int) or top_n <= 0:
         return None
     for key, value in freq_dict.items():
-        if not isinstance (key, str) or not isinstance (value, float):
+        if not (isinstance (key, str) and isinstance (value, float)):
             return None
 
-    keys = list(freq_dict.keys())
-    values = list(freq_dict.values())
-
+    sort_freq_dct = sorted(freq_dict.items(), key = lambda freqs: freqs[0])
+    sort_freq_dct = sorted(sort_freq_dct, key = lambda freqs: freqs[1], reverse = True)
     top_n_words = []
-    top_index = []
-    if top_n > len(freq_dict):
-        for i in range(len(freq_dict)):
-            top_n_words.append(keys[values.index(max(values))])
-            values.remove(max(values))
-    else:
-        while top_n > 0:
-            top_index.append(values.index(max(values)))
-            values.remove(max(values))
-            top_n -= 1
 
-        for element in top_index:
-            top_n_words.append(keys[element])
+    top_n_words = [item[0] for item in sort_freq_dct]
+
+    if len(freq_dict) >= top_n:
+        top_n_words = top_n_words[:top_n]
+        return top_n_words
 
     return top_n_words
 
