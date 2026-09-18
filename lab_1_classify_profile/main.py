@@ -63,6 +63,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
 
     return [token for token in tokens if token not in stop_words]
 
+
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
