@@ -74,7 +74,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-        if not isinstance(tokens, (list, tuple)):
+    if not isinstance(tokens, (list, tuple)):
         return None
     for token in tokens:
         if not isinstance(token, str):
@@ -105,7 +105,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
-        if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
+    if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
         return None
     if top_n <= 0:
         return None
