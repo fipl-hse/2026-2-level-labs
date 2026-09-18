@@ -26,7 +26,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
-     if not isinstance(text, str):
+    if not isinstance(text, str):
         return None
 
     tokens = []
@@ -52,7 +52,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-            if not isinstance(tokens, (list, tuple)):
+    if not isinstance(tokens, (list, tuple)):
         return None
     if not all(isinstance(token, str) for token in tokens):
         return None
