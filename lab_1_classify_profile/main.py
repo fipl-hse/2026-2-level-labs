@@ -9,12 +9,14 @@ from typing import Sequence
 
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
+
 ProfileType = tuple[str, FreqDictType, int]
 "Language profile of a text. Contains language name, frequency dictionary and number of tokens."
 # Mark 4.
 
 
 def tokenize(text: str) -> Sequence[str] | None:
+
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
@@ -26,7 +28,12 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
-
+    if isinstance(text, str):
+        text = text.lower()
+        tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
+        tokens = "".join(tokens).split()
+        return tokens
+    return None
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -39,6 +46,20 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+    if not isinstance (tokens, list):
+        return None
+    for token in tokens:
+        if not isinstance (token, str):
+            return None
+
+    if not isinstance(stop_words, list):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
+
+    tokens = [token for token in tokens if token not in stop_words]
+    return tokens
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -51,6 +72,23 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if not isinstance (tokens, list):
+        return None
+    for token in tokens:
+        if not isinstance (token, str):
+            return None
+
+    freq_dict = {}
+    for token in tokens:
+        if token in freq_dict:
+            freq_dict[token] += 1.0
+        else:
+            freq_dict[token] = 1.0
+
+    for token in freq_dict:
+        freq_dict[token] = freq_dict[token]/len(tokens)
+
+    return freq_dict
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -65,7 +103,25 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict):
+        return None
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
+    for key, value in freq_dict.items():
+        if not (isinstance (key, str) and isinstance (value, float)):
+            return None
 
+    sort_freq_dct = sorted(freq_dict.items(), key = lambda freqs: freqs[0])
+    sort_freq_dct = sorted(sort_freq_dct, key = lambda freqs: freqs[1], reverse = True)
+    top_n_words = []
+
+    top_n_words = [item[0] for item in sort_freq_dct]
+
+    if len(freq_dict) >= top_n:
+        top_n_words = top_n_words[:top_n]
+        return top_n_words
+
+    return top_n_words
 
 # Mark 6.
 
