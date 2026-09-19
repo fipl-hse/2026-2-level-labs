@@ -3,7 +3,7 @@ Language detection starter.
 """
 
 # pylint: disable=unused-variable, duplicate-code
-
+from main import tokenize, remove_stop_words, calculate_frequencies, get_top_n_words
 
 def main() -> None:
     """
@@ -17,9 +17,16 @@ def main() -> None:
         stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
-    result = None
+    de_tokens = tokenize(de_text)
+    de_wostopwords = remove_stop_words(de_tokens, stopwords)
+    de_freq = calculate_frequencies(de_wostopwords)
+    result = get_top_n_words (de_freq, 7)
+    print (result)
     assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
     main()
+
+
+
