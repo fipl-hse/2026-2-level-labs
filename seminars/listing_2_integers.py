@@ -27,7 +27,7 @@ print(a * b)  # multiplication
 print(a / b)  # division (always float)
 print(a // 3)  # integer division
 print(a % 3)  # modulus (remainder)
-print(a**2)  # exponentiation
+print(a**2) # exponentiation
 
 # Type conversion
 print(int(3.9))  # convert float to int → 3
@@ -58,6 +58,11 @@ def add_numbers(a: int, b: int) -> int:
     Returns:
         int: Sum of a and b
     """
+    c = a+b
+    return c
+print(add_numbers(2, 3))
+print(add_numbers(-5, 10))
+print(add_numbers(0, 0))
     # student implementation goes here
 
 
@@ -181,11 +186,13 @@ def distance(x1: float, y1: float, x2: float, y2: float) -> float:
         float: Euclidean distance between the two points
     """
     # student implementation goes here
+    result = pow(((x2 - x1) ** 2 + (y2 - y1) ** 2), 0.5)
+    return float(result)
 
 
-# distance(0, 0, 3, 4) → 5.0
-# distance(1, 2, 1, 2) → 0.0
-# distance(-1, -1, 2, 3) → 5.0
+print(distance(0, 0, 3, 0))
+print(distance(1, 2, 1, 2))
+print(distance(-1, -1, 2, 3))
 
 
 # Task 8 (advanced):
@@ -199,7 +206,11 @@ def fibonacci(n: int) -> int:
     Returns:
         int: n-th Fibonacci number
     """
-    # student implementation goes here
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return 0
 
 
 # fibonacci(0) → 0
@@ -210,8 +221,8 @@ def fibonacci(n: int) -> int:
 
 # Task 9 (advanced):
 def is_prime(n: int) -> bool:
-    """
-    Check if a number is prime.
+
+   """ Check if a number is prime.
 
     Args:
         n (int): Integer greater than or equal to 2
