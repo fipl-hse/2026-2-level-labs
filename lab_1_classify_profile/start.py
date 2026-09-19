@@ -20,7 +20,7 @@ def main() -> None:
     de_tokens = tokenize(de_text)
     de_wostopwords = remove_stop_words(de_tokens)
     de_freq = calculate_frequencies(de_wostopwords)
-    de_topn = get_top_n_words (de_freq)
+    de_topn = get_top_n_words (de_freq, 7)
     print (de_topn)
     result = None
     assert result, "Detection result is None"
