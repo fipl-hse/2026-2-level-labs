@@ -17,6 +17,11 @@ def main() -> None:
         stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
+    de_tokens = tokenize(de_text)
+    de_wostopwords = remove_stop_words(de_tokens)
+    de_freq = calculate_frequencies(de_wostopwords)
+    de_topn = get_top_n_words (de_freq)
+    print (de_topn)
     result = None
     assert result, "Detection result is None"
 
