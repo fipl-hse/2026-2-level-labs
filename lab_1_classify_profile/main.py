@@ -135,6 +135,29 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(language, str):
+        return None
+    if not isinstance(text, str):
+        return None
+    if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
+        return None
+
+    tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    tokens = remove_stop_words(tokens, stop_words)
+    if tokens is None:
+        return None
+
+    freq = calculate_frequencies(tokens)
+    if freq is None:
+        return None
+
+    n_words = len(freq)
+    profile = (language, freq, n_words)
+
+    return profile
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -148,7 +171,21 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
 
+    language, freq, n_words = profile
+    if (not isinstance(language, str)
+        or not isinstance(freq, dict)
+        or not isinstance(n_words, int)):
+        return False
+
+    if (not all(isinstance(key, str) and isinstance(value, float)
+                for key, value in freq.items()) or
+                n_words != len(freq)):
+        return False
+
+    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -164,7 +201,28 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
 
+    if not check_profile(profile_to_compare):
+        return None
+
+    if not isinstance (top_n, int) or top_n<=0:
+        return None
+
+    top_words_unknown = get_top_n_words(unknown_profile[1], top_n)
+    top_words_known = get_top_n_words(profile_to_compare[1], top_n)
+
+    if not top_words_unknown:
+        return None
+
+    top_words_unknown = set()
+    top_words_known = set()
+
+    common_words = top_words_unknown.intersection(top_words_known)
+    compared_words = len(common_words)/len(top_words_unknown)
+
+    return compared_words
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
