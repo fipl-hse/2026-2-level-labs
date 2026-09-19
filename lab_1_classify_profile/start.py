@@ -22,7 +22,6 @@ def main() -> None:
     de_freq = calculate_frequencies(de_wostopwords)
     result = get_top_n_words (de_freq, 7)
     print (result)
-    result = None
     assert result, "Detection result is None"
 
 
