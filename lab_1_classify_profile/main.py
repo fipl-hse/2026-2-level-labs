@@ -208,7 +208,7 @@ def compare_profiles_by_top_n(
     if not check_profile(profile_to_compare):
         return None
 
-    if not isinstance(top_n, int) or top_n <= 0:
+    if not isinstance (top_n, int) or top_n<=0:
         return None
 
     top_words_unknown = get_top_n_words(unknown_profile[1], top_n)
@@ -217,13 +217,14 @@ def compare_profiles_by_top_n(
     if not top_words_unknown:
         return None
 
-    top_words_unknown = set()
-    top_words_known = set()
+    top_words_unknown = set(top_words_unknown)
+    top_words_known = set(top_words_known)
 
     common_words = top_words_unknown.intersection(top_words_known)
-    compared_words = len(common_words) / len(top_words_unknown)
+    compared_words = len(common_words)/len(top_words_unknown)
 
     return compared_words
+
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -241,6 +242,34 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+
+    if not check_profile(profile_1):
+        return None
+
+    if not check_profile(profile_2):
+        return None
+
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
+
+    name_lang1 = profile_1[0]
+    name_lang2 = profile_2[0]
+
+    compared_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    compared_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+
+    if compared_1 is None or compared_2 is None:
+        return None
+
+    if compared_1 > compared_2:
+        return name_lang1
+    elif compared_2 > compared_1:
+        return name_lang2
+    else:
+        lang_in_order = sorted([name_lang1, name_lang2])
+        return lang_in_order[0]
 
 
 # Mark 8
