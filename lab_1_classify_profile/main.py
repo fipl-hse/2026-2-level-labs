@@ -57,7 +57,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         return None
     if not all(isinstance(token, str) for token in tokens):
         return None
-    if not isinstance(stop_words, (list, tuple)): # check for type (sequence но не str)
+    if not isinstance(stop_words, (list, tuple)):
         return None
     if not all(isinstance(word, str) for word in stop_words):
         return None
@@ -87,7 +87,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
 
     counts = {}
     for token in tokens:
-        counts[token] = counts.get(token, 0) + 1 #counter for tokens withot errors
+        counts[token] = counts.get(token, 0) + 1
 
     total = len(tokens)
     result = {}
@@ -114,7 +114,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         return None
 
     items = list(freq_dict.items())
-    items = sorted(items, key=lambda item: (-item[1], item[0])) #descending sorting
+    items = sorted(items, key=lambda item: (-item[1], item[0]))
 
     result = []
     for item in items[:top_n]:
@@ -173,7 +173,7 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-    if not isinstance(profile, tuple) or len(profile) != 3: #ProfileType = tuple[str, FreqDictType, int] -> 3
+    if not isinstance(profile, tuple) or len(profile) != 3:
         return False
 
     language, freq_dict, n_words = profile
@@ -213,14 +213,10 @@ def compare_profiles_by_top_n(
     unknown_words = get_top_n_words(unknown_profile[1], top_n)
     compare_words = get_top_n_words(profile_to_compare[1], top_n)
 
-    if (unknown_words is None) or (compare_words is None):
-        return None
-
     unknown_set = set(unknown_words)
     compare_set = set(compare_words)
 
-    common = unknown_set & compare_set
-    return len(common) / len(unknown_set)
+    return len(unknown_set.intersection(compare_set)) / len(unknown_set)
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -238,6 +234,21 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_1):
+        return None
+    if not check_profile(profile_2):
+        return None
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
+
+    distance_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    distance_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+
+    if distance_1 >= distance_2:
+        return profile_1[0]
+    return profile_2[0]
 
 
 # Mark 8

@@ -9,7 +9,10 @@ from lab_1_classify_profile.main import (
     remove_stop_words,
     calculate_frequencies,
     get_top_n_words,
+    create_language_profile,
+    detect_language_by_top_n,
 )
+
 
 
 def main() -> None:
@@ -24,12 +27,19 @@ def main() -> None:
         stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
+
     tokens = tokenize(de_text)
     filtered = remove_stop_words(tokens, stopwords)
     freq_dict = calculate_frequencies(filtered)
     print(get_top_n_words(freq_dict, 7))
 
-    result = None
+    de_profile = create_language_profile('de', de_text, stopwords)
+    en_profile = create_language_profile('en', en_text, stopwords)
+    unknown_profile = create_language_profile('unknown', unknown_text, stopwords)
+
+    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 7)
+    print("Detected language:", result)
+
     assert result, "Detection result is None"
 
 
