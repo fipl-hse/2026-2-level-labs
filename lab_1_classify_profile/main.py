@@ -175,6 +175,20 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple):
+        return False
+
+    if len(profile) != 3:
+        return False
+
+    if not (isinstance(profile[0], str) and isinstance(profile[1], dict) and isinstance(profile[2], int)):
+        return False
+
+    for key, value in profile[1].items():
+        if not (isinstance (key, str) and isinstance (value, float)):
+            return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
