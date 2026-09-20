@@ -76,7 +76,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
     if not isinstance(tokens, (list, tuple)):
         return None
-        if not all(isinstance(token, str) for token in tokens):
+    if not all(isinstance(token, str) for token in tokens):
             return None
 
     total_tokens = len(tokens)
