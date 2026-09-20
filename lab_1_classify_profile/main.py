@@ -284,6 +284,25 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
+    if not isinstance(predicted, (list, tuple)):
+        return None
+    if not isinstance(actual, (list, tuple)):
+        return None
+    if not all(isinstance(value, float) for value in predicted):
+        return None
+    if not all(isinstance(value, float) for value in actual):
+        return None
+    if len(predicted) != len(actual):
+        return None
+
+    if len(predicted) == 0:
+        return 0.0
+
+    total = 0
+    for i in range(len(predicted)):
+        total += (predicted[i] - actual[i]) ** 2
+
+    return total / len(predicted)
 
 
 def compare_profiles_by_mse(
@@ -301,6 +320,31 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_to_compare):
+        return None
+
+    unknown_freq = unknown_profile[1]
+    compare_freq = profile_to_compare[1]
+
+    all_tokens = set(unknown_freq.keys())
+    for token in compare_freq:
+        all_tokens.add(token)
+
+    unknown_values = []
+    compare_values = []
+    for token in all_tokens:
+        if token in unknown_freq:
+            unknown_values.append(unknown_freq[token])
+        else:
+            unknown_values.append(0.0)
+        if token in compare_freq:
+            compare_values.append(compare_freq[token])
+        else:
+            compare_values.append(0.0)
+
+    return calculate_mse(unknown_values, compare_values)
 
 
 def detect_language_by_mse(
@@ -319,6 +363,29 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_1):
+        return None
+    if not check_profile(profile_2):
+        return None
+
+    score_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    score_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+    if score_1 is None or score_2 is None:
+        return None
+
+    name_1 = profile_1[0]
+    name_2 = profile_2[0]
+
+    if score_1 < score_2:
+        return name_1
+    if score_2 < score_1:
+        return name_2
+    if name_1 < name_2:
+        return name_1
+    return name_2
+
 
 
 # Mark 10
