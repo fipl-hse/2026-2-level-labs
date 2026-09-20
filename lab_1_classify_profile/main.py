@@ -247,6 +247,30 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not (
+        check_profile(unknown_profile) and
+        check_profile(profile_1) and
+        check_profile(profile_2)
+        ):
+        return None
+
+    if not isinstance(top_n, int):
+        return None
+
+    compare_unknown_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    compare_unknown_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+
+    if compare_unknown_1 is None:
+        return None
+    if compare_unknown_2 is None:
+        return None
+
+    if compare_unknown_1 == compare_unknown_2:
+        return min(profile_2[0], profile_1[0])
+    elif compare_unknown_1 < compare_unknown_2:
+        return profile_2[0]
+    else:
+        return profile_1[0]
 
 
 # Mark 8
