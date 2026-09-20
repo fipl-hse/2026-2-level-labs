@@ -91,8 +91,8 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
             tokens_quantity[token] += 1
     if not tokens:
         return tokens_frequency
-    for token in tokens_quantity:
-        frequency = tokens_quantity[token] / len(tokens)
+    for token, quantity in tokens_quantity.items():
+        frequency = quantity / len(tokens)
         tokens_frequency[token] = frequency
     return tokens_frequency
 
@@ -213,10 +213,11 @@ def compare_profiles_by_top_n(
 
     top_unknown_profile = get_top_n_words(unknown_profile[1], top_n)
     top_profile_to_compare = get_top_n_words(profile_to_compare[1], top_n)
-    if (top_unknown_profile is None
-    or top_profile_to_compare is None
+    if (
+        top_unknown_profile is None
+        or top_profile_to_compare is None
     ):
-      return None
+        return None
 
     intersecting_top_words = []
     for top_word in top_unknown_profile:
