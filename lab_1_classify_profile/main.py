@@ -117,6 +117,18 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Returns None in case of incorrect input types or non-positive top_n.
 
     """
+    if not isinstance(freq_dict, dict) or not isinstance(top_n, int) or isinstance(top_n, bool):
+        return None
+
+    if not all(isinstance(k, str) and isinstance(v, (int, float)) for k, v in freq_dict.items()):
+        return None
+
+    if top_n <= 0:
+        return None
+
+    sorted_words = sorted(freq_dict.keys(), key=lambda w: (-freq_dict[w], w))
+
+    return sorted_words[:top_n]
 
 
 # Mark 6.
@@ -137,6 +149,27 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
+        return None
+    if not all(isinstance(w, str) for w in stop_words):
+        return None
+
+    tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    clean_tokens = remove_stop_words(tokens, stop_words)
+    if clean_tokens is None:
+        return None
+
+    frequencies = calculate_frequencies(clean_tokens)
+    if frequencies is None:
+        return None
+
+    return (language, frequencies, len(frequencies))
+
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -150,6 +183,24 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
+
+    lang, freqs, length = profile
+
+    if not isinstance(lang, str):
+        return False
+
+    if not isinstance(freqs, dict):
+        return False
+
+    if not all(isinstance(k, str) and isinstance(v, float) for k, v in freqs.items()):
+        return False
+
+    if not isinstance(length, int) or isinstance(length, bool):
+        return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
