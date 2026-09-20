@@ -72,7 +72,6 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     return [token for token in tokens if token not in stop_words]
 
 
-
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
@@ -146,11 +145,11 @@ def create_language_profile(
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(language, str):
-        return None
-    if not isinstance(text, str):
-        return None
-    if not isinstance(stop_words, (list, tuple)):
+    if (
+        not isinstance(language, str)
+        or not isinstance(text, str)
+        or not isinstance(stop_words, (list, tuple))
+    ):
         return None
 
     tokens = tokenize(text)
@@ -167,6 +166,7 @@ def create_language_profile(
 
     n_words = len(freq_dict)
     return (language, freq_dict, n_words)
+
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -199,6 +199,7 @@ def check_profile(profile: ProfileType) -> bool:
 
     return True
 
+
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
 ) -> float | None:
@@ -214,27 +215,21 @@ def compare_profiles_by_top_n(
         Returns None in case of incorrect input types.
     """
 
-    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
-        return None
     if not isinstance(top_n, int) or top_n <= 0:
         return None
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
+        return None
 
-    unknown_freq = unknown_profile[1]
-    compare_freq = profile_to_compare[1]
-
-    unknown_top = get_top_n_words(unknown_freq, top_n)
-    compare_top = get_top_n_words(compare_freq, top_n)
-
+    unknown_top = get_top_n_words(unknown_profile[1], top_n)
+    compare_top = get_top_n_words(profile_to_compare[1], top_n)
     if unknown_top is None or compare_top is None:
         return None
 
     unknown_set = set(unknown_top)
     compare_set = set(compare_top)
-
     intersection = unknown_set & compare_set
-    result = len(intersection) / len(unknown_set) if unknown_set else 0.0
+    return len(intersection) / len(unknown_set) if unknown_set else 0.0
 
-    return result
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -328,21 +323,15 @@ def compare_profiles_by_mse(
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
 
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_to_compare):
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
         return None
 
     unknown_freq = unknown_profile[1]
     compare_freq = profile_to_compare[1]
+    all_tokens = set(unknown_freq) | set(compare_freq)
 
-    all_tokens = set(unknown_freq.keys()) | set(compare_freq.keys())
-
-    unknown_values = []
-    compare_values = []
-    for token in all_tokens:
-        unknown_values.append(unknown_freq.get(token, 0.0))
-        compare_values.append(compare_freq.get(token, 0.0))
+    unknown_values = [unknown_freq.get(token, 0.0) for token in all_tokens]
+    compare_values = [compare_freq.get(token, 0.0) for token in all_tokens]
 
     return calculate_mse(unknown_values, compare_values)
 
@@ -364,22 +353,19 @@ def detect_language_by_mse(
         Returns None in case of incorrect input types.
     """
 
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_1):
-        return None
-    if not check_profile(profile_2):
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
         return None
 
     mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
     mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
-
     if mse_1 is None or mse_2 is None:
         return None
 
-    lang_1 = profile_1[0]
-    lang_2 = profile_2[0]
-
+    lang_1, lang_2 = profile_1[0], profile_2[0]
     if mse_1 < mse_2:
         return lang_1
     if mse_2 < mse_1:
