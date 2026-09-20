@@ -27,7 +27,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         Returns None if input text is not a string.
     """
 
-    if not isinstance (text, str):
+    if not isinstance(text, str):
         return None
 
     tokens = []
@@ -50,12 +50,12 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance (tokens, Sequence):
+    if not isinstance(tokens, Sequence):
         return None
     for token in tokens:
-        if not isinstance (token, str):
+        if not isinstance(token, str):
             return None
-    if not isinstance (stop_words, Sequence):
+    if not isinstance(stop_words, Sequence):
         return None
 
     for word in stop_words:
@@ -64,6 +64,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
 
     stop_set = set(stop_words)
     return [token for token in tokens if token not in stop_set]
+
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
@@ -75,7 +76,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-    if not isinstance (tokens, Sequence):
+    if not isinstance(tokens, Sequence):
         return None
     for token in tokens:
         if not isinstance (token, str):
@@ -89,7 +90,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     for token in tokens:
         if token not in freq:
             freq[token] = 0
-        freq[token] += 1/total
+        freq[token] += 1 / total
 
     return freq
 
@@ -106,9 +107,9 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
-    if not isinstance (freq_dict, dict):
+    if not isinstance(freq_dict, dict):
         return None
-    if not isinstance (top_n, int):
+    if not isinstance(top_n, int):
         return None
     if top_n <= 0:
         return None
@@ -207,7 +208,7 @@ def compare_profiles_by_top_n(
     if not check_profile(profile_to_compare):
         return None
 
-    if not isinstance (top_n, int) or top_n<=0:
+    if not isinstance(top_n, int) or top_n <= 0:
         return None
 
     top_words_unknown = get_top_n_words(unknown_profile[1], top_n)
@@ -220,7 +221,7 @@ def compare_profiles_by_top_n(
     top_words_known = set()
 
     common_words = top_words_unknown.intersection(top_words_known)
-    compared_words = len(common_words)/len(top_words_unknown)
+    compared_words = len(common_words) / len(top_words_unknown)
 
     return compared_words
 
