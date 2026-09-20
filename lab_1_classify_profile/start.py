@@ -7,6 +7,7 @@ Language detection starter.
 from lab_1_classify_profile.main import (
     calculate_frequencies,
     create_language_profile,
+    detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
     remove_stop_words,
@@ -32,12 +33,18 @@ def main() -> None:
     freq_de = calculate_frequencies(tokens_de_clean)
     top_7_de = get_top_n_words(freq_de, 7)
     print("Top-7 DE:", top_7_de)
+
     en_profile = create_language_profile("en", en_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
-    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
-    print("Detected language:", result)
 
+    result_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    print("Detected by Top-N:", result_top_n)
+
+    result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
+    print("Detected by MSE:", result_mse)
+
+    result = result_mse
     assert result, "Detection result is None"
 
 
