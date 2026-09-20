@@ -60,19 +60,17 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(tokens, (list, tuple)):
+    if not isinstance(tokens, (list, tuple)) or not all(
+        isinstance(token, str) for token in tokens
+    ):
         return None
-
-    if not all(isinstance(token, str) for token in tokens):
-        return None
-
-    if not isinstance(stop_words, (list, tuple)):
-        return None
-
-    if not all(isinstance(word, str) for word in stop_words):
+    if not isinstance(stop_words, (list, tuple)) or not all(
+        isinstance(word, str) for word in stop_words
+    ):
         return None
 
     return [token for token in tokens if token not in stop_words]
+
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -255,11 +253,11 @@ def detect_language_by_top_n(
         Returns None in case of incorrect input types.
     """
 
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_1):
-        return None
-    if not check_profile(profile_2):
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
         return None
     if not isinstance(top_n, int) or top_n <= 0:
         return None
