@@ -206,6 +206,24 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_to_compare):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool):
+        return None
+
+    unknown_top_n = get_top_n_words(unknown_profile[1], top_n)
+    compare_top_n = get_top_n_words(profile_to_compare[1], top_n)
+    if unknown_top_n is None or compare_top_n is None:
+        return None
+
+    common_words = 0
+    for word in unknown_top_n:
+        if word in compare_top_n:
+            common_words += 1
+
+    return common_words / len(unknown_top_n)
 
 
 def detect_language_by_top_n(
@@ -224,6 +242,30 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_1):
+        return None
+    if not check_profile(profile_2):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool):
+        return None
+
+    score_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    score_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    if score_1 is None or score_2 is None:
+        return None
+
+    name_1 = profile_1[0]
+    name_2 = profile_2[0]
+
+    if score_1 > score_2:
+        return name_1
+    if score_2 > score_1:
+        return name_2
+    if name_1 < name_2:
+        return name_1
+    return name_2
 
 
 # Mark 8
