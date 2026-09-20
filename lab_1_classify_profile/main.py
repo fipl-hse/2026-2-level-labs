@@ -171,18 +171,20 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-    if (isinstance (profile, tuple)
-    and len(profile) == 3
-    and isinstance(profile[0], str)
-    and isinstance(profile[1], dict)
-    and all(isinstance(key, str) for key in profile[1])
-    and all(isinstance(value, float) for value in profile[1].values())
-    and isinstance(profile[2], int)
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
+
+    if not isinstance(profile[0], str):
+        return False
+
+    if (not isinstance(profile[1], dict)
+    or not all(isinstance(key, str) for key in profile[1])
+    or not all(isinstance(value, float) for value in profile[1].values())
     ):
-        return True
-    return False
-
-
+        return False
+    if not isinstance(profile[2], int):
+        return False
+    return True
 
 
 def compare_profiles_by_top_n(
@@ -214,7 +216,7 @@ def compare_profiles_by_top_n(
     if (top_unknown_profile is None
     or top_profile_to_compare is None
     ):
-         return None
+      return None
 
     intersecting_top_words = []
     for top_word in top_unknown_profile:
@@ -250,7 +252,7 @@ def detect_language_by_top_n(
         or not checked_profile_1
         or not checked_profile_2
         ):
-            return None
+        return None
 
     comparison_with_profile_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     comparison_with_profile_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
@@ -262,7 +264,7 @@ def detect_language_by_top_n(
 
     if comparison_with_profile_1 > comparison_with_profile_2:
         return profile_1[0]
-    elif comparison_with_profile_1 < comparison_with_profile_2:
+    if comparison_with_profile_1 < comparison_with_profile_2:
         return profile_2[0]
     return min(profile_1[0], profile_2[0])
 
@@ -298,8 +300,9 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return 0.0
 
     squared_difference_sum = 0.0
-    for i in range(len(predicted)):
-        squared_difference_sum += (predicted[i] - actual[i]) ** 2
+    for i, predicted_value in enumerate(predicted):
+        actual_value = actual[i]
+        squared_difference_sum += (predicted_value - actual_value) ** 2
     mse = squared_difference_sum / len(predicted)
     return mse
 
@@ -379,7 +382,7 @@ def detect_language_by_mse(
 
     if mse_1 < mse_2:
         return profile_1[0]
-    elif mse_1 > mse_2:
+    if mse_1 > mse_2:
         return profile_2[0]
     return min(profile_1[0], profile_2[0])
 
