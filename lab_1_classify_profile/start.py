@@ -10,13 +10,13 @@ def main() -> None:
     """
     Launches an implementation.
     """
-    with open("assets/texts/de.txt", "r", encoding="utf-8") as file:
+    with open("lab_1_classify_profile/assets/texts/de.txt", "r", encoding="utf-8") as file:
         de_text = file.read()
-    with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file:
+    with open("lab_1_classify_profile/assets/texts/unknown.txt", "r", encoding="utf-8") as file:
         unknown_text = file.read()
-    with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
+    with open("lab_1_classify_profile/assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    with open("assets/texts/en.txt", "r", encoding="utf-8") as file:
+    with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
 
     tokenized_de_text = tokenize(de_text)

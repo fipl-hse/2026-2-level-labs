@@ -9,14 +9,12 @@ from typing import Sequence
 
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
-
 ProfileType = tuple[str, FreqDictType, int]
 "Language profile of a text. Contains language name, frequency dictionary and number of tokens."
 # Mark 4.
 
 
 def tokenize(text: str) -> Sequence[str] | None:
-
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
@@ -28,12 +26,14 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
-    if isinstance(text, str):
-        text = text.lower()
-        tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
-        tokens = "".join(tokens).split()
-        return tokens
-    return None
+    if not isinstance(text, str):
+        return None
+
+    text = text.lower()
+    tokens = [symbol for symbol in text if symbol.isalpha() or symbol.isspace()]
+    tokens = "".join(tokens).split()
+    return tokens
+
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -81,9 +81,9 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     freq_dict = {}
     for token in tokens:
         if token in freq_dict:
-            freq_dict[token] += 1.0
+            freq_dict[token] += 1
         else:
-            freq_dict[token] = 1.0
+            freq_dict[token] = 1
 
     for token in freq_dict:
         freq_dict[token] = freq_dict[token]/len(tokens)
