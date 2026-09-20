@@ -146,6 +146,29 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple):
+        return False
+    if len(profile) != 3:
+        return False
+
+    name = profile[0]
+    freq_dict = profile[1]
+    n_words = profile[2]
+
+    if not isinstance(name, str):
+        return False
+    if not isinstance(freq_dict, dict):
+        return False
+    if not isinstance(n_words, int):
+        return False
+
+    for token, freq in freq_dict.items():
+        if not isinstance(token, str):
+            return False
+        if not isinstance(freq, float):
+            return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
