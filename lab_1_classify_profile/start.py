@@ -29,14 +29,24 @@ def main() -> None:
         en_text = file.read()
 
     tokens_de = tokenize(de_text)
+    assert tokens_de is not None
+
     tokens_de_clean = remove_stop_words(tokens_de, stopwords)
+    assert tokens_de_clean is not None
+
     freq_de = calculate_frequencies(tokens_de_clean)
+    assert freq_de is not None
+
     top_7_de = get_top_n_words(freq_de, 7)
+    assert top_7_de is not None
     print("Top-7 DE:", top_7_de)
 
     en_profile = create_language_profile("en", en_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
+    assert en_profile is not None
+    assert de_profile is not None
+    assert unknown_profile is not None
 
     result_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
     print("Detected by Top-N:", result_top_n)

@@ -182,28 +182,21 @@ def check_profile(profile: ProfileType) -> bool:
         otherwise returns False.
     """
 
-    if not isinstance(profile, tuple):
-        return False
-    if len(profile) != 3:
+    if not isinstance(profile, tuple) or len(profile) != 3:
         return False
 
     language, freq_dict, n_words = profile
 
-    if not isinstance(language, str):
+    if not isinstance(language, str) or not isinstance(freq_dict, dict):
         return False
-    if not isinstance(freq_dict, dict):
-        return False
-    if not isinstance(n_words, int):
-        return False
-    if n_words < 0:
+
+    if not isinstance(n_words, int) or isinstance(n_words, bool) or n_words < 0:
         return False
 
     for key, value in freq_dict.items():
         if not isinstance(key, str):
             return False
-        if not isinstance(value, (int, float)):
-            return False
-        if isinstance(value, bool):
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
             return False
 
     return True
@@ -262,7 +255,11 @@ def detect_language_by_top_n(
         Returns None in case of incorrect input types.
     """
 
-    if not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_1):
+        return None
+    if not check_profile(profile_2):
         return None
     if not isinstance(top_n, int) or top_n <= 0:
         return None
@@ -278,10 +275,9 @@ def detect_language_by_top_n(
 
     if score_1 > score_2:
         return lang_1
-    elif score_2 > score_1:
+    if score_2 > score_1:
         return lang_2
-    else:
-        return min(lang_1, lang_2)
+    return min(lang_1, lang_2)
 
 # Mark 8
 
@@ -300,9 +296,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         In case of empty inputs, returns 0.0.
     """
 
-    if not isinstance(predicted, (list, tuple)):
-        return None
-    if not isinstance(actual, (list, tuple)):
+    if not isinstance(predicted, (list, tuple)) or not isinstance(actual, (list, tuple)):
         return None
     if len(predicted) != len(actual):
         return None
@@ -310,7 +304,6 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return None
     if not all(isinstance(value, (int, float)) for value in actual):
         return None
-
     if not predicted:
         return 0.0
 
