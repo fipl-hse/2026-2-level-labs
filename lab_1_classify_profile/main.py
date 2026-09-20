@@ -119,7 +119,6 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     if len(freq_dict) >= top_n:
         top_n_words = top_n_words[:top_n]
-        return top_n_words
 
     return top_n_words
 
@@ -205,6 +204,31 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    check_unknown = check_profile(unknown_profile)
+    check_compare = check_profile(profile_to_compare)
+
+    if not (check_unknown and check_compare):
+        return None
+
+    if not isinstance(top_n, int):
+        return None
+
+    top_n_unknown = get_top_n_words(unknown_profile[1], top_n)
+    if top_n_unknown is None:
+        return None
+    top_n_compare = get_top_n_words(profile_to_compare[1], top_n)
+    if top_n_compare is None:
+        return None
+
+
+    similarity = 0
+    for word in top_n_unknown:
+        for item in top_n_compare:
+            if word == item:
+                similarity +=1
+
+    result = similarity/top_n
+    return result
 
 
 def detect_language_by_top_n(
