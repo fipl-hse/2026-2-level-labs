@@ -60,8 +60,6 @@ def add_numbers(a: int, b: int) -> int:
     """
     # student implementation goes here
 
-    c = a+b
-    return c
 
 # add_numbers(2, 3) → 5
 # add_numbers(-5, 10) → 5
@@ -75,17 +73,13 @@ def average(a: float, b: float, c: float) -> float:
 
     Args:
         a (float): First number
-        b (float): Second numbert
+        b (float): Second number
         c (float): Third number
 
     Returns:
         float: Average value of the three numbers
     """
     # student implementation goes here
-    average_calc = sum([a,b,c])//3
-    return average_calc
-
-
 
 
 # average(1, 2, 3) → 2.0
@@ -105,7 +99,7 @@ def is_even(n: int) -> bool:
         bool: True if n is even, False otherwise
     """
     # student implementation goes here
-    return n%2==0
+
 
 # is_even(2) → True
 # is_even(3) → False
@@ -114,8 +108,6 @@ def is_even(n: int) -> bool:
 
 
 # Task 4:
-
-import math
 def area_of_circle(radius: float) -> float:
     """
     Calculate the area of a circle.
@@ -126,16 +118,15 @@ def area_of_circle(radius: float) -> float:
     Returns:
         float: Area of the circle
     """
-
     # student implementation goes here
-    calc_circle = 3,14*radius**2
+
+
 # area_of_circle(1) → 3.14159...
 # area_of_circle(0) → 0
 # area_of_circle(2.5) → ~19.63495
 
 
 # Task 5:
-import math
 def factorial(n: int) -> int:
     """
     Calculate the factorial of a number.
@@ -147,13 +138,6 @@ def factorial(n: int) -> int:
         int: Factorial of n
     """
     # student implementation goes here
-    if n >0 :
-        fact = factorial(n)
-        return fact
-    if n == 0:
-        return 1
-    else:
-        return None
 
 
 # factorial(0) → 1
@@ -174,8 +158,6 @@ def power(a: float, b: int) -> float:
         float: Result of a raised to the power of b
     """
     # student implementation goes here
-    calc_power = a**b
-    return calc_power
 
 
 # power(2, 3) → 8
@@ -199,10 +181,7 @@ def distance(x1: float, y1: float, x2: float, y2: float) -> float:
         float: Euclidean distance between the two points
     """
     # student implementation goes here
-    result = pow(((x2 - x1)**2 + (y2 - y1)**2)**0.5)
-    return result
 
-print((0, 0, 3, 4)) #и т.п.
 
 # distance(0, 0, 3, 4) → 5.0
 # distance(1, 2, 1, 2) → 0.0
@@ -221,11 +200,6 @@ def fibonacci(n: int) -> int:
         int: n-th Fibonacci number
     """
     # student implementation goes here
-    fib = [0, 1]
-    for i in range(2, n + 1):
-        fib.append(fib[i - 1] + fib[i - 2])
-    return fib[n]
-print(0)
 
 
 # fibonacci(0) → 0
@@ -246,13 +220,6 @@ def is_prime(n: int) -> bool:
         bool: True if n is prime, False otherwise
     """
     # student implementation goes here
-    if n < 2:
-        return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-
 
 
 # is_prime(2) → True
