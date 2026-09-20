@@ -177,16 +177,28 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-    if (isinstance(profile, tuple)
-    and len(profile) == 3
-    and isinstance(profile[0], str)
-    and isinstance(profile[1], dict)
-    and all(isinstance(key, str) for key in profile[1])
-    and all(isinstance(value, float) for value in profile[1].values())
-    and isinstance(profile[2], int)
-    ):
-        return True
-    return False
+    if not isinstance(profile, tuple):
+        return False
+
+    if len(profile) != 3:
+        return False
+
+    if not isinstance(profile[0], str):
+        return False
+
+    if not isinstance(profile[1], dict):
+        return False
+
+    if not all(isinstance(key, str) for key in profile[1]):
+        return False
+
+    if not all(isinstance(value, float) for value in profile[1].values()):
+        return False
+
+    if not isinstance(profile[2], int):
+        return False
+
+    return True
 
 
 
@@ -246,13 +258,14 @@ def detect_language_by_top_n(
     if intersection_1 is None or intersection_2 is None:
         return None
     if intersection_1 > intersection_2:
-        return profile_1[0]
+        result = profile_1[0]
     if intersection_2 > intersection_1:
-        return profile_2[0]
-    else:
-        if profile_1[0] < profile_2[0]:
-            return profile_1[0]
-        return profile_2[0]
+        result = profile_2[0]
+    if profile_1[0] < profile_2[0]:
+        result = profile_1[0]
+    result = profile_2[0]
+
+    return result
 
 # Mark 8
 
@@ -363,13 +376,14 @@ def detect_language_by_mse(
         return None
 
     if mse_1 < mse_2:
-        return profile_1[0]
+        result = profile_1[0]
     if mse_2 < mse_1:
-        return profile_2[0]
-    else:
-        if profile_1[0] < profile_2[0]:
-            return profile_1[0]
-        return profile_2[0]
+        result = profile_2[0]
+    if profile_1[0] < profile_2[0]:
+        result = profile_1[0]
+    result = profile_2[0]
+
+    return result
 
 
 
