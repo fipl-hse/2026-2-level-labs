@@ -32,7 +32,7 @@ def tokenize(text: str) -> Sequence[str] | None:
 
     tokens = []
     for word in text.split():
-        cleaned = ''.join(ch for ch in word if ch.isalpha())
+        cleaned = ''.join(char for char in word if char.isalpha())
         if cleaned:
             tokens.append(cleaned.lower())
     return tokens
