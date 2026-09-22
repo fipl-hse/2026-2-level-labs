@@ -4,13 +4,13 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 from main import (
-    tokenize,
-    remove_stop_words,
     calculate_frequencies,
-    get_top_n_words,
+    compare_profiles_by_top_n
     create_language_profile,
-    compare_profiles_by_top_n,
-    detect_language_by_top_n
+    detect_language_by_top_n,
+    get_top_n_words,
+    remove_stop_words,
+    tokenize
 )
 
 
@@ -62,3 +62,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    
