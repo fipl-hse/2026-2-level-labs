@@ -88,8 +88,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         else:
             freq_dict[token] = 1
 
-    for k in freq_dict.keys():
-        freq_dict[k] /= len(tokens)
+    freq_dict = {k: v / len(tokens) for k, v in freq_dict.items()}
 
     return freq_dict
 
