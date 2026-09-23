@@ -7,8 +7,8 @@ Language detection starter.
 from lab_1_classify_profile.main import (
         create_language_profile,
         detect_language_by_mse,
-        check_profile
     )
+
 
 def main() -> None:
     """
@@ -24,16 +24,11 @@ def main() -> None:
         en_text = file.read()
     # result = None
     en_profile = create_language_profile("en", en_text, stopwords)
+    assert en_profile is not None, "en_profile resulted as None"
     de_profile = create_language_profile("de", de_text, stopwords)
+    assert de_profile is not None, "de_profile resulted as None"
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
-    if not check_profile(en_profile):
-        return
-
-    if not check_profile(de_profile):
-        return
-
-    if not check_profile(unknown_profile):
-        return
+    assert unknown_profile is not None, "unknown_profile resulted as None"
     result = detect_language_by_mse(
         unknown_profile,
         en_profile,

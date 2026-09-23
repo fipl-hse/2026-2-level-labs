@@ -177,22 +177,16 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-    if not isinstance(profile, tuple):
-        return False
-
-    if len(profile) != 3:
+    if not isinstance(profile, tuple) or len(profile) != 3:
         return False
 
     if not isinstance(profile[0], str):
         return False
 
-    if not isinstance(profile[1], dict):
-        return False
-
-    if not all(isinstance(key, str) for key in profile[1]):
-        return False
-
-    if not all(isinstance(value, float) for value in profile[1].values()):
+    if (not isinstance(profile[1], dict)
+    or not all(isinstance(key, str) for key in profile[1])
+    or not all(isinstance(value, float) for value in profile[1].values())
+    ):
         return False
 
     if not isinstance(profile[2], int):
@@ -259,14 +253,15 @@ def detect_language_by_top_n(
         return None
     if intersection_1 > intersection_2:
         result = profile_1[0]
-    if intersection_2 > intersection_1:
+    elif intersection_2 > intersection_1:
         result = profile_2[0]
-    if profile_1[0] < profile_2[0]:
-        result = profile_1[0]
-    result = profile_2[0]
+    else:
+        if profile_1[0] < profile_2[0]:
+            result = profile_1[0]
+        else:
+            result = profile_2[0]
 
     return result
-
 # Mark 8
 
 
@@ -377,11 +372,13 @@ def detect_language_by_mse(
 
     if mse_1 < mse_2:
         result = profile_1[0]
-    if mse_2 < mse_1:
+    elif mse_2 < mse_1:
         result = profile_2[0]
-    if profile_1[0] < profile_2[0]:
-        result = profile_1[0]
-    result = profile_2[0]
+    else:
+        if profile_1[0] < profile_2[0]:
+            result = profile_1[0]
+        else:
+            result = profile_2[0]
 
     return result
 
