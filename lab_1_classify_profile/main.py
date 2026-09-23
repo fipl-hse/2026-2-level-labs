@@ -288,6 +288,33 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
+    if not isinstance(predicted, Sequence) or not isinstance(actual, Sequence):
+        return None
+
+    if not all (isinstance(element, float) for element in predicted):
+        return None
+
+    if not all (isinstance(element, float) for element in actual):
+        return None
+
+    if len(predicted) != len(actual):
+        return None
+
+    if not predicted:
+        return 0.0
+
+    if not actual:
+        return 0.0
+
+    sum_squared_error = 0.0
+
+    for i in range(len(actual)):
+        error = actual[i] - predicted[i]
+        sum_squared_error += error ** 2
+
+    mse_calculated = sum_squared_error / len(actual)
+
+    return mse_calculated
 
 
 def compare_profiles_by_mse(
@@ -305,7 +332,39 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if not check_profile(unknown_profile):
+        return None
 
+    if not check_profile(profile_to_compare):
+        return None
+
+    dict_unknown = unknown_profile[1]
+    dict_compare = profile_to_compare[1]
+
+    tokens_unknown = []
+    tokens_compare = []
+
+    for key in dict_unknown:
+        tokens_unknown.append(key)
+    for key in dict_compare:
+        tokens_compare.append(key)
+
+    set_dict_unknown = set(tokens_unknown)
+    set_dict_compare = set(tokens_compare)
+
+    all_tokens = set_dict_unknown | set_dict_compare
+
+    y_val = []
+    p_val = []
+
+    for token in all_tokens:
+        y = dict_unknown.get(token, 0.0)
+        p = dict_compare.get(token, 0.0)
+
+    y_val.append(y)
+    p_val.append(p)
+
+    return calculate_mse(p_val, y_val)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
