@@ -305,8 +305,8 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
 
     mse_summa = 0
-    for i, word in enumerate(actual):
-        mse_summa += ((actual[i] - predicted[i])**2)
+    for i, value in enumerate(actual):
+        mse_summa += ((value - predicted[i])**2)
 
     mse = mse_summa/len(actual)
     return mse
