@@ -41,7 +41,6 @@ def tokenize(text: str) -> Sequence[str] | None:
     return tokens
 
 
-
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
     Removes stop words
@@ -142,10 +141,11 @@ def create_language_profile(
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    if not isinstance(stop_words, (list, tuple)) or not all(
-        isinstance(word, str) for word in stop_words
-    ):
+    if not isinstance(stop_words, (list, tuple)):
         return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
 
     tokens = tokenize(text)
     if tokens is None:
@@ -160,7 +160,6 @@ def create_language_profile(
         return None
 
     return (language, frequency, len(frequency))
-
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -212,9 +211,14 @@ def compare_profiles_by_top_n(
 
     unknown_words = get_top_n_words(unknown_profile[1], top_n)
     compare_words = get_top_n_words(profile_to_compare[1], top_n)
+    if unknown_words is None or compare_words is None:
+        return None
 
     unknown_set = set(unknown_words)
     compare_set = set(compare_words)
+
+    if not unknown_set:
+        return 0.0
 
     return len(unknown_set.intersection(compare_set)) / len(unknown_set)
 
@@ -245,10 +249,15 @@ def detect_language_by_top_n(
 
     distance_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     distance_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    if distance_1 is None or distance_2 is None:
+        return None
 
-    if distance_1 >= distance_2:
+    if distance_1 > distance_2:
         return profile_1[0]
-    return profile_2[0]
+    if distance_2 > distance_1:
+        return profile_2[0]
+
+    return min(profile_1[0], profile_2[0])
 
 
 # Mark 8

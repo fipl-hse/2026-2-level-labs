@@ -128,7 +128,6 @@ def front_times(input_string: str, how_many: int) -> str:
     """
     # student implementation goes here
 
-
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
 # front_times('Abc', 3) → 'AbcAbcAbc'
@@ -149,6 +148,8 @@ def extra_end(input_string: str) -> str:
         str: Resulting string
     """
     # student implementation goes here
+    input_string[-2,-1]
+    return (input_s
 
 
 # extra_end('Hello') → 'lololo'
