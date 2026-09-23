@@ -180,7 +180,9 @@ def check_profile(profile: ProfileType) -> bool:
     if len(profile) != 3:
         return False
 
-    if not (isinstance(profile[0], str) and isinstance(profile[1], dict) and isinstance(profile[2], int)):
+    if not (isinstance(profile[0], str) and
+    isinstance(profile[1], dict) and
+    isinstance(profile[2], int)):
         return False
 
     for key, value in profile[1].items():
@@ -250,27 +252,21 @@ def detect_language_by_top_n(
     if not (
         check_profile(unknown_profile) and
         check_profile(profile_1) and
-        check_profile(profile_2)
-        ):
-        return None
-
-    if not isinstance(top_n, int):
+        check_profile(profile_2) and
+        isinstance(top_n, int)):
         return None
 
     compare_unknown_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     compare_unknown_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
 
-    if compare_unknown_1 is None:
-        return None
-    if compare_unknown_2 is None:
+    if (compare_unknown_1 is None) or (compare_unknown_2 is None):
         return None
 
     if compare_unknown_1 == compare_unknown_2:
         return min(profile_2[0], profile_1[0])
-    elif compare_unknown_1 < compare_unknown_2:
+    if compare_unknown_1 < compare_unknown_2:
         return profile_2[0]
-    else:
-        return profile_1[0]
+    return profile_1[0]
 
 
 # Mark 8
@@ -309,7 +305,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
 
     mse_summa = 0
-    for i in range(len(predicted)):
+    for i, word in enumerate(actual):
         mse_summa += ((actual[i] - predicted[i])**2)
 
     mse = mse_summa/len(actual)
