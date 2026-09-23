@@ -52,7 +52,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(tokens, list) or not isinstance(stop_words, list):
+    if not isinstance(tokens, Sequence) or not isinstance(stop_words, Sequence):
         return None
 
     for i in tokens:
@@ -79,7 +79,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(tokens, list):
+    if not isinstance(tokens, Sequence):
         return None
 
     for i in tokens:
@@ -151,7 +151,7 @@ def create_language_profile(
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(language, str) or not isinstance(text, str) or not isinstance(stop_words, list):
+    if not isinstance(language, str) or not isinstance(text, str) or not isinstance(stop_words, Sequence):
         return None
 
     for i in stop_words:
