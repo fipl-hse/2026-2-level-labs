@@ -148,9 +148,8 @@ def create_language_profile(
     if not isinstance(language, str) or not isinstance(text, str) or not isinstance(stop_words, Sequence):
         return None
 
-    for i in stop_words:
-        if not isinstance(i, str):
-            return None
+    if not all(isinstance(stop_word, str) for stop_word in stop_words):
+        return None
 
     tokens = tokenize(text)
     if tokens is None:
