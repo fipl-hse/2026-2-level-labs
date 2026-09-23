@@ -340,19 +340,20 @@ def compare_profiles_by_mse(
     for word in all_words:
         if word not in list(unknown_profile[1].keys()):
             values_unknown.append(0.0)
-            values_to_compare.append(profile_to_compare[1].get(word))
+            values_to_compare.append(profile_to_compare[1].get(word, 0.0))
         elif word not in list(profile_to_compare[1].keys()):
             values_to_compare.append(0.0)
-            values_unknown.append(unknown_profile[1].get(word))
+            values_unknown.append(unknown_profile[1].get(word, 0.0))
         else:
-            values_to_compare.append(profile_to_compare[1].get(word))
-            values_unknown.append(unknown_profile[1].get(word))
+            values_to_compare.append(profile_to_compare[1].get(word, 0.0))
+            values_unknown.append(unknown_profile[1].get(word, 0.0))
 
+    mse = calculate_mse(values_unknown, values_to_compare)
 
-    if calculate_mse(values_unknown, values_to_compare) is None:
+    if mse is None:
         return None
 
-    mse_compared = round(calculate_mse(values_unknown, values_to_compare), 3)
+    mse_compared = round(mse, 3)
     return mse_compared
 
 
@@ -379,6 +380,9 @@ def detect_language_by_mse(
 
     mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
     mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 is None or mse_2 is None:
+        return None
 
     if mse_1 == mse_2:
         return max(profile_1[0], profile_2[0])
