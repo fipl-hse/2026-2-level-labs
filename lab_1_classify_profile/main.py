@@ -158,7 +158,23 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-
+    if not isinstance(profile,tuple):
+        return False
+    if len(profile) != 3:
+        return False
+    language, counts, len_counts = profile #распаковка кортежа
+    if not isinstance(language, str):
+        return False
+    if not isinstance(counts, dict):
+        return False
+    for key, value in counts.items():
+        if not isinstance(key,str):
+            return False
+        if not isinstance(value,(int,float)):
+            return False
+    if isinstance(len_counts, bool) or not isinstance(len_counts, int):
+        return False
+    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -174,6 +190,27 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_to_compare):
+        return None
+    if not isinstance(top_n,int) or top_n<=0:
+        return None
+    unknown = get_top_n_words(unknown_profile[1],top_n)
+    if unknown is None:
+        return None
+    set_unknown = set(unknown)
+    compare = get_top_n_words(profile_to_compare[1],top_n)
+    if compare is None:
+        return None
+    set_compare = set(compare)
+    common = set_unknown & set_compare
+    if len(set_unknown) != 0:
+        metric = len(common)/len(set_unknown)
+    else: return None
+    return metric
+
+
 
 
 def detect_language_by_top_n(
