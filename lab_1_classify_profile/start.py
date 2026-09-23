@@ -5,7 +5,7 @@ Language detection starter.
 # pylint: disable=unused-variable, duplicate-code
 from main import (
     calculate_frequencies,
-    compare_profiles_by_top_n
+    compare_profiles_by_top_n,
     create_language_profile,
     detect_language_by_top_n,
     get_top_n_words,
@@ -62,4 +62,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-    
