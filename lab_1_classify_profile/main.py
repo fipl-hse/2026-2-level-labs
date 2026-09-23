@@ -119,7 +119,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     top_n_words = []
 
     i = 0
-    for k in sorted_dict.keys():
+    for k, _ in sorted_dict.items():
         i += 1
         if i <= top_n:
             top_n_words.append(k)
