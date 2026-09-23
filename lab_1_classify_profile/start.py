@@ -6,6 +6,7 @@ Language detection starter.
 from main import (
     calculate_frequencies,
     create_language_profile,
+    detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
     remove_stop_words,
@@ -35,6 +36,7 @@ def main() -> None:
     de_profile = create_language_profile ("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
     result = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 15)
+    result = detect_language_by_mse(unknown_profile, de_profile, en_profile)
 
     assert result, "Detection result is None"
 

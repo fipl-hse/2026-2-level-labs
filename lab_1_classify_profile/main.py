@@ -117,8 +117,8 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     top_n_words = [item[0] for item in sort_freq_dct]
 
-    if len(freq_dict) >= top_n:
-        top_n_words = top_n_words[:top_n]
+
+    top_n_words = top_n_words[:top_n]
 
     return top_n_words
 
@@ -290,6 +290,31 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         In case of empty inputs, returns 0.0.
     """
 
+    if not (isinstance(predicted, list) and
+    isinstance(actual, list) and
+    len(predicted) == len(actual)):
+        return None
+
+
+    if not (len(predicted) != 0 and len(actual) !=0):
+        return 0.0
+
+    for item in actual:
+        if not isinstance(item, float):
+            return None
+
+    for item in predicted:
+        if not isinstance(item, float):
+            return None
+
+
+    mse_summa = 0
+    for i in range(len(predicted)):
+        mse_summa += ((actual[i] - predicted[i])**2)
+
+    mse = mse_summa/len(actual)
+    return mse
+
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
@@ -306,6 +331,33 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if not (check_profile(unknown_profile) and
+    check_profile(profile_to_compare)
+    ):
+        return None
+
+    all_words = list(unknown_profile[1].keys())[:]
+    all_words = [word for word in list(profile_to_compare[1].keys()) if word not in all_words]
+
+    values_unknown = []
+    values_to_compare = []
+    for word in all_words:
+        if word not in list(unknown_profile[1].keys()):
+            values_unknown.append(0.0)
+            values_to_compare.append(profile_to_compare[1].get(word))
+        elif word not in list(profile_to_compare[1].keys()):
+            values_to_compare.append(0.0)
+            values_unknown.append(unknown_profile[1].get(word))
+        else:
+            values_to_compare.append(profile_to_compare[1].get(word))
+            values_unknown.append(unknown_profile[1].get(word))
+
+
+    if calculate_mse(values_unknown, values_to_compare) is None:
+        return None
+
+    mse_compared = round(calculate_mse(values_unknown, values_to_compare), 3)
+    return mse_compared
 
 
 def detect_language_by_mse(
@@ -324,6 +376,21 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not (check_profile(unknown_profile)
+    and check_profile(profile_1)
+    and check_profile(profile_2)):
+        return None
+
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 == mse_2:
+        return max(profile_1[0], profile_2[0])
+
+    if mse_1 < mse_2:
+        return profile_1[0]
+    return profile_2[0]
+
 
 
 # Mark 10
