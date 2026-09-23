@@ -4,10 +4,7 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 
-from lab_1_classify_profile.main import (
-        create_language_profile,
-        detect_language_by_mse,
-    )
+from lab_1_classify_profile.main import (create_language_profile, detect_language_by_mse)
 
 
 def main() -> None:
@@ -35,7 +32,7 @@ def main() -> None:
         de_profile,
     )
     print(result)
-    # assert result, "Detection result is None"
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

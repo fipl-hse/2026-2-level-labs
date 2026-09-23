@@ -28,22 +28,13 @@ def tokenize(text: str) -> Sequence[str] | None:
     """
     if not isinstance(text, str):
         return None
-    processed_tokens = []
-    unprocessed_tokens = text.split()
-    for word in unprocessed_tokens:
-        word = word.lower()
-        if word.isalpha():
-            processed_tokens.append(word)
-        else:
-            alpha_symbols = []
-            for symbol in word:
-                if symbol.isalpha():
-                    alpha_symbols.append(symbol)
-            joined_symbols = ''.join(alpha_symbols)
+    processed_text = []
+    for symbol in text.lower():
+        if symbol.isalpha() or symbol.isspace():
+            processed_text.append(symbol)
 
-            if joined_symbols:
-                processed_tokens.append(joined_symbols)
-    return processed_tokens
+    tokens = ''.join(processed_text).split()
+    return tokens
 
 
 
@@ -89,16 +80,15 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     if not all(isinstance(token, str) for token in tokens):
         return None
 
-    quantity = {}
     freq_dict = {}
-    for i in tokens:
-        if i not in quantity:
-            quantity[i] = 1
-        else:
-            quantity[i] += 1
     total = len(tokens)
-    for token, count in quantity.items():
-        freq_dict[token] = count / total
+
+    for i in tokens:
+        if i not in freq_dict:
+            freq_dict[i] = 1 / total
+    else:
+        freq_dict[i] += 1 / total
+
     return freq_dict
 
 
@@ -298,9 +288,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     for i, prediction in enumerate(predicted):
         squares += (prediction - actual[i]) ** 2
 
-    total = squares / len(predicted)
-
-    return total
+    return squares / len(predicted)
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
@@ -320,12 +308,12 @@ def compare_profiles_by_mse(
     if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
         return None
 
-    combined_tokens = set(unknown_profile[1]) | set(profile_to_compare[1])
+    all_profile_tokens = set(unknown_profile[1]) | set(profile_to_compare[1])
 
     values_1 = []
     values_2 = []
 
-    for token in combined_tokens:
+    for token in all_profile_tokens:
         if token in unknown_profile[1]:
             values_1.append(unknown_profile[1][token])
         else:
