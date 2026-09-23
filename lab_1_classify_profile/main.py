@@ -61,9 +61,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     if not all(isinstance(stop_word, str) for stop_word in stop_words):
         return None
 
-    tokens = [token for token in tokens if token not in stop_words]
-
-    return tokens
+    return [token for token in tokens if token not in stop_words]
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -80,9 +78,8 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     if not isinstance(tokens, Sequence):
         return None
 
-    for i in tokens:
-        if not isinstance(i, str):
-            return None
+    if not all(isinstance(token, str) for token in tokens):
+        return None
 
     freq_dict = dict()
     for token in tokens:
@@ -113,12 +110,12 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     if not isinstance(freq_dict, dict) or not isinstance(top_n, int) or top_n <= 0:
         return None
 
-    for k, v in freq_dict.items():
-        if not isinstance(k, str) or not isinstance(v, float):
-            return None
+    if not all(isinstance(k, str) and isinstance(v, float) for k, v in freq_dict.items()):
+        return None
 
     sorted_dict = dict(
         sorted(freq_dict.items(), key=lambda item: (-item[1], item[0])))
+
     top_n_words = []
 
     i = 0
@@ -172,9 +169,7 @@ def create_language_profile(
     cleared_tokens = remove_stop_words(tokens, stop_words)
     freq_dict = calculate_frequencies(cleared_tokens)
 
-    lang_prof = (language, freq_dict, len(freq_dict))
-
-    return lang_prof
+    return (language, freq_dict, len(freq_dict))
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -200,9 +195,8 @@ def check_profile(profile: ProfileType) -> bool:
     if not isinstance(language, str) or not isinstance(freq_dict, dict) or not isinstance(length, int):
         return False
 
-    for k, v in freq_dict.items():
-        if not isinstance(k, str) or not isinstance(v, float):
-            return False
+    if not all(isinstance(k, str) and isinstance(v, float) for k, v in freq_dict.items()):
+        return False
 
     return True
 
