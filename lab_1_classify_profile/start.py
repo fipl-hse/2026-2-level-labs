@@ -31,7 +31,8 @@ def main() -> None:
     profile_de = create_language_profile("de", de_text, stopwords)
     profile_en = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("en", unknown_text, stopwords)
-    result = compare_profiles_by_top_n(unknown_profile, profile_en, profile_de)
+    result = compare_profiles_by_top_n(
+        unknown_profile, profile_en, profile_de, 15)
     assert result, "Detection result is None"
 
 
