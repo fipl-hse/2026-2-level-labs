@@ -58,6 +58,9 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         if not isinstance(word, str):
             return None
 
+    if tokens is None:
+        return None
+
     tokens = [token for token in tokens if token not in stop_words]
     return tokens
 
@@ -77,6 +80,9 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     for token in tokens:
         if not isinstance (token, str):
             return None
+
+    if tokens is None:
+        return None
 
     freq_dict = {}
     for token in tokens:
@@ -110,6 +116,9 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     for key, value in freq_dict.items():
         if not (isinstance (key, str) and isinstance (value, float)):
             return None
+
+    if freq_dict is None:
+        return None
 
     sort_freq_dct = sorted(freq_dict.items(), key = lambda freqs: freqs[0])
     sort_freq_dct = sorted(sort_freq_dct, key = lambda freqs: freqs[1], reverse = True)
@@ -256,6 +265,11 @@ def detect_language_by_top_n(
         isinstance(top_n, int)):
         return None
 
+    if (unknown_profile is None or
+    profile_1 is None or
+    profile_2 is None):
+        return None
+
     compare_unknown_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     compare_unknown_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
 
@@ -376,6 +390,11 @@ def detect_language_by_mse(
     if not (check_profile(unknown_profile)
     and check_profile(profile_1)
     and check_profile(profile_2)):
+        return None
+
+    if (unknown_profile is None or
+    profile_1 is None or
+    profile_2 is None):
         return None
 
     mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
