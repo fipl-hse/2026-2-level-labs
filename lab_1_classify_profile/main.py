@@ -276,6 +276,24 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
+    if (
+    not isinstance(predicted, (list, tuple))
+    or not isinstance(actual, (list, tuple))
+    ):
+        return None
+    if len(predicted) != len(actual):
+        return None
+    if not all(isinstance(value, (int, float)) for value in predicted):
+        return None
+    if not all(isinstance(value, (int, float)) for value in actual):
+        return None
+    if not predicted:
+        return 0.0
+
+    sum_of_squares = sum((y - p) ** 2 for y, p in zip(predicted, actual))
+    count = len(predicted)
+
+    return sum_of_squares / count
 
 
 def compare_profiles_by_mse(
@@ -293,7 +311,24 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_to_compare)
+    ):
+        return None
 
+    unknown_freq = unknown_profile[1]
+    known_freq = profile_to_compare[1]
+
+    all_tokens = set(unknown_freq).union(set(known_freq))
+
+    unknown_values = []
+    known_values = []
+    for token in all_tokens:
+        unknown_values.append(unknown_freq.get(token, 0.0))
+        known_values.append(known_freq.get(token, 0.0))
+
+    return calculate_mse(unknown_values, known_values)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
@@ -311,6 +346,24 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
+        return None
+
+    mse_1_profile = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2_profile = compare_profiles_by_mse(unknown_profile, profile_2)
+    if mse_1_profile is None or mse_2_profile is None:
+        return None
+
+    if mse_1_profile < mse_2_profile:
+        return profile_1[0]
+    if mse_2_profile < mse_1_profile:
+        return profile_2[0]
+
+    return min(profile_1[0], profile_2[0])
 
 
 # Mark 10
