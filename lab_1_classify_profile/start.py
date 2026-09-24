@@ -51,7 +51,7 @@ def main() -> None:
     assert de_profile is not None, "de_profile resulted as None"
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
     assert unknown_profile is not None, "unknown_profile resulted as None"
-    result = detect_language_by_top_n(unknown_profile, de_profile, en_profile)
+    result = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 15)
     print(result)
 
     #mark 8
