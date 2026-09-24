@@ -5,6 +5,8 @@ Language detection
 """
 
 # pylint:disable=unused-argument
+import json
+
 from typing import Sequence
 
 FreqDictType = dict[str, float]
@@ -376,10 +378,8 @@ def detect_language_by_mse(
         return profile_2[0]
     return min(profile_1[0], profile_2[0])
 
-
 # Mark 10
 
-import json
 
 def save_profile(profile: ProfileType, save_path: str) -> bool:
     """
@@ -578,6 +578,6 @@ def print_report(
     print("---------------")
 
     for langugage, scores in metrics_stats:
-        print(f"{langugage}: MSE {scores["MSE"]:.5f}  Top-N Score {scores["Top-N"]:.5f}")
+        print(f"{langugage}: MSE {scores['MSE']:.5f}  Top-N Score {scores['Top-N']:.5f}")
 
     return None
