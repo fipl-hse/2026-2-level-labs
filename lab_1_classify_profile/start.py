@@ -4,15 +4,17 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 
+from main import (
+    detect_language_by_mse,
+    create_language_profile,
+)
+
 
 def main() -> None:
     """
     Launches an implementation.
     """
-    from main import (
-        detect_language_by_mse,
-        create_language_profile,
-    )
+
     with open("lab_1_classify_profile/assets/texts/de.txt", "r", encoding="utf-8") as file:
         de_text = file.read()
     with open("lab_1_classify_profile/assets/texts/unknown.txt", "r", encoding="utf-8") as file:
