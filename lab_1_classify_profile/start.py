@@ -35,18 +35,28 @@ def main() -> None:
         en_text = file.read()
 
     de_tokens = tokenize(de_text)
+    if de_tokens is None:
+        return
 
     de_tokens = remove_stop_words(de_tokens, stopwords)
+    if de_tokens is None:
+        return
 
     de_freq = calculate_frequencies(de_tokens)
+    if de_freq is None:
+        return
 
     de_top_words = get_top_n_words(de_freq, 15)
+    if de_top_words is None:
+        return
 
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
 
-    if de_profile and en_profile and unknown_profile is None:
+    if de_profile is None or \
+    en_profile is None or \
+    unknown_profile is None:
         return
 
     result = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 15)
