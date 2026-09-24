@@ -164,10 +164,6 @@ def create_language_profile(
     if freq_dict is None:
         return None
 
-    tokens = tokenize(text)
-    cleared_tokens = remove_stop_words(tokens, stop_words)
-    freq_dict = calculate_frequencies(cleared_tokens)
-
     return (language, freq_dict, len(freq_dict))
 
 
@@ -373,6 +369,9 @@ def detect_language_by_mse(
 
     mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
     mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 is None or mse_2 is None:
+        return None
 
     if mse_1 < mse_2:
         return profile_1[0]
