@@ -6,7 +6,6 @@ Language detection
 
 # pylint:disable=unused-argument
 import json
-
 from typing import Sequence
 
 FreqDictType = dict[str, float]
