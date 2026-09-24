@@ -344,8 +344,8 @@ def compare_profiles_by_mse(
         y = dict_unknown.get(token, 0.0)
         p = dict_compare.get(token, 0.0)
 
-    y_val.append(y)
-    p_val.append(p)
+        y_val.append(y)
+        p_val.append(p)
 
     return calculate_mse(p_val, y_val)
 
