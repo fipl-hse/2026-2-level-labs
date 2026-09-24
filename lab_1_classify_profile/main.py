@@ -293,14 +293,11 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if not predicted or not actual:
         return 0.0
 
-    sum_squared_error = 0.0
+    results_mse = [(a - p) ** 2 for a, p in zip(actual, predicted)]
+    total_mse = sum(results_mse)
+    mse = total_mse / len(actual)
 
-    for i, a in enumerate(actual):
-        sum_squared_error += (a - predicted[i]) ** 2
-
-    mse_calculated = sum_squared_error / len(actual)
-
-    return mse_calculated
+    return mse
 
 
 def compare_profiles_by_mse(
@@ -386,9 +383,9 @@ def detect_language_by_mse(
         return name_lang_1
     if mse_2 < mse_1:
         return name_lang_2
-    else:
-        name_in_order = sorted([name_lang_1, name_lang_2])
-        return name_in_order[0]
+
+    name_in_order = sorted([name_lang_1, name_lang_2])
+    return name_in_order[0]
 
 # Mark 10
 
