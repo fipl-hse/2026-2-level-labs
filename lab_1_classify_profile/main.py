@@ -384,7 +384,7 @@ def detect_language_by_mse(
 
     if mse_1 < mse_2:
         return name_lang_1
-    elif mse_2 < mse_1:
+    if mse_2 < mse_1:
         return name_lang_2
     else:
         name_in_order = sorted([name_lang_1, name_lang_2])
