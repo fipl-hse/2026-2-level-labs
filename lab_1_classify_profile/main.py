@@ -5,6 +5,8 @@ Language detection
 """
 
 # pylint:disable=unused-argument
+
+
 from typing import Sequence
 
 FreqDictType = dict[str, float]
@@ -81,7 +83,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     if not all(isinstance(token, str) for token in tokens):
         return None
 
-    freq_dict = dict()
+    freq_dict = {}
     for token in set(tokens):
         freq_dict[token] = tokens.count(token) / len(tokens)
 
@@ -140,7 +142,11 @@ def create_language_profile(
         Returns None in case of incorrect input types.
     """
 
-    if not isinstance(language, str) or not isinstance(text, str) or not isinstance(stop_words, Sequence):
+    if (
+        not isinstance(language, str)
+        or not isinstance(text, str)
+        or not isinstance(stop_words, Sequence)
+    ):
         return None
 
     if not all(isinstance(stop_word, str) for stop_word in stop_words):
@@ -185,7 +191,11 @@ def check_profile(profile: ProfileType) -> bool:
 
     language, freq_dict, length = profile
 
-    if not isinstance(language, str) or not isinstance(freq_dict, dict) or not isinstance(length, int):
+    if (
+        not isinstance(language, str)
+        or not isinstance(freq_dict, dict)
+        or not isinstance(length, int)
+    ):
         return False
 
     if not all(isinstance(k, str) and isinstance(v, float) for k, v in freq_dict.items()):
@@ -209,7 +219,11 @@ def compare_profiles_by_top_n(
         Returns None in case of incorrect input types.
     """
 
-    if not check_profile(unknown_profile) or not check_profile(profile_to_compare) or not isinstance(top_n, int):
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_to_compare)
+        or not isinstance(top_n, int)
+    ):
         return None
 
     unknown_top_most_common = get_top_n_words(unknown_profile[1], top_n)
@@ -268,9 +282,7 @@ def detect_language_by_top_n(
         return profile_1[0]
     if lang_1_probability < lang_2_probability:
         return profile_2[0]
-    if profile_1[0] < profile_2[0]:
-        return profile_1[0]
-    return profile_2[0]
+    return min(profile_1[0], profile_2[0])
 
     # Mark 8
 
@@ -299,7 +311,9 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if len(predicted) != len(actual):
         return None
 
-    return sum([(predicted[i] - actual[i]) ** 2 for i in range(len(predicted))]) / len(predicted)
+    return sum(
+        (predicted[i] - actual[i]) ** 2 for i in range(len(predicted))
+    ) / len(predicted)
 
 
 def compare_profiles_by_mse(
@@ -362,10 +376,9 @@ def detect_language_by_mse(
 
     if mse_1 < mse_2:
         return profile_1[0]
-    elif mse_2 > mse_1:
+    if mse_2 > mse_1:
         return profile_2[0]
-    else:
-        return min(profile_1[0], profile_2[0])
+    return min(profile_1[0], profile_2[0])
 
 # Mark 10
 
