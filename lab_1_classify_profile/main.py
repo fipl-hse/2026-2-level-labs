@@ -289,6 +289,18 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         In case of empty inputs, returns 0.0.
     """
 
+    if not isinstance(predicted, Sequence) or not isinstance(actual, Sequence):
+        return None
+    if (not all(isinstance(el, float) for el in predicted)
+            or not all(isinstance(el,  float) for el in actual)):
+        return None
+    if predicted == [] or actual == []:
+        return 0.0
+    if len(predicted) != len(actual):
+        return None
+
+    return sum([(predicted[i] - actual[i]) ** 2 for i in range(len(predicted))]) / len(predicted)
+
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
