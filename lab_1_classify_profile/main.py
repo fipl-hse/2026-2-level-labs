@@ -89,7 +89,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     freq = {}
     for token in tokens:
         if token not in freq:
-            freq[token] = 0
+            freq[token] = 0.0
         freq[token] += 1.0 / total
 
     return freq
@@ -208,14 +208,14 @@ def compare_profiles_by_top_n(
     if not isinstance (top_n, int) or top_n<=0:
         return None
 
-    top_words_unknown = get_top_n_words(unknown_profile[1], top_n)
-    top_words_known = get_top_n_words(profile_to_compare[1], top_n)
+    top_words_unknown_seq = get_top_n_words(unknown_profile[1], top_n)
+    top_words_known_seq = get_top_n_words(profile_to_compare[1], top_n)
 
-    if not top_words_unknown:
+    if not top_words_unknown_seq or not top_words_known_seq:
         return None
 
-    top_words_unknown = set(top_words_unknown)
-    top_words_known = set(top_words_known)
+    top_words_unknown = set(top_words_unknown_seq)
+    top_words_known = set(top_words_known_seq)
 
     common_words = top_words_unknown.intersection(top_words_known)
     compared_words = len(common_words)/len(top_words_unknown)
