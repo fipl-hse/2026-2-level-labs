@@ -3,14 +3,15 @@ Language detection starter.
 """
 from main import (
     calculate_frequencies,
+    check_profile,
+    compare_profiles_by_top_n,
+    create_language_profile,
+    detect_language_by_top_n,
     get_top_n_words,
     remove_stop_words,
     tokenize,
-    create_language_profile,
-    check_profile,
-    compare_profiles_by_top_n,
-    detect_language_by_top_n
 )
+
 # pylint: disable=unused-variable, duplicate-code
 
 
