@@ -318,6 +318,20 @@ def compare_profiles_by_mse(
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
 
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
+        return None
+
+    union_tokens = set(unknown_profile[1].keys()) | \
+        set(profile_to_compare[1].keys())
+    tokens_freq_unknown = []
+    tokens_freq_to_compare = []
+
+    for token in union_tokens:
+        tokens_freq_unknown.append(unknown_profile[1].get(token, 0.0))
+        tokens_freq_to_compare.append(profile_to_compare[1].get(token, 0.0))
+
+    return calculate_mse(tokens_freq_unknown, tokens_freq_to_compare)
+
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
