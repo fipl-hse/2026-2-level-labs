@@ -379,6 +379,7 @@ def detect_language_by_mse(
 
 # Mark 10
 
+import json
 
 def save_profile(profile: ProfileType, save_path: str) -> bool:
     """
@@ -397,8 +398,6 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
     or not isinstance(save_path, str)
     ):
         return False
-
-    import json
 
     language, freq_dict, n_words = profile
     lang_dict = {
@@ -425,16 +424,14 @@ def load_profile(path_to_file: str) -> ProfileType | None:
         ProfileType | None: Loaded profile.
         Returns None in case of incorrect input types.
     """
-    if (not isinstance(path_to_file, str)):
+    if not isinstance(path_to_file, str):
         return None
-
-    import json
 
     with open(path_to_file, "r", encoding="utf-8") as file:
         language_data = json.load(file)
 
     if not isinstance(language_data, dict):
-            return None
+        return None
 
     if not all(key in language_data for key in ("name", "freq", "n_words")):
         return None
@@ -565,9 +562,6 @@ def print_report(
     popular_words = sorted(top_words)
 
     words = freq_dict.keys()
-    max_word = max(words, key=len)
-    min_word = min(words, key=len)
-
     if words:
         average_length = sum(len(word) for word in words) / len(words)
     else:
@@ -576,16 +570,14 @@ def print_report(
     print("Unknown language stats")
     print("======================")
     print(f"Popular words: {popular_words}")
-    print(f"Max length word: {max_word!r}")
-    print(f"Min length word: {min_word!r}")
+    print(f"Max length word: {max(words, key=len)!r}")
+    print(f"Min length word: {min(words, key=len)!r}")
     print(f"Average token length: {average_length:.5f}")
     print()
     print("Language scores")
     print("---------------")
 
     for langugage, scores in metrics_stats:
-        mse = scores["MSE"]
-        top_score = scores["Top-N"]
-        print(f"{langugage}: MSE {mse:.5f}  Top-N Score {top_score:.5f}")
+        print(f"{langugage}: MSE {scores["MSE"]:.5f}  Top-N Score {scores["Top-N"]:.5f}")
 
     return None

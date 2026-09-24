@@ -13,7 +13,6 @@ from lab_1_classify_profile.main import (
     get_top_n_words,
     print_report,
     remove_stop_words,
-    save_profile,
     tokenize,
 )
 
@@ -33,14 +32,14 @@ def main() -> None:
     # result = None
     # assert result, "Detection result is None"
 
-    tokens = tokenize(de_text)
-    assert tokens is not None, "tokenize resulted as None"
-    tokens_without_stop_words = remove_stop_words(tokens, stopwords)
-    assert tokens_without_stop_words is not None, "tokens_without_stop_words resulted as None"
-    freq_dict = calculate_frequencies(tokens_without_stop_words)
-    assert freq_dict is not None, "freq_dict resulted as None"
-    top_words = get_top_n_words(freq_dict, 7)
-    assert top_words is not None, "get_top_n_words resulted as None"
+    # tokens = tokenize(de_text)
+    # assert tokens is not None, "tokenize resulted as None"
+    # tokens_without_stop_words = remove_stop_words(tokens, stopwords)
+    # assert tokens_without_stop_words is not None, "tokens_without_stop_words resulted as None"
+    # freq_dict = calculate_frequencies(tokens_without_stop_words)
+    # assert freq_dict is not None, "freq_dict resulted as None"
+    # top_words = get_top_n_words(freq_dict, 7)
+    # assert top_words is not None, "get_top_n_words resulted as None"
     # print(top_words)
 
     en_profile = create_language_profile("en", en_text, stopwords)
@@ -50,12 +49,12 @@ def main() -> None:
     assert de_profile is not None, "Deutsch profile is None"
     assert unknown_profile is not None, "Unknown profile is None"
 
-    result_by_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
-    assert result_by_top_n, "Detection by top n words is None"
+    # result_by_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    # assert result_by_top_n, "Detection by top n words is None"
     # print(result_by_top_n)
 
-    result_by_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
-    assert result_by_mse, "Detection by mse is None"
+    # result_by_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
+    # assert result_by_mse, "Detection by mse is None"
     # print(result_by_mse)
 
     profiles_folder = "lab_1_classify_profile/assets/profiles"
