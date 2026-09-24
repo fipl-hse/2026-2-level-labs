@@ -47,6 +47,8 @@ def main() -> None:
 
     print("Язык текста:", result)
 
+
+
     assert result, "Detection result is None"
 
 

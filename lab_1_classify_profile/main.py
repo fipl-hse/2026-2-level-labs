@@ -26,6 +26,9 @@ def tokenize(text: str) -> Sequence[str] | None:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
+    if not isinstance(text, str):
+        return None
+
     tokens = []
     for word in text.split():
         cleaned = ''.join(ch.lower() for ch in word if ch.isalpha())
