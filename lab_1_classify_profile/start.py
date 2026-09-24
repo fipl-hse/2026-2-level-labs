@@ -6,11 +6,15 @@ Language detection starter.
 
 from lab_1_classify_profile.main import (
     calculate_frequencies,
+    collect_profiles,
     create_language_profile,
+    detect_language_advanced,
     detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
+    print_report,
     remove_stop_words,
+    save_profile,
     tokenize,
 )
 
@@ -48,14 +52,31 @@ def main() -> None:
     assert de_profile is not None
     assert unknown_profile is not None
 
-    result_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
-    print("Detected by Top-N:", result_top_n)
+    print(
+        "Detected by Top-N:",
+        detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15),
+    )
 
     result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
     print("Detected by MSE:", result_mse)
 
-    result = result_mse
-    assert result, "Detection result is None"
+    save_profile(en_profile, "lab_1_classify_profile/assets/profiles")
+    save_profile(de_profile, "lab_1_classify_profile/assets/profiles")
+
+    profiles = collect_profiles(
+        [
+            "lab_1_classify_profile/assets/profiles/en.json",
+            "lab_1_classify_profile/assets/profiles/de.json",
+            "lab_1_classify_profile/assets/profiles/la.json",
+        ]
+    )
+    assert profiles is not None
+
+    results = detect_language_advanced(unknown_profile, profiles, 15)
+    assert results is not None
+    print_report(unknown_profile, results, 15)
+
+    assert result_mse, "Detection result is None"
 
 
 if __name__ == "__main__":

@@ -81,6 +81,7 @@ def average(a: float, b: float, c: float) -> float:
     """
     # student implementation goes here
 
+
 # average(1, 2, 3) → 2.0
 # average(10, 20, 30) → 20.0
 # average(5.5, 6.5, 7.5) → 6.5
@@ -104,7 +105,6 @@ def is_even(n: int) -> bool:
 # is_even(3) → False
 # is_even(0) → True
 # is_even(-4) → True
-    return n % 2 == 0
 
 
 # Task 4:

@@ -4,6 +4,9 @@ Lab 1.
 Language detection
 """
 
+import json
+import os
+
 # pylint:disable=unused-argument
 from typing import Sequence
 
@@ -95,10 +98,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     total = len(tokens)
 
     for token in tokens:
-        freq_dict[token] = freq_dict.get(token, 0) + 1
-
-    for key in freq_dict:
-        freq_dict[key] = freq_dict[key] / total
+        freq_dict[token] = freq_dict.get(token, 0) + 1 / total
 
     return freq_dict
 
@@ -259,18 +259,13 @@ def detect_language_by_top_n(
 
     score_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     score_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
-
     if score_1 is None or score_2 is None:
         return None
 
-    lang_1 = profile_1[0]
-    lang_2 = profile_2[0]
-
-    if score_1 > score_2:
-        return lang_1
-    if score_2 > score_1:
-        return lang_2
-    return min(lang_1, lang_2)
+    return sorted(
+        [(score_1, profile_1[0]), (score_2, profile_2[0])],
+        key=lambda item: (-item[0], item[1]),
+    )[0][1]
 
 # Mark 8
 
@@ -388,6 +383,31 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
         is missing obligatory keys. True if the profile is saved.
     """
 
+    if not check_profile(profile):
+        return False
+    if not isinstance(save_path, str):
+        return False
+
+    language = profile[0]
+    freq_dict = profile[1]
+    n_words = profile[2]
+
+    profile_dict = {
+        "name": language,
+        "freq": freq_dict,
+        "n_words": n_words,
+    }
+
+    try:
+        os.makedirs(save_path, exist_ok=True)
+        file_path = os.path.join(save_path, f"{language}.json")
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump(profile_dict, file, ensure_ascii=False, indent=4)
+    except (OSError, TypeError, ValueError):
+        return False
+
+    return True
+
 
 def load_profile(path_to_file: str) -> ProfileType | None:
     """
@@ -401,6 +421,30 @@ def load_profile(path_to_file: str) -> ProfileType | None:
         Returns None in case of incorrect input types.
     """
 
+    if not isinstance(path_to_file, str):
+        return None
+
+    try:
+        with open(path_to_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, ValueError):
+        return None
+
+    if not isinstance(data, dict) or set(data.keys()) != {"name", "freq", "n_words"}:
+        return None
+
+    name = data["name"]
+    freq = data["freq"]
+    n_words = data["n_words"]
+
+    if not isinstance(name, str) or not isinstance(freq, dict):
+        return None
+    if not isinstance(n_words, int):
+        return None
+
+    profile = (name, freq, n_words)
+    return profile if check_profile(profile) else None
+
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
     """
@@ -413,6 +457,19 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         Sequence[ProfileType] | None: Sequence of loaded profiles.
         Returns None in case of incorrect input types.
     """
+
+    if not isinstance(paths_to_profiles, (list, tuple)):
+        return None
+
+    profiles = []
+    for path in paths_to_profiles:
+        if not isinstance(path, str):
+            return None
+        profile = load_profile(path)
+        if profile is not None:
+            profiles.append(profile)
+
+    return profiles
 
 
 def detect_language_advanced(
@@ -434,6 +491,29 @@ def detect_language_advanced(
         Returns None in case of incorrect input types.
     """
 
+    if (
+        not check_profile(unknown_profile)
+        or not isinstance(known_profiles, (list, tuple))
+        or not isinstance(top_n, int)
+        or top_n <= 0
+    ):
+        return None
+
+    results = []
+    for profile in known_profiles:
+        if not check_profile(profile):
+            return None
+
+        mse = compare_profiles_by_mse(unknown_profile, profile)
+        top_n_score = compare_profiles_by_top_n(unknown_profile, profile, top_n)
+        if mse is None or top_n_score is None:
+            return None
+
+        results.append((profile[0], {"MSE": mse, "Top-N": top_n_score}))
+
+    results.sort(key=lambda item: (item[1]["MSE"], -item[1]["Top-N"], item[0]))
+    return results
+
 
 def print_report(
     unknown_profile: ProfileType, metrics_stats: Sequence[tuple[str, dict[str, float]]], top_n: int
@@ -449,3 +529,46 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
+
+    if not check_profile(unknown_profile) or not isinstance(metrics_stats, (list, tuple)):
+        return
+    if not isinstance(top_n, int) or top_n <= 0:
+        return
+
+    for item in metrics_stats:
+        if not isinstance(item, tuple) or len(item) != 2:
+            return
+        if not isinstance(item[0], str) or not isinstance(item[1], dict):
+            return
+        if "MSE" not in item[1] or "Top-N" not in item[1]:
+            return
+
+    freq_dict = unknown_profile[1]
+    top_words = get_top_n_words(freq_dict, top_n)
+    if top_words is None:
+        return
+
+    tokens = list(freq_dict.keys())
+    if tokens:
+        max_word = max(tokens, key=len)
+        min_word = min(tokens, key=len)
+        avg_length = sum(len(token) for token in tokens) / len(tokens)
+    else:
+        max_word = ""
+        min_word = ""
+        avg_length = 0.0
+
+    print("Unknown language stats")
+    print("======================")
+    print(f"Popular words: {sorted(top_words)}")
+    print(f"Max length word: '{max_word}'")
+    print(f"Min length word: '{min_word}'")
+    print(f"Average token length: {avg_length:.5f}")
+    print()
+    print("Language scores")
+    print("---------------")
+
+    for language, scores in sorted(
+        metrics_stats, key=lambda item: (item[1]["MSE"], -item[1]["Top-N"], item[0])
+    ):
+        print(f"{language}: MSE {scores['MSE']:.5f}  Top-N Score {scores['Top-N']:.5f}")
