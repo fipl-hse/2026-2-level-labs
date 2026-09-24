@@ -85,15 +85,10 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     tokens_quantity = {}
     tokens_frequency = {}
     for token in tokens:
-        if token not in tokens_quantity:
-            tokens_quantity[token] = 1
-        else:
-            tokens_quantity[token] += 1
-    if not tokens:
-        return tokens_frequency
+        tokens_quantity[token] = tokens_quantity.get(token, 0) + 1
+
     for token, quantity in tokens_quantity.items():
-        frequency = quantity / len(tokens)
-        tokens_frequency[token] = frequency
+        tokens_frequency[token] = quantity / len(tokens)
     return tokens_frequency
 
 
@@ -157,7 +152,7 @@ def create_language_profile(
     if freq_dict is None:
         return None
 
-    return (language, freq_dict, len(freq_dict))
+    return language, freq_dict, len(freq_dict)
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -219,12 +214,12 @@ def compare_profiles_by_top_n(
     ):
         return None
 
-    intersecting_top_words = []
-    for top_word in top_unknown_profile:
-        if top_word in top_profile_to_compare:
-            intersecting_top_words.append(top_word)
-    profile_comparison = len(intersecting_top_words) / len(top_unknown_profile)
-    return profile_comparison
+    intersecting_top_words = [
+        top_word for top_word in top_unknown_profile
+        if top_word in top_profile_to_compare
+        ]
+
+    return len(intersecting_top_words) / len(top_unknown_profile)
 
 
 def detect_language_by_top_n(
@@ -297,15 +292,14 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if len(predicted) != len(actual):
         return None
 
-    if len(predicted) == 0:
+    if not predicted:
         return 0.0
 
     squared_difference_sum = 0.0
     for i, predicted_value in enumerate(predicted):
         actual_value = actual[i]
         squared_difference_sum += (predicted_value - actual_value) ** 2
-    mse = squared_difference_sum / len(predicted)
-    return mse
+    return squared_difference_sum / len(predicted)
 
 
 def compare_profiles_by_mse(
@@ -333,21 +327,16 @@ def compare_profiles_by_mse(
     freq_dict_unknown = unknown_profile[1]
     freq_dict_to_compare = profile_to_compare[1]
 
-    all_tokens = []
-    for token in freq_dict_unknown:
-        all_tokens.append(token)
-    for token in freq_dict_to_compare:
-        if token not in all_tokens:
-            all_tokens.append(token)
+    all_tokens = list(freq_dict_unknown)
+    all_tokens += [
+        token for token in freq_dict_to_compare
+        if token not in all_tokens
+        ]
 
-    predicted = []
-    actual = []
-    for token in all_tokens:
-        predicted.append(freq_dict_unknown.get(token, 0.0))
-        actual.append(freq_dict_to_compare.get(token, 0.0))
+    predicted = [freq_dict_unknown.get(token, 0.0) for token in all_tokens]
+    actual = [freq_dict_to_compare.get(token, 0.0) for token in all_tokens]
 
-    mse = calculate_mse(predicted, actual)
-    return mse
+    return calculate_mse(predicted, actual)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
@@ -403,6 +392,26 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
         bool: False in case of incorrect input types or if the profile
         is missing obligatory keys. True if the profile is saved.
     """
+    checked_profile = check_profile(profile)
+    if (not checked_profile
+    or not isinstance(save_path, str)
+    ):
+        return False
+
+    import json
+
+    language, freq_dict, n_words = profile
+    lang_dict = {
+        "name": language,
+        "freq": freq_dict,
+        "n_words": n_words,
+    }
+
+    path_to_file = f"{save_path}/{language}.json"
+
+    with open(path_to_file, "w", encoding="utf-8") as file:
+        json.dump(lang_dict, file, indent=4, ensure_ascii=False)
+    return True
 
 
 def load_profile(path_to_file: str) -> ProfileType | None:
@@ -416,7 +425,26 @@ def load_profile(path_to_file: str) -> ProfileType | None:
         ProfileType | None: Loaded profile.
         Returns None in case of incorrect input types.
     """
+    if (not isinstance(path_to_file, str)):
+        return None
 
+    import json
+
+    with open(path_to_file, "r", encoding="utf-8") as file:
+        language_data = json.load(file)
+
+    if not isinstance(language_data, dict):
+            return None
+
+    if not all(key in language_data for key in ("name", "freq", "n_words")):
+        return None
+
+    profile = (language_data["name"], language_data["freq"], language_data["n_words"])
+
+    if not check_profile(profile):
+        return None
+
+    return profile
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
     """
@@ -429,6 +457,19 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         Sequence[ProfileType] | None: Sequence of loaded profiles.
         Returns None in case of incorrect input types.
     """
+    if (
+    not isinstance(paths_to_profiles, list)
+    or not all(isinstance(path, str) for path in paths_to_profiles)
+    ):
+        return None
+
+    profiles = []
+    for path in paths_to_profiles:
+        profile = load_profile(path)
+        if profile is not None:
+            profiles.append(profile)
+
+    return profiles
 
 
 def detect_language_advanced(
@@ -449,7 +490,37 @@ def detect_language_advanced(
         The sequence is sorted by best MSE value, then by best Top-N value.
         Returns None in case of incorrect input types.
     """
+    if (
+    not check_profile(unknown_profile)
+    or not isinstance(known_profiles, list)
+    or not all(check_profile(known_profile) for known_profile in known_profiles)
+    or not isinstance(top_n, int)
+    or top_n <= 0
+    ):
+        return None
 
+    if not known_profiles:
+        return None
+
+    result = []
+    for known_profile in known_profiles:
+        language = known_profile[0]
+        top_n_score = compare_profiles_by_top_n(unknown_profile, known_profile, top_n)
+        mse_score = compare_profiles_by_mse(unknown_profile, known_profile)
+
+        if top_n_score is None or mse_score is None:
+            return None
+
+        scores = {
+            "MSE": mse_score,
+            "Top-N": top_n_score,
+        }
+
+        result.append((language, scores))
+
+    result.sort(key=lambda i: (i[1]["MSE"], -i[1]["Top-N"], i[0]))
+
+    return result
 
 def print_report(
     unknown_profile: ProfileType, metrics_stats: Sequence[tuple[str, dict[str, float]]], top_n: int
@@ -465,3 +536,56 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
+    checked_unknown_profile = check_profile(unknown_profile)
+    if (
+    not checked_unknown_profile
+    or not isinstance(top_n, int)
+    or top_n <= 0
+    or not isinstance(metrics_stats, list)
+    ):
+        return None
+    for i in metrics_stats:
+        if (
+            not isinstance(i, tuple)
+            or len(i) != 2
+            or not isinstance(i[0], str)
+            or not isinstance(i[1], dict)
+        ):
+            return None
+        if (
+        not all(isinstance(key, str) for key in i[1])
+        or not all(isinstance(value, float) for value in i[1].values())
+        ):
+            return None
+
+    freq_dict = unknown_profile[1]
+    top_words = get_top_n_words(freq_dict, top_n)
+    if top_words is None:
+        return None
+    popular_words = sorted(top_words)
+
+    words = freq_dict.keys()
+    max_word = max(words, key=len)
+    min_word = min(words, key=len)
+
+    if words:
+        average_length = sum(len(word) for word in words) / len(words)
+    else:
+        average_length = 0.0
+
+    print("Unknown language stats")
+    print("======================")
+    print(f"Popular words: {popular_words}")
+    print(f"Max length word: {max_word!r}")
+    print(f"Min length word: {min_word!r}")
+    print(f"Average token length: {average_length:.5f}")
+    print()
+    print("Language scores")
+    print("---------------")
+
+    for langugage, scores in metrics_stats:
+        mse = scores["MSE"]
+        top_score = scores["Top-N"]
+        print(f"{langugage}: MSE {mse:.5f}  Top-N Score {top_score:.5f}")
+
+    return None
