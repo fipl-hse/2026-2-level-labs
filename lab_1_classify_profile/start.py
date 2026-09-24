@@ -5,8 +5,8 @@ Language detection starter.
 # pylint: disable=unused-variable, duplicate-code
 
 from main import (
+    detect_language_by_mse,
     create_language_profile,
-    detect_language_by_top_n,
 )
 
 
@@ -27,8 +27,8 @@ def main() -> None:
     profile_de = create_language_profile("de", de_text, stopwords)
     profile_en = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("en", unknown_text, stopwords)
-    result = detect_language_by_top_n(
-        unknown_profile, profile_en, profile_de, 15)
+    result = detect_language_by_mse(
+        unknown_profile, profile_en, profile_de)
     assert result, "Detection result is None"
 
 

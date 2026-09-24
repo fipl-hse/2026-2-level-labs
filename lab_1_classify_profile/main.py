@@ -350,6 +350,22 @@ def detect_language_by_mse(
         Returns None in case of incorrect input types.
     """
 
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
+        return None
+
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 < mse_2:
+        return profile_1[0]
+    elif mse_2 > mse_1:
+        return profile_2[0]
+    else:
+        return min(profile_1[0], profile_2[0])
 
 # Mark 10
 
