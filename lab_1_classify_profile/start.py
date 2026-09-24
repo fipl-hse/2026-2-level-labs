@@ -5,7 +5,6 @@ Language detection starter.
 # pylint: disable=unused-variable, duplicate-code
 from lab_1_classify_profile.main import (
     calculate_frequencies,
-    compare_profiles_by_top_n,
     create_language_profile,
     detect_language_by_top_n,
     get_top_n_words,
@@ -48,8 +47,6 @@ def main() -> None:
     unknown_freq = calculate_frequencies(unknown_tokens)
 
     de_top_words = get_top_n_words(de_freq, 15)
-    en_top_words = get_top_n_words(en_freq, 15)
-    unknown_top_words = get_top_n_words(unknown_freq, 15)
 
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
