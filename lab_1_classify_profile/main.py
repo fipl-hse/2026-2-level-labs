@@ -217,6 +217,29 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(unknown_profile, tuple) or not isinstance(profile_to_compare, tuple):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool) or top_n <= 0:
+        return None
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
+        return None
+
+    un_top = get_top_n_words(unknown_profile[1], top_n)
+    comp_top = get_top_n_words(profile_to_compare[1], top_n)
+
+    if un_top is None or comp_top is None:
+        return None
+
+    if len(un_top) == 0:
+        return 0.0
+
+    common_words_count = 0
+    for word in un_top:
+        if word in comp_top:
+            common_words_count += 1
+
+    return float(common_words_count / len(un_top))
+
 
 
 def detect_language_by_top_n(
@@ -235,6 +258,31 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(unknown_profile, tuple) or not isinstance(profile_1, tuple) or not isinstance(profile_2, tuple):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool) or top_n <= 0:
+        return None
+    if not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+        return None
+
+    score_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    score_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+
+    if score_1 is None or score_2 is None:
+        return None
+
+    name_1 = profile_1[0]
+    name_2 = profile_2[0]
+
+    if score_1 > score_2:
+        return name_1
+    elif score_2 > score_1:
+        return name_2
+    else:
+        if name_1 < name_2:
+            return name_1
+        else:
+            return name_2
 
 
 # Mark 8
@@ -253,6 +301,29 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
+    if not isinstance(predicted, (list, tuple)) or not isinstance(actual, (list, tuple)):
+        return None
+
+    if len(predicted) != len(actual):
+        return None
+
+    if len(predicted) == 0:
+        return 0.0
+
+    for p in predicted:
+        if not isinstance(p, (int, float)) or isinstance(p, bool):
+            return None
+
+    for a in actual:
+        if not isinstance(a, (int, float)) or isinstance(a, bool):
+            return None
+
+    error_sum = 0.0
+    for i in range(len(predicted)):
+        difference = predicted[i] - actual[i]
+        error_sum += difference ** 2
+
+    return float(error_sum / len(predicted))
 
 
 def compare_profiles_by_mse(
@@ -270,6 +341,37 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if not isinstance(unknown_profile, tuple) or not isinstance(profile_to_compare, tuple):
+        return None
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
+        return None
+
+    un_freqs = unknown_profile[1]
+    comp_freqs = profile_to_compare[1]
+
+    all_words = []
+    for word in un_freqs:
+        if word not in all_words:
+            all_words.append(word)
+    for word in comp_freqs:
+        if word not in all_words:
+            all_words.append(word)
+
+    predicted = []
+    actual = []
+
+    for word in all_words:
+        if word in un_freqs:
+            predicted.append(un_freqs[word])
+        else:
+            predicted.append(0.0)
+
+        if word in comp_freqs:
+            actual.append(comp_freqs[word])
+        else:
+            actual.append(0.0)
+
+    return calculate_mse(predicted, actual)
 
 
 def detect_language_by_mse(
@@ -288,6 +390,30 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(unknown_profile, tuple) or not isinstance(profile_1, tuple) or not isinstance(profile_2, tuple):
+        return None
+    if not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+        return None
+
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 is None or mse_2 is None:
+        return None
+
+    name_1 = profile_1[0]
+    name_2 = profile_2[0]
+
+    if mse_1 < mse_2:
+        return name_1
+    elif mse_2 < mse_1:
+        return name_2
+    else:
+        if name_1 < name_2:
+            return name_1
+        else:
+            return name_2
+
 
 
 # Mark 10
