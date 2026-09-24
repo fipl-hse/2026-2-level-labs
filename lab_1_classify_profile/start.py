@@ -4,10 +4,7 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 
-from main import (
-    detect_language_by_mse,
-    create_language_profile,
-)
+from main import detect_language_by_mse, create_language_profile
 
 
 def main() -> None:
