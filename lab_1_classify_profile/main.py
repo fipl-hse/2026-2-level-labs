@@ -90,7 +90,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     for token in tokens:
         if token not in freq:
             freq[token] = 0
-        freq[token] += 1 / total
+        freq[token] += 1.0 / total
 
     return freq
 
@@ -136,9 +136,7 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(language, str):
-        return None
-    if not isinstance(text, str):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
         return None
@@ -181,9 +179,8 @@ def check_profile(profile: ProfileType) -> bool:
         or not isinstance(n_words, int)):
         return False
 
-    if (not all(isinstance(key, str) and isinstance(value, float)
-                for key, value in freq.items()) or
-                n_words != len(freq)):
+    if not all(isinstance(key, str) and isinstance(value, float)
+                for key, value in freq.items()):
         return False
 
     return True
@@ -242,13 +239,9 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile):
-        return None
-
-    if not check_profile(profile_1):
-        return None
-
-    if not check_profile(profile_2):
+    if not all([check_profile(unknown_profile),
+                    check_profile(profile_1),
+                    check_profile(profile_2)]):
         return None
 
     if not isinstance(top_n, int) or top_n <= 0:
@@ -265,11 +258,10 @@ def detect_language_by_top_n(
 
     if compared_1 > compared_2:
         return name_lang1
-    elif compared_2 > compared_1:
+    if compared_2 > compared_1:
         return name_lang2
-    else:
-        lang_in_order = sorted([name_lang1, name_lang2])
-        return lang_in_order[0]
+    lang_in_order = sorted([name_lang1, name_lang2])
+    return lang_in_order[0]
 
 
 # Mark 8
@@ -291,26 +283,20 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if not isinstance(predicted, Sequence) or not isinstance(actual, Sequence):
         return None
 
-    if not all (isinstance(element, float) for element in predicted):
-        return None
-
-    if not all (isinstance(element, float) for element in actual):
+    if not all (isinstance(element, float) for element in predicted) or\
+        not all (isinstance(element, float) for element in actual):
         return None
 
     if len(predicted) != len(actual):
         return None
 
-    if not predicted:
-        return 0.0
-
-    if not actual:
+    if not predicted or not actual:
         return 0.0
 
     sum_squared_error = 0.0
 
-    for i in range(len(actual)):
-        error = actual[i] - predicted[i]
-        sum_squared_error += error ** 2
+    for i, a in enumerate(actual):
+        sum_squared_error += (a - predicted[i]) ** 2
 
     mse_calculated = sum_squared_error / len(actual)
 
@@ -382,7 +368,27 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if not all([check_profile(unknown_profile),
+                    check_profile(profile_1),
+                    check_profile(profile_2)]):
+        return None
 
+    name_lang_1 = profile_1[0]
+    name_lang_2 = profile_2[0]
+
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+
+    if mse_1 is None or mse_2 is None:
+        return None
+
+    if mse_1 < mse_2:
+        return name_lang_1
+    elif mse_2 < mse_1:
+        return name_lang_2
+    else:
+        name_in_order = sorted([name_lang_1, name_lang_2])
+        return name_in_order[0]
 
 # Mark 10
 
