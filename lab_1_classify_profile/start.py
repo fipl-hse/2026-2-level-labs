@@ -6,7 +6,7 @@ Language detection starter.
 
 from main import (
     create_language_profile,
-    detect_language_by_top_n
+    detect_language_by_top_n,
 )
 
 
