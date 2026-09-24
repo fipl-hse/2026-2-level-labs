@@ -321,8 +321,8 @@ def compare_profiles_by_mse(
     if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
         return None
 
-    union_tokens = set(unknown_profile[1].keys()) | \
-        set(profile_to_compare[1].keys())
+    union_tokens = (set(unknown_profile[1].keys()) |
+                    set(profile_to_compare[1].keys()))
     tokens_freq_unknown = []
     tokens_freq_to_compare = []
 
