@@ -307,7 +307,22 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
+        return None
 
+    freq_unk = unknown_profile[1]
+    freq_profile_to_compare = profile_to_compare[1]
+
+    all_words = set(freq_unk.keys()) | set(freq_profile_to_compare.keys())
+
+    actual = []
+    predicted = []
+
+    for word in all_words:
+        actual.append(freq_unk.get(word, 0.0))
+        predicted.append(freq_profile_to_compare.get(word, 0.0))
+
+    return calculate_mse(predicted, actual)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
