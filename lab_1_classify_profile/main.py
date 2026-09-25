@@ -172,17 +172,6 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-def check_profile(profile: ProfileType) -> bool:
-    """
-    Checks profile structure
-
-    Args:
-        profile (ProfileType): Profile to check
-
-    Returns:
-        bool: Returns True if the profile has right structure and types,
-        otherwise returns False.
-    """
 
     if not isinstance(profile, tuple) or len(profile) != 3:
         return False
@@ -222,6 +211,20 @@ def compare_profiles_by_top_n(
         Returns None in case of incorrect input types.
     """
 
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare) or top_n == 0:
+        return None
+
+    top_n_unk_profile = get_top_n_words(unknown_profile[1], top_n)
+    if top_n_unk_profile is None:
+        return None
+
+    top_n_profile_to_compare = get_top_n_words(profile_to_compare[1], top_n)
+    if top_n_profile_to_compare is None:
+        return None
+
+    common_words = len(set(top_n_unk_profile) & set(top_n_profile_to_compare))
+
+    return common_words / len(top_n_unk_profile)
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -240,6 +243,20 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+
+    compare_unk_to_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    if compare_unk_to_1 is None:
+        return None
+    compare_unk_to_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    if compare_unk_to_2 is None:
+        return None
+
+    if compare_unk_to_1 > compare_unk_to_2:
+        return profile_1[0]
+    elif compare_unk_to_1 < compare_unk_to_2:
+        return profile_2[0]
+
+    return min(profile_1[0], profile_2[0])
 
 
 # Mark 8
