@@ -39,6 +39,7 @@ def main() -> None:
     unk_lang_profile = create_language_profile("unk", unknown_text, stopwords)
     de_lang_profile = create_language_profile("de", de_text, stopwords)
     en_lang_profile = create_language_profile("en", en_text, stopwords)
+
     lang_by_top_n = detect_language_by_top_n(unk_lang_profile, de_lang_profile, en_lang_profile, 15)
     print(lang_by_top_n)
 

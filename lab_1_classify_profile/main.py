@@ -6,6 +6,7 @@ Language detection
 
 # pylint:disable=unused-argument
 from typing import Sequence
+import json
 
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
@@ -253,7 +254,7 @@ def detect_language_by_top_n(
 
     if compare_unk_to_1 > compare_unk_to_2:
         return profile_1[0]
-    elif compare_unk_to_1 < compare_unk_to_2:
+    if compare_unk_to_1 < compare_unk_to_2:
         return profile_2[0]
 
     return min(profile_1[0], profile_2[0])
@@ -284,7 +285,8 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return 0.0
     if (
         not all(
-            isinstance(num, (int,float)) and not isinstance(num, bool)
+            isinstance(num, (int,float))
+            and not isinstance(num, bool)
             for num in actual
             )
         or not all(
@@ -297,7 +299,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
     squares = [(a - p) ** 2 for a, p in zip(actual, predicted)]
 
-    return sum(squares) / len(actual)
+    return float(sum(squares) / len(actual))
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
@@ -363,7 +365,7 @@ def detect_language_by_mse(
 
     if unk_1_mse < unk_2_mse:
         return profile_1[0]
-    elif unk_1_mse > unk_2_mse:
+    if unk_1_mse > unk_2_mse:
         return profile_2[0]
 
     return min(profile_1[0], profile_2[0])
@@ -384,7 +386,19 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
         bool: False in case of incorrect input types or if the profile
         is missing obligatory keys. True if the profile is saved.
     """
+    if not check_profile(profile) or not isinstance(save_path, str):
+        return False
 
+    profile_dict = {
+        "name": profile[0],
+        "freq": profile[1],
+        "n_words": profile[2]
+    }
+
+    with open(f"{save_path}/{profile[0]}.json", "w", encoding="utf-8") as file:
+        file.write(json.dumps(profile_dict, indent=4, ensure_ascii=False))
+
+    return True
 
 def load_profile(path_to_file: str) -> ProfileType | None:
     """
