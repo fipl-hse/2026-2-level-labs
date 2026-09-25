@@ -276,19 +276,26 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         In case of empty inputs, returns 0.0.
     """
 
-    if not isinstance(predicted, Sequence) or not isinstance(actual, Sequence):
+    if not isinstance(predicted, (tuple, list)) or not isinstance(actual, (tuple, list)):
         return None
     if len(actual) != len(predicted):
         return None
-    if len(actual) == 0 and len(predicted) == 0:
+    if not actual:
         return 0.0
     if (
-        not all(isinstance(num, (int,float)) for num in actual)
-        or not all(isinstance(num, (int, float)) for num in predicted)
+        not all(
+            isinstance(num, (int,float)) and not isinstance(num, bool)
+            for num in actual
+            )
+        or not all(
+            isinstance(num, (int, float))
+            and not isinstance(num, bool)
+            for num in predicted
+            )
         ):
         return None
 
-    squares = [(actual[i] - predicted[i])**2 for i in range(len(actual))]
+    squares = [(a - p) ** 2 for a, p in zip(actual, predicted)]
 
     return sum(squares) / len(actual)
 
