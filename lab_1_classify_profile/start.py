@@ -42,8 +42,7 @@ def main() -> None:
 
     print(result)
 
-
-    # Шаг 7: определение языка
+    # определение языка
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
 
     en_profile = create_language_profile("en", en_text, stopwords)
@@ -51,13 +50,10 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text, stopwords)
 
     if unknown_profile is None or en_profile is None or de_profile is None:
-      return
+        return None
 
-detected = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
-print(f"Detected language: {detected}")
-if name == "main": main()
-
-
+    detected = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    print(f"Detected language: {detected}")
 
 
 if __name__ == "__main__":

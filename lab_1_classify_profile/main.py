@@ -32,13 +32,11 @@ def tokenize(text: str) -> Sequence[str] | None:
     for word in text.split():
         clean_word = ''
         for letter in word:
-        if letter.isalpha():
-             clean_word +=
-    letter.lower()
+            if letter.isalpha():
+                clean_word += letter.lower()
     if len(clean_word) > 0:
         tokens.append(clean_word)
     return tokens
-
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
@@ -86,9 +84,6 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         freq_dict[token] = freq_dict.get(token, 0) + 1
 
     return {word: count / total for word, count in freq_dict.items()}
-
-
-
 
 
 
@@ -153,9 +148,6 @@ def create_language_profile(
     return {"language": language, "frequencies": freq}
 
 
-
-
-
 def check_profile(profile: ProfileType) -> bool:
     """
     Checks profile structure
@@ -179,8 +171,6 @@ def check_profile(profile: ProfileType) -> bool:
             return False
 
     return True
-
-
 
 
 def compare_profiles_by_top_n(
@@ -214,7 +204,6 @@ def compare_profiles_by_top_n(
         distance += abs(freq_unknown.get(word, 0) - freq_ref.get(word, 0))
 
         return distance
-
 
 
 def detect_language_by_top_n(
@@ -269,16 +258,6 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
-    if not isinstance(predicted, (list, tuple)) or not isinstance(actual, (list, tuple)):
-        return None
-    if len(predicted) != len(actual):
-        return None
-    if len(predicted) == 0:
-        return 0.0
-
-    return sum((p - a) ** 2 for p, a in zip(predicted, actual)) / len(predicted)
-
-
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
@@ -295,24 +274,6 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if "frequencies" not in unknown_profile or "frequencies" not in profile_to_compare:
-        return None
-
-    freq_unknown = unknown_profile["frequencies"]
-    freq_ref = profile_to_compare["frequencies"]
-
-    if not isinstance(freq_unknown, dict) or not isinstance(freq_ref, dict):
-        return None
-
-    all_words = set(freq_unknown.keys()) | set(freq_ref.keys())
-
-    predicted = [freq_unknown.get(w, 0.0) for w in all_words]
-
-
-    return calculate_mse(predicted, actual)
-
 
 
 def detect_language_by_mse(
@@ -331,20 +292,6 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not isinstance (unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
-        return None
-    if "language" not in profile_1 or "language" not in profile_2:
-        return None
-
-    dist_1 = compare_profiles_by_mse(unknown_profile, profile_1)
-    dist_2 = compare_profiles_by_mse(unknown_profile, profile_2)
-
-    if dist_1 is None or dist_2 is None:
-        return None
-    if dist_1 <= dist_2:
-        return profile_1["language"]
-    else:
-        return profile_2["language"]
 
 
 # Mark 10
@@ -362,8 +309,6 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
         bool: False in case of incorrect input types or if the profile
         is missing obligatory keys. True if the profile is saved.
     """
-
-
 
 
 def load_profile(path_to_file: str) -> ProfileType | None:
