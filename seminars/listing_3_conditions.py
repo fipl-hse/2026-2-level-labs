@@ -102,6 +102,14 @@ def is_positive(n: int) -> bool:
         bool: True if n > 0, False otherwise
     """
     # student implementation goes here
+    if n < 0:
+        return False
+    else:
+        return True
+
+print(is_positive(5))
+print(is_positive(-5))
+
 
 
 # is_positive(5) → True
@@ -121,6 +129,14 @@ def number_sign(n: int) -> str:
         str: "positive", "negative", or "zero"
     """
     # student implementation goes here
+    if n > 0:
+        return "positive"
+    elif n < 0:
+        return "negative"
+    else:
+        return "zero"
+
+print(number_sign(5))
 
 
 # number_sign(5) → "positive"
@@ -186,6 +202,10 @@ def is_in_range(n: int, low: int, high: int) -> bool:
         bool: True if low <= n <= high, False otherwise
     """
     # student implementation goes here
+    if low <= n <= high:
+        return True
+    return False
+print(is_in_range(5, 1, 10))
 
 
 # is_in_range(5, 1, 10) → True
@@ -208,6 +228,11 @@ def complex_condition(a: bool, b: bool, c: bool) -> bool:
         bool: Result of the expression
     """
     # student implementation goes here
+    return (a and b) or (not c)
+
+print(complex_condition(True, True, False))
+print(complex_condition(False, True, True))
+print(complex_condition(False, False, False))
 
 
 # complex_condition(True, True, False) → True
@@ -231,7 +256,10 @@ def leap_year(year: int) -> bool:
         bool: True if leap year, False otherwise
     """
     # student implementation goes here
-
+    if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+        return True
+    else:
+        return False
 
 # leap_year(2000) → True
 # leap_year(1900) → False

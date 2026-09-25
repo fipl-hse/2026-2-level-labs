@@ -106,6 +106,9 @@ def multiply_string(input_string: str, how_many: int) -> str:
         str: Repeated string
     """
     # student implementation goes here
+    return input_string * how_many
+
+print (multiply_string('Hi', 2))
 
 
 # multiply_string('Hi', 2) → 'HiHi'
@@ -127,7 +130,10 @@ def front_times(input_string: str, how_many: int) -> str:
         str: Repeated substring
     """
     # student implementation goes here
+    front_part = input_string[:3]
+    return front_part * how_many
 
+print(front_times('Chocolate', 2))
 
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
@@ -149,7 +155,9 @@ def extra_end(input_string: str) -> str:
         str: Resulting string
     """
     # student implementation goes here
+    return input_string[-2:] * 3
 
+print(extra_end('Hello'))
 
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
