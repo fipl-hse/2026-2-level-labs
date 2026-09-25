@@ -70,3 +70,4 @@
 5. `Инструкция по запуску тестов <https://fipl-hse.github.io/docs/useful_docs/tests.html>`__
 6. `Инструкция по запуску Python программ в терминале <https://fipl-hse.github.io/docs/useful_docs/run_in_terminal.html>`__
 7. `Ответы на часто задаваемые вопросы <https://fipl-hse.github.io/docs/useful_docs/FAQ.html>`__
+ 

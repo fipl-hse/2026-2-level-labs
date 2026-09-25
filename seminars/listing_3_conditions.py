@@ -103,7 +103,6 @@ def is_positive(n: int) -> bool:
     """
     # student implementation goes here
 
-
 # is_positive(5) → True
 # is_positive(-3) → False
 # is_positive(0) → False
@@ -122,7 +121,6 @@ def number_sign(n: int) -> str:
     """
     # student implementation goes here
 
-
 # number_sign(5) → "positive"
 # number_sign(-3) → "negative"
 # number_sign(0) → "zero"
@@ -140,7 +138,6 @@ def max_of_two(a: int, b: int) -> int:
     Returns:
         int: The larger of a and b
     """
-    # student implementation goes here
 
 
 # max_of_two(3, 7) → 7
@@ -164,12 +161,6 @@ def grade(score: int) -> str:
     Returns:
         str: Letter grade
     """
-    # student implementation goes here
-
-
-# grade(95) → "A"
-# grade(72) → "C"
-# grade(59) → "F"
 
 
 # Task 5:
@@ -186,7 +177,6 @@ def is_in_range(n: int, low: int, high: int) -> bool:
         bool: True if low <= n <= high, False otherwise
     """
     # student implementation goes here
-
 
 # is_in_range(5, 1, 10) → True
 # is_in_range(0, 1, 10) → False
@@ -207,12 +197,6 @@ def complex_condition(a: bool, b: bool, c: bool) -> bool:
     Returns:
         bool: Result of the expression
     """
-    # student implementation goes here
-
-
-# complex_condition(True, True, False) → True
-# complex_condition(False, True, True) → False
-# complex_condition(False, False, False) → True
 
 
 # Task 7 (advanced):

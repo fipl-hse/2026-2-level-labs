@@ -107,7 +107,6 @@ def multiply_string(input_string: str, how_many: int) -> str:
     """
     # student implementation goes here
 
-
 # multiply_string('Hi', 2) → 'HiHi'
 # multiply_string('Hi', 3) → 'HiHiHi'
 # multiply_string('Hi', 1) → 'Hi'
@@ -126,9 +125,6 @@ def front_times(input_string: str, how_many: int) -> str:
     Returns:
         str: Repeated substring
     """
-    # student implementation goes here
-
-
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
 # front_times('Abc', 3) → 'AbcAbcAbc'
@@ -142,14 +138,12 @@ def extra_end(input_string: str) -> str:
     """
     Take the last two characters of the string and repeat them three times.
 
-    Args:
+    Args:inp
         input_string (str): Input string
 
     Returns:
         str: Resulting string
     """
-    # student implementation goes here
-
 
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
