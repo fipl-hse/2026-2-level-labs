@@ -58,7 +58,7 @@ def add_numbers(a: int, b: int) -> int:
     Returns:
         int: Sum of a and b
     """
-    # student implementation goes here
+def add_numbers(a)
 
 
 # add_numbers(2, 3) → 5
@@ -78,8 +78,8 @@ def average(a: float, b: float, c: float) -> float:
 
     Returns:
         float: Average value of the three numbers
-    """
-    # student implementation goes here
+
+    
 
 
 # average(1, 2, 3) → 2.0
@@ -93,12 +93,12 @@ def is_even(n: int) -> bool:
     Check if a number is even.
 
     Args:
-        n (int): Number to check
+    n (int): Number to check
 
     Returns:
-        bool: True if n is even, False otherwise
+    bool: True if n is even, False otherwise
     """
-    # student implementation goes here
+
 
 
 # is_even(2) → True
@@ -137,7 +137,7 @@ def factorial(n: int) -> int:
     Returns:
         int: Factorial of n
     """
-    # student implementation goes here
+
 
 
 # factorial(0) → 1
