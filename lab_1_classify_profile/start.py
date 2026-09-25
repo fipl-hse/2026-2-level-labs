@@ -18,14 +18,20 @@ def main() -> None:
         stopwords = [word.lower() for word in file.read().splitlines() if word.strip()]
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
-    #result = None
-    #assert result, "Detection result is None"
+
+
     tokenized_de_text = tokenize(de_text)
     cleaned_de_tokens = remove_stop_words(tokenized_de_text, stopwords)
     freq_dict = calculate_frequencies(cleaned_de_tokens)
     top_n_words = get_top_n_words(freq_dict, 7)
 
+
     for word in top_n_words:
         print(word)
+
+    result = top_n_words
+    assert result, "Detection result is None"
+
+
 if __name__ == "__main__":
     main()

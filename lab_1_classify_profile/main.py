@@ -2,7 +2,7 @@
 Lab 1.
 
 Language detection
-""" # privet
+"""
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -54,7 +54,13 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-    if not all(isinstance(word, str) and word.isalpha() for word in stop_words) or tokens is None:
+    if not isinstance(tokens, (list, tuple)) or not isinstance(stop_words, (list, tuple)):
+        return None
+
+    if not all(isinstance(word, str) for word in tokens):
+        return None
+
+    if not all(isinstance(word, str) and word.isalpha() for word in stop_words):
         return None
 
     stop_words_set =set(stop_words) # for optimization
@@ -77,7 +83,11 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-    if tokens is None: return None
+    if not isinstance(tokens, Sequence):
+        return None
+
+    if tokens is None or not all(isinstance(word, str) for word in tokens):
+        return None
 
     total_n = len(tokens)
     if total_n == 0:
@@ -108,7 +118,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
         return None
 
-    if top_n < 0:
+    if top_n <= 0:
         return None
 
     sorted_freq_dict = sorted(freq_dict.items(), key = lambda item: (-item[1],item))
@@ -136,7 +146,20 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(language, str):
+        return None
 
+    tokenized_text = tokenize(text)
+    if tokenized_text is None:
+        return None
+    filtered_tokens = remove_stop_words(tokenized_text, stop_words)
+    if filtered_tokens is None:
+        return None
+    tokens_freq = calculate_frequencies(filtered_tokens)
+    if tokens_freq is None:
+        return None
+
+    return (language, tokens_freq, len(tokens_freq))
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -149,6 +172,39 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+def check_profile(profile: ProfileType) -> bool:
+    """
+    Checks profile structure
+
+    Args:
+        profile (ProfileType): Profile to check
+
+    Returns:
+        bool: Returns True if the profile has right structure and types,
+        otherwise returns False.
+    """
+
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
+
+    language, freq_dict, n = profile
+
+    if not isinstance(language, str):
+        return False
+
+    if not isinstance(freq_dict, dict):
+        return False
+
+    for key, value in freq_dict.items():
+        if not isinstance(key, str):
+            return False
+        if not isinstance(value, (int, float)):
+            return False
+
+    if not isinstance(n, (int, float)):
+        return False
+
+    return True
 
 
 def compare_profiles_by_top_n(
