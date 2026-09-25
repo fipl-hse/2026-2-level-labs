@@ -2,8 +2,8 @@
 Language detection starter.
 """
 from main import (
-    tokenize, remove_stop_words, calculate_frequencies, get_top_n_words,
-    create_language_profile, detect_language_by_top_n
+    calculate_frequencies, create_language_profile, detect_language_by_top_n,
+    get_top_n_words, remove_stop_words, tokenize
 )
 
 # pylint: disable=unused-variable, duplicate-code
