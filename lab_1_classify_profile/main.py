@@ -8,6 +8,7 @@ Language detection
 
 
 from typing import Sequence
+import json
 
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
@@ -395,6 +396,12 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
         is missing obligatory keys. True if the profile is saved.
     """
 
+    if not check_profile(profile) or not isinstance(save_path, str):
+        return False
+
+    with open(save_path, 'w') as file:
+        file.write(json.dump(profile, ensure_ascii=False, indent=4))
+
 
 def load_profile(path_to_file: str) -> ProfileType | None:
     """
@@ -407,6 +414,15 @@ def load_profile(path_to_file: str) -> ProfileType | None:
         ProfileType | None: Loaded profile.
         Returns None in case of incorrect input types.
     """
+
+    if not isinstance(path_to_file, str):
+        return None
+
+    with open(path_to_file, 'r') as file:
+        f = file.read()
+        profile = json.loads(f)
+
+    return profile
 
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
@@ -456,3 +472,21 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
+
+    if (
+        not check_profile(unknown_profile)
+        or not isinstance(metrics_stats, Sequence)
+        or not isinstance(top_n, int)
+    ):
+        return None
+
+    print("Unknown language stats")
+    print("======================")
+    print(f"Popular words: {get_top_n_words(unknown_profile[1], top_n)}")
+    print(f"Max length word: {max(unknown_profile[1].keys(), key=len)}")
+    print(f"Min length word: {min(unknown_profile[1].keys(), key=len)}")
+    print(f"Average token length: {sum(len(s) for s in unknown_profile[1].keys())
+                                   / len(unknown_profile[1].keys()) if unknown_profile[1].keys() else 0:.5f}")
+    print()
+    print("Language scores")
+    print("---------------")
