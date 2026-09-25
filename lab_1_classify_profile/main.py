@@ -15,6 +15,31 @@ ProfileType = tuple[str, FreqDictType, int]
 
 
 def tokenize(text: str) -> Sequence[str] | None:
+    if not isinstance(text, str):
+        return None
+
+    punctuation = "!;%:?*()_-=+/}{]|[@#$^&~`/,.<>"
+    text = text.lower()
+    cleaned_text = ""
+    for char in text:
+        if char not in punctuation:
+            cleaned_text += char
+        else:
+            cleaned_text += ""
+    tokens = []
+    current_word = ""
+    for char in cleaned_text:
+        if char == " " or char == "\n" or char == "\t":
+            if current_word != "":
+                tokens.append(current_word)
+                current_word =  ""
+        else:
+            current_word += char
+    if current_word != "":
+        tokens.append(current_word)
+    return tokens
+
+    ""
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
@@ -29,6 +54,19 @@ def tokenize(text: str) -> Sequence[str] | None:
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
+    if not isinstance(tokens, list) or not isinstance(stop_words, list):
+        return None
+    for g in tokens:
+        if not isinstance(g, str):
+            return None
+    for g in stop_words:
+        if not isinstance(g, str):
+            return None
+    stop_words_set = set(stop_words)
+    filtered_tokens = [token for token in tokens if token not in stop_words_set]
+    return filtered_tokens
+
+
     """
     Removes stop words
 
@@ -42,6 +80,20 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
+    if not isinstance(tokens, list):
+        return None
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    counts = {}
+    for token in set(tokens):
+        counts[token] = tokens.count(token)
+    total_tokens = len(tokens)
+    for token, count in counts.items():
+        counts[token] = count / total_tokens
+    return counts
+
+
     """
     Calculates frequencies of given tokens
 
@@ -54,6 +106,25 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
+    if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
+        return None
+    for k, v in freq_dict.items():
+        if not isinstance(k, str) or not isinstance(v, float):
+            return None
+    if top_n <= 0:
+        return None
+    sorted_dict = dict(sorted(freq_dict.items(), key=lambda item: (-item[1], item[0])))
+    top_n_words = []
+
+    i = 0
+    for k in sorted_dict.keys():
+        i += 1
+        if i <= top_n:
+            top_n_words.append(k)
+        else:
+            break
+    return top_n_words
+
     """
     Finds the most common words
 
@@ -70,9 +141,24 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 # Mark 6.
 
 
-def create_language_profile(
-    language: str, text: str, stop_words: Sequence[str]
-) -> ProfileType | None:
+def create_language_profile(language: str, text: str, stop_words: Sequence[str]) -> ProfileType | None:
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    if not isinstance(stop_words, Sequence) or isinstance(stop_words, str):
+        return None
+    tokens = tokenize(text)
+    filtered_tokens = remove_stop_words(tokens, stop_words)
+    if filtered_tokens is None:
+        return None
+    frequencies = calculate_frequencies(filtered_tokens)
+    if frequencies is None:
+        return None
+    top_wods = get_top_n_words(frequencies, top_n=10)
+    if top_wods is None:
+        return None
+    profile: ProfileType = {"language": language, "top_words": top_wods}
+    return profile
+
     """
     Creates a language profile
 
@@ -264,3 +350,4 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
+print("Hello World!")
