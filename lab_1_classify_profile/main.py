@@ -20,12 +20,25 @@ def tokenize(text: str) -> Sequence[str] | None:
     removes punctuation and other symbols from words
 
     Args:
-       text (str): Text
+        text (str): Text
 
     Returns:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
         Returns None if input text is not a string.
     """
+
+    if not isinstance(text, str):
+        return None
+
+    tokens = []
+    for word in text.lower().split():
+        token = ''
+        for letter in word:
+            if letter.isalpha():
+                token = token + letter
+        if token:
+            tokens.append(token)
+    return tokens
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
@@ -39,7 +52,20 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    if not all(isinstance(token, str) for token in tokens):
+        return None
+    if not isinstance(stop_words, (list, tuple)):
+        return None
+    if not all(isinstance(word, str) for word in stop_words):
+        return None
 
+    result = []
+    for token in tokens:
+        if token not in stop_words:
+            result.append(token)
+    return result
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
@@ -51,6 +77,22 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    if not all(isinstance(token, str) for token in tokens):
+        return None
+    if not tokens:
+        return {}
+
+    counts = {}
+    for token in tokens:
+        counts[token] = counts.get(token, 0) + 1
+
+    total = len(tokens)
+    result = {}
+    for token, count in counts.items():
+        result[token] = count / total
+    return result  #frequency
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -65,6 +107,18 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict):
+        return None
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
+
+    items = list(freq_dict.items())
+    items = sorted(items, key=lambda item: (-item[1], item[0]))
+
+    result = []
+    for item in items[:top_n]:
+        result.append(item[0])
+    return result
 
 
 # Mark 6.
@@ -85,7 +139,28 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if (not isinstance(language, str)
+        or not isinstance(text, str)
+        or not isinstance(stop_words, (list, tuple))
+    ):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
 
+    tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    filtered_tokens = remove_stop_words(tokens, stop_words)
+    if filtered_tokens is None:
+        return None
+
+    frequency = calculate_frequencies(filtered_tokens)
+    if frequency is None:
+        return None
+
+    return (language, frequency, len(frequency))
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -98,7 +173,21 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple) or len(profile) != 3:
+        return False
 
+    language, freq_dict, n_words = profile
+
+    if not isinstance(language, str) or not isinstance(freq_dict, dict):
+        return False
+    if not isinstance(n_words, int):
+        return False
+    if not all(isinstance(word, str) for word in freq_dict):
+        return False
+    if not all(isinstance(value, float) for value in freq_dict.values()):
+        return False
+
+    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -114,7 +203,26 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
+    if not check_profile(unknown_profile):
+        return None
+    if not check_profile(profile_to_compare):
+        return None
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
 
+    unknown_words = get_top_n_words(unknown_profile[1], top_n)
+    compare_words = get_top_n_words(profile_to_compare[1], top_n)
+
+    if unknown_words is None or compare_words is None:
+        return None
+
+    unknown_set = set(unknown_words)
+    compare_set = set(compare_words)
+
+    if not unknown_set:
+        return 0.0
+
+    return len(unknown_set.intersection(compare_set)) / len(unknown_set)
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -132,6 +240,25 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if (not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
+        return None
+    if not isinstance(top_n, int) or top_n <= 0:
+        return None
+
+    distance_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
+    distance_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    if distance_1 is None or distance_2 is None:
+        return None
+
+    if distance_1 > distance_2:
+        return profile_1[0]
+    if distance_2 > distance_1:
+        return profile_2[0]
+
+    return min(profile_1[0], profile_2[0])
 
 
 # Mark 8
@@ -150,6 +277,23 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
+    if (
+    not isinstance(predicted, (list, tuple))
+    or not isinstance(actual, (list, tuple))
+    ):
+        return None
+    if len(predicted) != len(actual):
+        return None
+    if not all(isinstance(value, (int, float)) for value in predicted):
+        return None
+    if not all(isinstance(value, (int, float)) for value in actual):
+        return None
+    if not predicted:
+        return 0.0
+
+    sum_of_squares: float = sum((y - p) ** 2 for y, p in zip(predicted, actual))
+    count: int = len(predicted)
+    return sum_of_squares / count
 
 
 def compare_profiles_by_mse(
@@ -167,7 +311,24 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_to_compare)
+    ):
+        return None
 
+    unknown_freq = unknown_profile[1]
+    known_freq = profile_to_compare[1]
+
+    all_tokens = set(unknown_freq).union(set(known_freq))
+
+    unknown_values = []
+    known_values = []
+    for token in all_tokens:
+        unknown_values.append(unknown_freq.get(token, 0.0))
+        known_values.append(known_freq.get(token, 0.0))
+
+    return calculate_mse(unknown_values, known_values)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
@@ -185,6 +346,24 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
+        return None
+
+    mse_1_profile = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2_profile = compare_profiles_by_mse(unknown_profile, profile_2)
+    if mse_1_profile is None or mse_2_profile is None:
+        return None
+
+    if mse_1_profile < mse_2_profile:
+        return profile_1[0]
+    if mse_2_profile < mse_1_profile:
+        return profile_2[0]
+
+    return min(profile_1[0], profile_2[0])
 
 
 # Mark 10
