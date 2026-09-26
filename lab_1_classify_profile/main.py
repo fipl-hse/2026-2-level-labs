@@ -40,10 +40,9 @@ def tokenize(text: str) -> Sequence[str] | None:
     for char in text:
         if char.isalpha():
             current_token += char
-        elif char.isspace():
-            if current_token:
-                tokens.append(current_token)
-                current_token = ""
+        elif char.isspace() and current_token:
+            tokens.append(current_token)
+            current_token = ""
 
     if current_token:
         tokens.append(current_token)
