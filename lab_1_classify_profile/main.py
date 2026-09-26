@@ -139,9 +139,10 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(language, str) or not isinstance(text, str):
-        return None
-    if not isinstance(stop_words, (list, tuple)):
+    if (not isinstance(language, str)
+        or not isinstance(text, str)
+        or not isinstance(stop_words, (list, tuple))
+    ):
         return None
     for word in stop_words:
         if not isinstance(word, str):
@@ -211,6 +212,7 @@ def compare_profiles_by_top_n(
 
     unknown_words = get_top_n_words(unknown_profile[1], top_n)
     compare_words = get_top_n_words(profile_to_compare[1], top_n)
+
     if unknown_words is None or compare_words is None:
         return None
 
@@ -238,11 +240,10 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_1):
-        return None
-    if not check_profile(profile_2):
+    if (not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
         return None
     if not isinstance(top_n, int) or top_n <= 0:
         return None
@@ -290,9 +291,8 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if not predicted:
         return 0.0
 
-    sum_of_squares = sum((y - p) ** 2 for y, p in zip(predicted, actual))
-    count = len(predicted)
-
+    sum_of_squares: float = sum((y - p) ** 2 for y, p in zip(predicted, actual))
+    count: int = len(predicted)
     return sum_of_squares / count
 
 
