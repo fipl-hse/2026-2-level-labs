@@ -39,9 +39,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         if not (char.isalpha()) and char != " ":
             text = text.replace(char, "")
 
-    tokens = text.split()
-
-    return tokens
+    return text.split()
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
@@ -113,15 +111,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
     sorted_dict = dict(
         sorted(freq_dict.items(), key=lambda item: (-item[1], item[0])))
 
-    top_n_words = []
-
-    i = 0
-    for k, _ in sorted_dict.items():
-        i += 1
-        if i <= top_n:
-            top_n_words.append(k)
-        else:
-            break
+    top_n_words = list(sorted_dict.keys())[:top_n]
 
     return top_n_words
 # Mark 6.
@@ -154,18 +144,18 @@ def create_language_profile(
         return None
 
     tokens = tokenize(text)
-    if tokens is None:
+    if not tokens:
         return None
 
     cleared_tokens = remove_stop_words(tokens, stop_words)
-    if cleared_tokens is None:
+    if not cleared_tokens:
         return None
 
     freq_dict = calculate_frequencies(cleared_tokens)
-    if freq_dict is None:
+    if not freq_dict:
         return None
 
-    return (language, freq_dict, len(freq_dict))
+    return language, freq_dict, len(freq_dict)
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -224,20 +214,14 @@ def compare_profiles_by_top_n(
         return None
 
     unknown_top_most_common = get_top_n_words(unknown_profile[1], top_n)
-    if unknown_top_most_common is None:
+    if not unknown_top_most_common:
         return None
 
     to_compare_top_most_common = get_top_n_words(profile_to_compare[1], top_n)
-    if to_compare_top_most_common is None:
+    if not to_compare_top_most_common:
         return None
 
-    intersection = 0
-
-    for word in unknown_top_most_common:
-        if word in to_compare_top_most_common:
-            intersection += 1
-
-    return intersection / top_n
+    return len(set(unknown_top_most_common) & set(to_compare_top_most_common)) / top_n
 
 
 def detect_language_by_top_n(
@@ -303,7 +287,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if (not all(isinstance(el, float) for el in predicted)
             or not all(isinstance(el,  float) for el in actual)):
         return None
-    if predicted == [] or actual == []:
+    if not predicted or not actual:
         return 0.0
     if len(predicted) != len(actual):
         return None
@@ -418,9 +402,12 @@ def load_profile(path_to_file: str) -> ProfileType | None:
     if not isinstance(path_to_file, str):
         return None
 
-    with open(path_to_file, 'r') as file:
+    with open(path_to_file) as file:
         f = file.read()
         profile = json.loads(f)
+
+    if not check_profile(profile):
+        return None
 
     return profile
 
@@ -477,6 +464,18 @@ def print_report(
         not check_profile(unknown_profile)
         or not isinstance(metrics_stats, Sequence)
         or not isinstance(top_n, int)
+    ):
+        return None
+
+    if not all(isinstance(el, tuple)
+               and len(el) == 2
+               and isinstance(el[0], str)
+               and isinstance(el[1], dict)
+               and all(
+            isinstance(k, str) and isinstance(v, float)
+            for k, v in el[1].items()
+    )
+        for el in metrics_stats
     ):
         return None
 
