@@ -28,12 +28,15 @@ def main() -> None:
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
     result = None
+
     # Mark 4
+
     de_tokens = tokenize(de_text)
     de_tokens = remove_stop_words(de_tokens, stopwords)
     de_frequency = calculate_frequencies(de_tokens)
     de_get_top_n_words = get_top_n_words(de_frequency, 7)
     result = de_get_top_n_words
+
     print(result)
 
     # Mark 6
