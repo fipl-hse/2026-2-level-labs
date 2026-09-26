@@ -69,7 +69,12 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         return None
 
     stop_words_set = set(stop_words)
-    return [token for token in tokens if token not in stop_words_set]
+    filtered_tokens = []
+    for token in tokens:
+        if token not in stop_words_set:
+            filtered_tokens.append(token)
+
+    return filtered_tokens
 
 
 
