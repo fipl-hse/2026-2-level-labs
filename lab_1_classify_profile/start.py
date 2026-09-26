@@ -35,8 +35,8 @@ def main() -> None:
 
     result = detect_language_advanced(
         unknown_profile, [profile_de, profile_en], 15)
-    print_report(unknown_profile, result, 15)
     assert result, "Detection result is None"
+    print_report(unknown_profile, result, 15)
 
 
 if __name__ == "__main__":
