@@ -517,7 +517,7 @@ def print_report(
         or not isinstance(metrics_stats, Sequence)
         or not isinstance(top_n, int)
     ):
-        return None
+        return
 
     if not all(isinstance(el, tuple)
                and len(el) == 2
@@ -529,7 +529,7 @@ def print_report(
     )
         for el in metrics_stats
     ):
-        return None
+        return
 
     print("Unknown language stats")
     print("======================")
@@ -537,7 +537,8 @@ def print_report(
     print(f"Max length word: '{max(unknown_profile[1].keys(), key=len)}'")
     print(f"Min length word: '{min(unknown_profile[1].keys(), key=len)}'")
     print(f"Average token length: {sum(len(s) for s in unknown_profile[1].keys())
-                                   / len(unknown_profile[1].keys()) if unknown_profile[1].keys() else 0:.5f}")
+                                   / len(unknown_profile[1].keys())
+                                   if unknown_profile[1].keys() else 0:.5f}")
     print()
     print("Language scores")
     print("---------------")

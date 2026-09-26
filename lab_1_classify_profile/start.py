@@ -3,7 +3,8 @@ Language detection starter.
 """
 
 # pylint: disable=unused-variable, duplicate-code
-from main import (
+
+from lab_1_classify_profile.main import (
     create_language_profile,
     detect_language_advanced,
     print_report
