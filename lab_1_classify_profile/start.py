@@ -54,10 +54,10 @@ def main() -> None:
     en_profile = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
 
-    if de_profile is None or \
+    if (de_profile is None or \
     en_profile is None or \
-    unknown_profile is None:
-        return
+    unknown_profile is None):
+        return None
 
     result = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 15)
     print(result)
