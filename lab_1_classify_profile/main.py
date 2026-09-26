@@ -36,8 +36,7 @@ def tokenize(text: str) -> Sequence[str] | None:
     for symbol in text:
         if symbol.isalpha():
             current_word = current_word + symbol
-        elif symbol.isspace():
-            if current_word != "":
+        elif symbol.isspace() and current_word != "":
                 words.append(current_word)
                 current_word = ""
 
