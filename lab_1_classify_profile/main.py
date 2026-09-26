@@ -214,11 +214,9 @@ def compare_profiles_by_top_n(
         return None
 
     unknown_top_most_common = get_top_n_words(unknown_profile[1], top_n)
-    if not unknown_top_most_common:
-        return None
-
     to_compare_top_most_common = get_top_n_words(profile_to_compare[1], top_n)
-    if not to_compare_top_most_common:
+
+    if not to_compare_top_most_common or not unknown_top_most_common:
         return None
 
     return len(set(unknown_top_most_common) & set(to_compare_top_most_common)) / top_n
