@@ -252,9 +252,14 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if (not isinstance(unknown_profile, tuple) or not isinstance(profile_1, tuple) or
-            not isinstance(profile_2, tuple) or not isinstance(top_n, int) or
-            isinstance(top_n, bool) or top_n <= 0):
+    if (not isinstance(unknown_profile, tuple) or
+            not isinstance(profile_1, tuple) or
+            not isinstance(profile_2, tuple)):
+        return None
+
+    if (not isinstance(top_n, int) or
+            isinstance(top_n, bool) or
+            top_n <= 0):
         return None
 
     if (not check_profile(unknown_profile) or not check_profile(profile_1) or
@@ -276,7 +281,6 @@ def detect_language_by_top_n(
             result = profile_2[0]
 
     return result
-
 
 # Mark 8
 
