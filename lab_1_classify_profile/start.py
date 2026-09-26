@@ -43,7 +43,7 @@ def main() -> None:
     assert en_profile is not None
     assert unknown_profile is not None
 
-    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 7)
+    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
     print("Detected language:", result)
     result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
     print("Detected language by MSE:", result_mse)
