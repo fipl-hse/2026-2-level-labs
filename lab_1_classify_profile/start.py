@@ -48,6 +48,8 @@ def main() -> None:
     result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
     print("Detected language by MSE:", result_mse)
 
+    assert result, "Detection result is None"
+
 
 if __name__ == "__main__":
     main()
