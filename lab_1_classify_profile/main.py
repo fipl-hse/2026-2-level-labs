@@ -387,23 +387,19 @@ def detect_language_by_mse(
             not isinstance(profile_2, tuple)):
         return None
 
-    if (not isinstance(top_n, int) or
-            isinstance(top_n, bool) or
-            top_n <= 0):
-        return None
-
-    if (not check_profile(unknown_profile) or not check_profile(profile_1) or
+    if (not check_profile(unknown_profile) or
+            not check_profile(profile_1) or
             not check_profile(profile_2)):
         return None
 
-    score_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
-    score_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
     result = None
 
-    if score_1 is not None and score_2 is not None:
-        if score_1 > score_2:
+    if mse_1 is not None and mse_2 is not None:
+        if mse_1 < mse_2:
             result = profile_1[0]
-        elif score_2 > score_1:
+        elif mse_2 < mse_1:
             result = profile_2[0]
         elif profile_1[0] < profile_2[0]:
             result = profile_1[0]
