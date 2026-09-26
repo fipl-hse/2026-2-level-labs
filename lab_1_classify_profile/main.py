@@ -358,7 +358,7 @@ def detect_language_by_mse(
 
     if mse_1 < mse_2:
         return profile_1[0]
-    if mse_2 > mse_1:
+    if mse_2 < mse_1:
         return profile_2[0]
     return min(profile_1[0], profile_2[0])
 
@@ -381,8 +381,16 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
     if not check_profile(profile) or not isinstance(save_path, str):
         return False
 
-    with open(save_path, 'w') as file:
-        file.write(json.dump(profile, ensure_ascii=False, indent=4))
+    to_write = {
+        "name": profile[0],
+        "freq": profile[1],
+        "n_words": profile[2]
+    }
+    path = f"{save_path}/{profile[0]}.json"
+    with open(path, 'w', encoding='utf-8') as file:
+        file.write(json.dumps(to_write, ensure_ascii=False, indent=4))
+
+    return True
 
 
 def load_profile(path_to_file: str) -> ProfileType | None:
@@ -400,14 +408,19 @@ def load_profile(path_to_file: str) -> ProfileType | None:
     if not isinstance(path_to_file, str):
         return None
 
-    with open(path_to_file) as file:
-        f = file.read()
-        profile = json.loads(f)
+    with open(path_to_file, encoding="utf-8") as file:
+        read_data = json.load(file)
 
-    if not check_profile(profile):
+    if not isinstance(read_data, dict):
         return None
 
-    return profile
+    if list(read_data.keys()) != ["name", "freq", "n_words"]:
+        return None
+
+    if check_profile((read_data["name"], read_data["freq"], read_data["n_words"])):
+        return read_data["name"], read_data["freq"], read_data["n_words"]
+
+    return None
 
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
@@ -421,6 +434,19 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         Sequence[ProfileType] | None: Sequence of loaded profiles.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(paths_to_profiles, Sequence):
+        return None
+
+    if not all(isinstance(path, str) for path in paths_to_profiles):
+        return None
+
+    profiles = []
+    for path in paths_to_profiles:
+        profile = load_profile(path)
+        if profile is not None:
+            profiles.append(profile)
+
+    return profiles
 
 
 def detect_language_advanced(
@@ -441,6 +467,34 @@ def detect_language_advanced(
         The sequence is sorted by best MSE value, then by best Top-N value.
         Returns None in case of incorrect input types.
     """
+
+    if (
+        not check_profile(unknown_profile)
+        or not isinstance(known_profiles, Sequence)
+        or not isinstance(top_n, int)
+        or top_n <= 0
+    ):
+        return None
+
+    if not all(check_profile(profile) for profile in known_profiles):
+        return None
+
+    res = []
+    for known_profile in known_profiles:
+        mse_compare = compare_profiles_by_mse(unknown_profile, known_profile)
+        top_n_compare = compare_profiles_by_top_n(
+            unknown_profile, known_profile, top_n)
+
+        if mse_compare is None or top_n_compare is None:
+            return None
+
+        metrics = {
+            "MSE": mse_compare,
+            "Top-N": top_n_compare
+        }
+        res.append((known_profile[0], metrics))
+
+    return sorted(res, key=lambda el: (el[1]["MSE"], -el[1]["Top-N"]))
 
 
 def print_report(
@@ -480,10 +534,13 @@ def print_report(
     print("Unknown language stats")
     print("======================")
     print(f"Popular words: {get_top_n_words(unknown_profile[1], top_n)}")
-    print(f"Max length word: {max(unknown_profile[1].keys(), key=len)}")
-    print(f"Min length word: {min(unknown_profile[1].keys(), key=len)}")
+    print(f"Max length word: '{max(unknown_profile[1].keys(), key=len)}'")
+    print(f"Min length word: '{min(unknown_profile[1].keys(), key=len)}'")
     print(f"Average token length: {sum(len(s) for s in unknown_profile[1].keys())
                                    / len(unknown_profile[1].keys()) if unknown_profile[1].keys() else 0:.5f}")
     print()
     print("Language scores")
     print("---------------")
+    for el in metrics_stats:
+        print(
+            f'{el[0]}: MSE {el[1]["MSE"]:.5f}  Top-N Score {el[1]["Top-N"]:.5f}')
