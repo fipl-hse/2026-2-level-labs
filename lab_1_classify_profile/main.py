@@ -427,12 +427,12 @@ def load_profile(path_to_file: str) -> ProfileType | None:
     if "name" not in profile_dict or "freq" not in profile_dict or "n_words" not in profile_dict:
         return None
 
-    ProfileType = (profile_dict["name"], profile_dict["freq"], profile_dict["n_words"])
+    profile = (profile_dict["name"], profile_dict["freq"], profile_dict["n_words"])
 
-    if not check_profile(ProfileType):
+    if not check_profile(profile):
         return None
 
-    return ProfileType
+    return profile
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
     """
@@ -532,11 +532,17 @@ def print_report(
         if not isinstance(item, tuple) or len(item) != 2:
             return None
         lang, metrics = item
-        if not isinstance(lang, str) or not isinstance(metrics, dict):
+        if (
+            not isinstance(lang, str)
+            or not isinstance(metrics, dict)
+            or "MSE" not in metrics
+            or "Top-N" not in metrics
+        ):
             return None
-        if "MSE" not in metrics or "Top-N" not in metrics:
-            return None
-        if not isinstance(metrics["MSE"], (int, float)) or not isinstance(metrics["Top-N"], (int, float)):
+        if (
+            not isinstance(metrics["MSE"], (int, float))
+            or not isinstance(metrics["Top-N"], (int, float))
+        ):
             return None
 
     print("Unknown language stats")
@@ -560,3 +566,5 @@ def print_report(
         mse = metrics["MSE"]
         topn = metrics["Top-N"]
         print(f"{lang}: MSE {mse:.5f}  Top-N Score {topn:.5f}")
+
+    return None

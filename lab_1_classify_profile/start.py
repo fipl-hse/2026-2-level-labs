@@ -1,7 +1,7 @@
 """
 Language detection starter.
 """
-from main import (
+from lab_1_classify_profile.main import (
     calculate_frequencies,
     collect_profiles,
     create_language_profile,
@@ -35,7 +35,7 @@ def main() -> None:
     for word in get_top_n_words(
         calculate_frequencies(remove_stop_words(tokenize(de_text), stopwords)), 7
     ):
-            print(word)
+        print(word)
 
     print()
 
