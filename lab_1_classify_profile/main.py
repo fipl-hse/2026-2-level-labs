@@ -352,8 +352,8 @@ def compare_profiles_by_mse(
     values_unknown = []
     values_to_compare = []
     for word in all_words:
-            values_to_compare.append(profile_to_compare[1].get(word, 0.0))
-            values_unknown.append(unknown_profile[1].get(word, 0.0))
+        values_to_compare.append(profile_to_compare[1].get(word, 0.0))
+        values_unknown.append(unknown_profile[1].get(word, 0.0))
 
     mse = calculate_mse(values_unknown, values_to_compare)
 
