@@ -31,10 +31,17 @@ def main() -> None:
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
 
+    temp = tokenize(de_text)
+    assert temp is not None
+    temp = remove_stop_words(temp, stopwords)
+    assert temp is not None
+    temp = calculate_frequencies(temp)
+    assert temp is not None
+    temp = get_top_n_words(temp, 7)
+    assert temp is not None
     print("Top 7 words:")
-    for word in get_top_n_words(
-        calculate_frequencies(remove_stop_words(tokenize(de_text), stopwords)), 7
-    ):
+
+    for word in temp:
         print(word)
 
     print()
@@ -42,6 +49,10 @@ def main() -> None:
     unk_lang_profile = create_language_profile("unk", unknown_text, stopwords)
     de_lang_profile = create_language_profile("de", de_text, stopwords)
     en_lang_profile = create_language_profile("en", en_text, stopwords)
+
+    assert unk_lang_profile is not None
+    assert de_lang_profile is not None
+    assert en_lang_profile is not None
 
     print("Language by top_n:",
     f"{detect_language_by_top_n(unk_lang_profile, de_lang_profile, en_lang_profile, 15)}")
@@ -61,12 +72,14 @@ def main() -> None:
     ]
 
     profiles_collected = collect_profiles(paths_to_profiles)
+    assert profiles_collected is not None
 
     unk_metrics = detect_language_advanced(
          unk_lang_profile,
          [profile for profile in profiles_collected if profile[0] != unk_lang_profile[0]],
          15
          )
+    assert unk_metrics is not None
 
     print_report(unk_lang_profile, unk_metrics, 15)
     result = unk_metrics

@@ -454,9 +454,10 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
 
     profiles = []
     for path in paths_to_profiles:
-        if load_profile(path) is None:
+        profile = load_profile(path)
+        if profile is None:
             continue
-        profiles.append(load_profile(path))
+    profiles.append(profile)
 
     return profiles
 
