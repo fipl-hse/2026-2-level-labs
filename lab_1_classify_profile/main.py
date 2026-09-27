@@ -325,7 +325,6 @@ def compare_profiles_by_mse(
     freq_dict_unknown = unknown_profile[1]
     freq_dict_to_compare = profile_to_compare[1]
 
-    all_tokens = list(freq_dict_unknown)
     all_tokens = set(freq_dict_unknown) | set(freq_dict_to_compare)
 
     predicted = [freq_dict_unknown.get(token, 0.0) for token in all_tokens]
