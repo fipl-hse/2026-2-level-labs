@@ -92,7 +92,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     result = {}
     for token, count in counts.items():
         result[token] = count / total
-    return result  #frequency
+    return result
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
