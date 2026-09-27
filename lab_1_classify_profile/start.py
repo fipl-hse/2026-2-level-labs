@@ -41,10 +41,8 @@ def main() -> None:
     assert frequencies is not None
     top_n = get_top_n_words(frequencies, 7)
     assert top_n is not None
-    print("Top 7 words:")
-
-    for word in top_n:
-        print(word)
+    print("Top 7 DE words:")
+    print(*top_n, sep="\n")
 
     print()
 
