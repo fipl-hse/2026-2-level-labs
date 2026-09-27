@@ -30,11 +30,11 @@ def tokenize(text: str) -> Sequence[str] | None:
         return None
 
     tokens = []
-    for chunk in text.split():
+    for symbol in text.split():
         word = ''
-        for char in chunk:
-            if char.isalpha():
-                word += char.lower()
+        for symbol in incoming_words:
+            if symbol.isalpha():
+                word += symbol.lower()
         if word:
             tokens.append(word)
 
