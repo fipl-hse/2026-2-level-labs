@@ -7,8 +7,7 @@ from main import (
     calculate_frequencies,
     get_top_n_words,
     remove_stop_words, 
-    tokenize, 
-)
+    tokenize)
 
 
 def main() -> None:
