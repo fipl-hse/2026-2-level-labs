@@ -126,10 +126,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     top_n_words = [item[0] for item in sort_freq_dct]
 
-
-    top_n_words = top_n_words[:top_n]
-
-    return top_n_words
+    return top_n_words[:top_n]
 
 # Mark 6.
 
