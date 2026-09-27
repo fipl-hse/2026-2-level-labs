@@ -4,6 +4,7 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 from lab_1_classify_profile.main import (
+    ProfileType,
     calculate_frequencies,
     collect_profiles,
     create_language_profile,
@@ -33,7 +34,7 @@ def main() -> None:
     # result = None
     # assert result, "Detection result is None"
 
-    def demonstrate_top_n_words():
+    def demonstrate_top_n_words() -> None:
         tokens = tokenize(de_text)
         assert tokens is not None, "tokenize resulted as None"
 
@@ -48,19 +49,23 @@ def main() -> None:
 
         print(top_words)
 
-    def demostarte_top_n_detection():
-        result_by_top_n = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    def demonstrate_top_n_detection(
+        unknown: ProfileType, en: ProfileType, de: ProfileType
+    ) -> None:
+        result_by_top_n = detect_language_by_top_n(unknown, en, de, 15)
         assert result_by_top_n, "Detection by top n words is None"
 
         print(result_by_top_n)
 
-    def demonstrate_mse_detection():
-        result_by_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
+    def demonstrate_mse_detection(
+        unknown: ProfileType, en: ProfileType, de: ProfileType
+    ) -> None:
+        result_by_mse = detect_language_by_mse(unknown, en, de)
         assert result_by_mse, "Detection by mse is None"
 
         print(result_by_mse)
 
-    demonstrate_top_n_words
+    demonstrate_top_n_words()
 
     en_profile = create_language_profile("en", en_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
@@ -69,9 +74,9 @@ def main() -> None:
     assert de_profile is not None, "Deutsch profile is None"
     assert unknown_profile is not None, "Unknown profile is None"
 
-    demostarte_top_n_detection
+    demonstrate_top_n_detection(unknown_profile, en_profile, de_profile)
 
-    demonstrate_mse_detection
+    demonstrate_mse_detection(unknown_profile, en_profile, de_profile)
 
     profiles_folder = "lab_1_classify_profile/assets/profiles"
 
