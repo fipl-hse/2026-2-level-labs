@@ -91,7 +91,7 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         return None
 
     if not tokens:
-            return {}
+        return {}
 
     total_n = len(tokens)
 
@@ -418,7 +418,21 @@ def load_profile(path_to_file: str) -> ProfileType | None:
     if not isinstance(path_to_file, str):
         return None
 
+    with open(path_to_file, "r", encoding="utf-8") as file:
+        profile_dict = json.load(file)
 
+    if not isinstance(profile_dict, dict):
+        return None
+
+    if "name" not in profile_dict or "freq" not in profile_dict or "n_words" not in profile_dict:
+        return None
+
+    ProfileType = (profile_dict["name"], profile_dict["freq"], profile_dict["n_words"])
+
+    if not check_profile(ProfileType):
+        return None
+
+    return ProfileType
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
     """
@@ -432,6 +446,19 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         Returns None in case of incorrect input types.
     """
 
+    if not isinstance(paths_to_profiles, (tuple, list)):
+        return None
+
+    if not all(isinstance(path, str) for path in paths_to_profiles):
+        return None
+
+    profiles = []
+    for path in paths_to_profiles:
+        if load_profile(path) is None:
+            continue
+        profiles.append(load_profile(path))
+
+    return profiles
 
 def detect_language_advanced(
     unknown_profile: ProfileType, known_profiles: Sequence[ProfileType], top_n: int
@@ -452,6 +479,33 @@ def detect_language_advanced(
         Returns None in case of incorrect input types.
     """
 
+    if not check_profile(unknown_profile) or not isinstance(known_profiles, (list, tuple)):
+        return None
+
+    if not all(check_profile(profile) for profile in known_profiles):
+        return None
+
+    if not isinstance(top_n, int) or isinstance(top_n, bool) or top_n <= 0:
+        return None
+
+    results = []
+
+    for profile in known_profiles:
+        mse = compare_profiles_by_mse(unknown_profile, profile)
+        if mse is None:
+            return None
+
+        top_n_score = compare_profiles_by_top_n(unknown_profile, profile, top_n)
+        if top_n_score is None:
+            return None
+
+        language = profile[0]
+        results.append((language, {"MSE": mse, "Top-N": top_n_score}))
+
+    results.sort(key=lambda item: (item[1]["MSE"], -item[1]["Top-N"]))
+
+    return results
+
 
 def print_report(
     unknown_profile: ProfileType, metrics_stats: Sequence[tuple[str, dict[str, float]]], top_n: int
@@ -467,3 +521,42 @@ def print_report(
 
     In case of incorrect type inputs, does not print anything.
     """
+    if not check_profile(unknown_profile) or not isinstance(metrics_stats, Sequence):
+        return None
+
+    unk_top_n = get_top_n_words(unknown_profile[1], top_n)
+    if unk_top_n is None:
+        return None
+
+    for item in metrics_stats:
+        if not isinstance(item, tuple) or len(item) != 2:
+            return None
+        lang, metrics = item
+        if not isinstance(lang, str) or not isinstance(metrics, dict):
+            return None
+        if "MSE" not in metrics or "Top-N" not in metrics:
+            return None
+        if not isinstance(metrics["MSE"], (int, float)) or not isinstance(metrics["Top-N"], (int, float)):
+            return None
+
+    print("Unknown language stats")
+    print("======================")
+    print(f"Popular words: {unk_top_n}")
+
+    all_words = list(unknown_profile[1].keys())
+    max_l_word = max(all_words, key=len)
+    min_l_word = min(all_words, key=len)
+    avg_length = sum(len(word) for word in all_words) / len(all_words)
+
+    print(f"Max length word: '{max_l_word}'")
+    print(f"Min length word: '{min_l_word}'")
+    print(f"Average token length: {avg_length:.5f}")
+    print()
+
+    print("Language scores")
+    print("---------------")
+
+    for lang, metrics in metrics_stats:
+        mse = metrics["MSE"]
+        topn = metrics["Top-N"]
+        print(f"{lang}: MSE {mse:.5f}  Top-N Score {topn:.5f}")
