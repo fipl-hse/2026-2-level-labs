@@ -40,7 +40,7 @@ def main() -> None:
     en_profile = create_language_profile('en', en_text, stopwords)
     de_profile = create_language_profile('de', de_text, stopwords)
     unk_profile = create_language_profile('unk', unknown_text, stopwords)
-    assert en_profile is not None                          
+    assert en_profile is not None
     assert de_profile is not None
     assert unk_profile is not None
     detect_lang = detect_language_by_top_n(unk_profile,de_profile,en_profile,15)
