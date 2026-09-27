@@ -5,8 +5,8 @@ Language detection
 """
 
 # pylint:disable=unused-argument
-from typing import Sequence
 import json
+from typing import Sequence
 
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
@@ -64,7 +64,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     if not all(isinstance(word, str) and word.isalpha() for word in stop_words):
         return None
 
-    stop_words_set =set(stop_words) # for optimization
+    stop_words_set =set(stop_words)
 
     filtered_tokens = []
 
@@ -90,9 +90,10 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     if tokens is None or not all(isinstance(word, str) for word in tokens):
         return None
 
+    if not tokens:
+            return {}
+
     total_n = len(tokens)
-    if total_n == 0:
-        return {}
 
     tokens_set = set(tokens)
     tokens_freq = {}
@@ -160,7 +161,7 @@ def create_language_profile(
     if tokens_freq is None:
         return None
 
-    return (language, tokens_freq, len(tokens_freq))
+    return language, tokens_freq, len(tokens_freq)
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -185,11 +186,13 @@ def check_profile(profile: ProfileType) -> bool:
     if not isinstance(freq_dict, dict):
         return False
 
-    for key, value in freq_dict.items():
-        if not isinstance(key, str):
-            return False
-        if not isinstance(value, (int, float)):
-            return False
+    if not all(
+        isinstance(key,str)
+        and isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        for key, value in freq_dict.items()
+        ):
+        return False
 
     if not isinstance(n, (int, float)):
         return False
@@ -285,7 +288,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return 0.0
     if (
         not all(
-            isinstance(num, (int,float))
+            isinstance(num, (int, float))
             and not isinstance(num, bool)
             for num in actual
             )
@@ -396,7 +399,7 @@ def save_profile(profile: ProfileType, save_path: str) -> bool:
     }
 
     with open(f"{save_path}/{profile[0]}.json", "w", encoding="utf-8") as file:
-        file.write(json.dumps(profile_dict, indent=4, ensure_ascii=False))
+        json.dump(profile_dict, file, indent=4, ensure_ascii=False)
 
     return True
 
@@ -411,6 +414,10 @@ def load_profile(path_to_file: str) -> ProfileType | None:
         ProfileType | None: Loaded profile.
         Returns None in case of incorrect input types.
     """
+
+    if not isinstance(path_to_file, str):
+        return None
+
 
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
