@@ -139,15 +139,21 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(stop_words, Sequence):
-        return None
-    if not isinstance(text,str):
-        return None
-    if not isinstance(language,str):
+    if (
+        not isinstance(stop_words, Sequence)
+        or not isinstance(text,str)
+        or not isinstance(language,str)
+    ):
         return None
     tokens = tokenize(text)
+    if tokens is None:
+        return None
     cleaned_tokens = remove_stop_words(tokens,stop_words)
+    if cleaned_tokens is None:
+        return None
     counts = calculate_frequencies(cleaned_tokens)
+    if counts is None:
+        return None
     if counts is None:
         return None
     return (language, counts, len(counts))
@@ -193,11 +199,12 @@ def compare_profiles_by_top_n(
         float | None: The distance between profiles.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_to_compare):
-        return None
-    if not isinstance(top_n,int) or top_n<=0:
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_to_compare)
+        or not isinstance(top_n,int)
+        or top_n<=0
+    ):
         return None
     unknown = get_top_n_words(unknown_profile[1],top_n)
     if unknown is None:
@@ -338,11 +345,11 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_1):
-        return None
-    if not check_profile(profile_2):
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+    ):
         return None
     mse1 = compare_profiles_by_mse(unknown_profile,profile_1)
     mse2 = compare_profiles_by_mse(unknown_profile, profile_2)
