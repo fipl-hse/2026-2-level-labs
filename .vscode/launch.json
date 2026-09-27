@@ -78,6 +78,16 @@
             }
         },
         {
+            "name": "[SEMINAR 4] Learn lists",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_5_lists.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
             "name": "[ADMIN] Run tests",
             "type": "debugpy",
             "request": "launch",
