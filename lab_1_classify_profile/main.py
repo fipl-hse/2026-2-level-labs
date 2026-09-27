@@ -283,7 +283,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         if not isinstance(y, (int,float)):
             return None
         difference = y - p
-        summa += difference * ifference
+        summa += difference * difference
     return summa/len(predicted)
 
 
