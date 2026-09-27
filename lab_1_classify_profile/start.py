@@ -31,17 +31,19 @@ def main() -> None:
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
 
-    temp = tokenize(de_text)
-    assert temp is not None
-    temp = remove_stop_words(temp, stopwords)
-    assert temp is not None
-    temp = calculate_frequencies(temp)
-    assert temp is not None
-    temp = get_top_n_words(temp, 7)
-    assert temp is not None
+
+
+    tokenized_text = tokenize(de_text)
+    assert tokenized_text is not None
+    filtered_text = remove_stop_words(tokenized_text, stopwords)
+    assert filtered_text is not None
+    frequencies = calculate_frequencies(filtered_text)
+    assert frequencies is not None
+    top_n = get_top_n_words(frequencies, 7)
+    assert top_n is not None
     print("Top 7 words:")
 
-    for word in temp:
+    for word in top_n:
         print(word)
 
     print()
@@ -61,8 +63,9 @@ def main() -> None:
 
     print()
 
-    for profile in [de_lang_profile, en_lang_profile, unk_lang_profile]:
-        save_profile(profile, "lab_1_classify_profile/assets/profiles/")
+    save_profile(de_lang_profile, "lab_1_classify_profile/assets/profiles/")
+    save_profile(en_lang_profile, "lab_1_classify_profile/assets/profiles/")
+    save_profile(unk_lang_profile, "lab_1_classify_profile/assets/profiles/")
 
     paths_to_profiles = [
         f"lab_1_classify_profile/assets/profiles/{de_lang_profile[0]}.json",
@@ -74,15 +77,14 @@ def main() -> None:
     profiles_collected = collect_profiles(paths_to_profiles)
     assert profiles_collected is not None
 
-    unk_metrics = detect_language_advanced(
+    result = detect_language_advanced(
          unk_lang_profile,
          [profile for profile in profiles_collected if profile[0] != unk_lang_profile[0]],
          15
          )
-    assert unk_metrics is not None
+    assert result is not None
 
-    print_report(unk_lang_profile, unk_metrics, 15)
-    result = unk_metrics
+    print_report(unk_lang_profile, result, 15)
     assert result, "Detection result is None"
 
 

@@ -457,7 +457,7 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         profile = load_profile(path)
         if profile is None:
             continue
-    profiles.append(profile)
+        profiles.append(profile)
 
     return profiles
 
