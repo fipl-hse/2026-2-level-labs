@@ -337,17 +337,17 @@ def compare_profiles_by_mse(
 
     all_tokens = set_dict_unknown | set_dict_compare
 
-    y_val = []
-    p_val = []
+    actual_val = []
+    predicted_val = []
 
     for token in all_tokens:
-        y = dict_unknown.get(token, 0.0)
-        p = dict_compare.get(token, 0.0)
+        actual = dict_unknown.get(token, 0.0)
+        predicted = dict_compare.get(token, 0.0)
 
-        y_val.append(y)
-        p_val.append(p)
+        actual_val.append(actual)
+        predicted_val.append(predicted)
 
-    return calculate_mse(p_val, y_val)
+    return calculate_mse(predicted_val, actual_val)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
