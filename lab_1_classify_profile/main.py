@@ -215,10 +215,7 @@ def compare_profiles_by_top_n(
     ):
         return None
 
-    intersecting_top_words = [
-        top_word for top_word in top_unknown_profile
-        if top_word in top_profile_to_compare
-        ]
+    intersecting_top_words = set(top_unknown_profile) & set(top_profile_to_compare)
 
     return len(intersecting_top_words) / len(top_unknown_profile)
 
@@ -329,10 +326,7 @@ def compare_profiles_by_mse(
     freq_dict_to_compare = profile_to_compare[1]
 
     all_tokens = list(freq_dict_unknown)
-    all_tokens += [
-        token for token in freq_dict_to_compare
-        if token not in all_tokens
-        ]
+    all_tokens = set(freq_dict_unknown) | set(freq_dict_to_compare)
 
     predicted = [freq_dict_unknown.get(token, 0.0) for token in all_tokens]
     actual = [freq_dict_to_compare.get(token, 0.0) for token in all_tokens]
@@ -453,14 +447,13 @@ def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] 
         Sequence[ProfileType] | None: Sequence of loaded profiles.
         Returns None in case of incorrect input types.
     """
-    if (
-    not isinstance(paths_to_profiles, list)
-    or not all(isinstance(path, str) for path in paths_to_profiles)
-    ):
+    if not isinstance(paths_to_profiles, list):
         return None
 
     profiles = []
     for path in paths_to_profiles:
+        if not isinstance(path, str):
+            return None
         profile = load_profile(path)
         if profile is not None:
             profiles.append(profile)
@@ -489,17 +482,15 @@ def detect_language_advanced(
     if (
     not check_profile(unknown_profile)
     or not isinstance(known_profiles, list)
-    or not all(check_profile(known_profile) for known_profile in known_profiles)
     or not isinstance(top_n, int)
     or top_n <= 0
     ):
         return None
 
-    if not known_profiles:
-        return None
-
     result = []
     for known_profile in known_profiles:
+        if not check_profile(known_profile):
+            return None
         language = known_profile[0]
         top_n_score = compare_profiles_by_top_n(unknown_profile, known_profile, top_n)
         mse_score = compare_profiles_by_mse(unknown_profile, known_profile)
