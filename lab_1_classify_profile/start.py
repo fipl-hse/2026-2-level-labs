@@ -4,10 +4,11 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 from main import(
-    tokenize, 
+    calculate_frequencies,
+    get_top_n_words,
     remove_stop_words, 
-    calculate_frequencies, 
-    get_top_n_words,)
+    tokenize, 
+    )
 
 
 def main() -> None:
