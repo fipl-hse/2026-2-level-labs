@@ -10,8 +10,6 @@ from main import calculate_frequencies
 from main import get_top_n_words
 from main import detect_language_by_top_n
 from main import create_language_profile
-from main import calculate_mse
-from main import compare_profiles_by_mse
 from main import detect_language_by_mse
 def main() -> None:
     """

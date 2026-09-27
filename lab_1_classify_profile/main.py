@@ -49,14 +49,19 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     """
     if not isinstance(tokens,Sequence):
         return None
+    if not isinstance(stop_words,Sequence):
+        return None
+    if not all(isinstance(token, str) for token in tokens):
+            return None
+    if not all(isinstance(word, str) for word in stop_words):
+        return None
     result = []
     if stop_words:
         for token in tokens:
             if token not in stop_words:
                 result.append(token)
         return result
-    else:
-        return tokens
+    return tokens
 
 
 
@@ -80,8 +85,8 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         token_counts[token] = token_counts.get(token,0) +1
     total=len(tokens)
     result = {}
-    for token in token_counts:
-        result[token] = token_counts[token] / total
+    for token, count in token_counts.items():
+        result[token] = count / total
     return result
 
 
@@ -143,8 +148,7 @@ def create_language_profile(
     counts = calculate_frequencies(cleaned_tokens)
     if counts is None:
         return None
-    else:
-        return (language, counts, len(counts))
+    return (language, counts, len(counts))
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -163,14 +167,10 @@ def check_profile(profile: ProfileType) -> bool:
     if len(profile) != 3:
         return False
     language, counts, len_counts = profile #распаковка кортежа
-    if not isinstance(language, str):
-        return False
-    if not isinstance(counts, dict):
+    if not isinstance(language, str) or not isinstance(counts, dict):
         return False
     for key, value in counts.items():
-        if not isinstance(key,str):
-            return False
-        if not isinstance(value,(int,float)):
+        if not isinstance(key,str) or not isinstance(value,(int,float)):
             return False
     if isinstance(len_counts, bool) or not isinstance(len_counts, int):
         return False
@@ -229,23 +229,22 @@ def detect_language_by_top_n(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_1):
-        return None
-    if not check_profile(profile_2):
-        return None
-    if not isinstance(top_n, int) or top_n <=0:
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)
+        or not isinstance(top_n, int)
+        or top_n <=0
+    ):
         return None
 
     cross_1_unknown = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
     cross_2_unknown = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
     if cross_1_unknown is None or cross_2_unknown is None:
         return None
-
     if cross_1_unknown > cross_2_unknown:
         return profile_1[0]
-    elif cross_2_unknown > cross_1_unknown:
+    if cross_2_unknown > cross_1_unknown:
         return profile_2[0]
 
     return min(profile_1[0], profile_2[0])
@@ -267,25 +266,24 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
-    if not isinstance(predicted, Sequence) or not isinstance(actual, Sequence):
-        return None
-    if isinstance(predicted, str) or isinstance(actual, str):
-        return None
-    if len(predicted) != len(actual):
+    if (
+        not isinstance(predicted, Sequence)
+        or not isinstance(actual, Sequence)
+        or isinstance(predicted, str)
+        or isinstance(actual, str)
+        or len(predicted) != len(actual)
+    ):
         return None
     if len(predicted) == 0:
         return 0.0
-    mse = 0
-    summa = 0
-    for i in range(len(predicted)):
-        p = predicted[i]
-        y = actual[i]
+    summa = 0.0
+    for p, y in zip(predicted, actual):
         if not isinstance(p, (int,float)):
             return None
         if not isinstance(y, (int,float)):
             return None
         difference = y - p
-        summa += difference*difference
+        summa += difference * ifference
     return summa/len(predicted)
 
 
