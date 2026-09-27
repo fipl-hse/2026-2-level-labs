@@ -3,7 +3,7 @@ Language detection starter.
 """
 
 # pylint: disable=unused-variable, duplicate-code
-from main import(
+from main import (
     calculate_frequencies,
     get_top_n_words,
     remove_stop_words, 
