@@ -56,11 +56,11 @@ def tokenize(text: str) -> Sequence[str] | None:
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     if not isinstance(tokens, list) or not isinstance(stop_words, list):
         return None
-    for g in tokens:
-        if not isinstance(g, str):
+    for token in tokens:
+        if not isinstance(token, str):
             return None
-    for g in stop_words:
-        if not isinstance(g, str):
+    for word in stop_words:
+        if not isinstance(word, str):
             return None
     stop_words_set = set(stop_words)
     filtered_tokens = [token for token in tokens if token not in stop_words_set]
@@ -103,7 +103,6 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
     if not isinstance(freq_dict, dict) or not isinstance(top_n, int):
