@@ -3,8 +3,10 @@ Lab 1.
 
 Language detection
 """
+
+# pylint: disable=unused-argument
+
 import re
-# pylint:disable=unused-argument
 from typing import Sequence
 
 FreqDictType = dict[str, float]
@@ -52,7 +54,7 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     if not isinstance(stop_words,Sequence):
         return None
     if not all(isinstance(token, str) for token in tokens):
-            return None
+        return None
     if not all(isinstance(word, str) for word in stop_words):
         return None
     result = []
@@ -162,18 +164,19 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
-    if not isinstance(profile,tuple):
+    if not isinstance(profile, tuple) or len(profile) != 3:
         return False
-    if len(profile) != 3:
-        return False
-    language, counts, len_counts = profile #распаковка кортежа
-    if not isinstance(language, str) or not isinstance(counts, dict):
+    language, counts, len_counts = profile
+    if (
+        not isinstance(language, str)
+        or not isinstance(counts, dict)
+        or isinstance(len_counts, bool)
+        or not isinstance(len_counts, int)
+    ):
         return False
     for key, value in counts.items():
-        if not isinstance(key,str) or not isinstance(value,(int,float)):
+        if not isinstance(key, str) or not isinstance(value, (int, float)):
             return False
-    if isinstance(len_counts, bool) or not isinstance(len_counts, int):
-        return False
     return True
 
 def compare_profiles_by_top_n(
@@ -302,9 +305,10 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
-    if not check_profile(unknown_profile):
-        return None
-    if not check_profile(profile_to_compare):
+    if (
+        not check_profile(unknown_profile)
+        or not check_profile(profile_to_compare)
+    ):
         return None
     unknown_profile_set = set(unknown_profile[1])
     profile_to_compare_set = set(profile_to_compare[1])
@@ -313,8 +317,8 @@ def compare_profiles_by_mse(
     actual = []
     for token in all_tokens_set:
         predicted.append(unknown_profile[1].get(token, 0.0))
-        actual.append(profile_to_compare[1].get(token,0.0))
-    res = calculate_mse(predicted,actual)
+        actual.append(profile_to_compare[1].get(token, 0.0))
+    res = calculate_mse(predicted, actual)
     return res
 
 

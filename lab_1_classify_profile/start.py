@@ -4,13 +4,15 @@ Language detection starter.
 
 # pylint: disable=unused-variable, duplicate-code
 
-from main import tokenize
-from main import remove_stop_words
-from main import calculate_frequencies
-from main import get_top_n_words
-from main import detect_language_by_top_n
-from main import create_language_profile
-from main import detect_language_by_mse
+from lab_1_classify_profile.main import(
+tokenize,
+remove_stop_words,
+calculate_frequencies,
+get_top_n_words,
+detect_language_by_top_n,
+create_language_profile,
+detect_language_by_mse)
+
 def main() -> None:
     """
     Launches an implementation.
