@@ -58,6 +58,7 @@ def add_numbers(a: int, b: int) -> int:
     Returns:
         int: Sum of a and b
     """
+
 # student implementation goes here
 
 # add_numbers(2, 3) → 5
@@ -78,8 +79,8 @@ def average(a: float, b: float, c: float) -> float:
     Returns:
         float: Average value of the three numbers
     """
-# student implementation goes here
 
+# student implementation goes here
 
 
 # average(1, 2, 3) → 2.0
