@@ -32,7 +32,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         return None
     tokens = []
     for word in text.split():
-        cleaned = re.sub(r'[^a-zA-ZёЁäöüßÄÖÜ]|[aoeuiAOEUIyёäöüЁÄÖÜ]', '', word)
+        cleaned = re.sub(r'[^a-zA-ZёЁäöüßÄÖÜ]', '', word)
         if cleaned:
             tokens.append(cleaned.lower())
 
