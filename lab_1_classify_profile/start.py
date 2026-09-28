@@ -26,6 +26,8 @@ def main() -> None:
     if en_profile and de_profile and unknown_profile:
         result = detect_language_by_mse(unknown_profile, en_profile, de_profile)
     assert result, "Detection result is None"
+    print(result)
+
 
 
 if __name__ == "__main__":
