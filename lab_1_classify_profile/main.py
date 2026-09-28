@@ -166,7 +166,7 @@ def create_language_profile(
         if clean_tokens is not None:
             frequencies = calculate_frequencies(clean_tokens)
             if frequencies is not None:
-                return (language, frequencies, len(frequencies))
+                return language, frequencies, len(frequencies)
     return None
 
 
@@ -230,13 +230,7 @@ def compare_profiles_by_top_n(
     if un_top is None or comp_top is None:
         return None
 
-    if len(un_top) == 0:
-        return 0.0
-
-    common_words_count = 0
-    for word in un_top:
-        if word in comp_top:
-            common_words_count += 1
+    common_words_count = len(set(un_top) & set(comp_top))
 
     return float(common_words_count / len(un_top))
 
@@ -312,18 +306,13 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if len(predicted) == 0:
         return 0.0
 
-    for p_value in predicted:
-        if not isinstance(p_value, (int, float)) or isinstance(p_value, bool):
-            return None
-
-    for a_value in actual:
-        if not isinstance(a_value, (int, float)) or isinstance(a_value, bool):
-            return None
-
     error_sum = 0.0
-    for i, pred_val in enumerate(predicted):
-        difference = pred_val - actual[i]
-        error_sum += difference ** 2
+    for p_val, a_val in zip(predicted, actual):
+        if not isinstance(p_val, (int, float)) or isinstance(p_val, bool):
+            return None
+    if not isinstance(a_val, (int, float)) or isinstance(a_val, bool):
+        return None
+    error_sum += (p_val - a_val) ** 2
 
     return float(error_sum / len(predicted))
 
@@ -351,27 +340,13 @@ def compare_profiles_by_mse(
     un_freqs = unknown_profile[1]
     comp_freqs = profile_to_compare[1]
 
-    all_words = []
-    for word in un_freqs:
-        if word not in all_words:
-            all_words.append(word)
-    for word in comp_freqs:
-        if word not in all_words:
-            all_words.append(word)
+    all_words = list(set(un_freqs) | set(comp_freqs))
 
     predicted = []
     actual = []
-
     for word in all_words:
-        if word in un_freqs:
-            predicted.append(un_freqs[word])
-        else:
-            predicted.append(0.0)
-
-        if word in comp_freqs:
-            actual.append(comp_freqs[word])
-        else:
-            actual.append(0.0)
+        predicted.append(un_freqs.get(word, 0.0))
+        actual.append(comp_freqs.get(word, 0.0))
 
     return calculate_mse(predicted, actual)
 
@@ -392,11 +367,6 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if (not isinstance(unknown_profile, tuple) or
-            not isinstance(profile_1, tuple) or
-            not isinstance(profile_2, tuple)):
-        return None
-
     if (not check_profile(unknown_profile) or
             not check_profile(profile_1) or
             not check_profile(profile_2)):
