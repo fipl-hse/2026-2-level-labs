@@ -32,7 +32,7 @@ def tokenize(text: str) -> Sequence[str] | None:
         return None
     tokens = []
     for word in text.split():
-        cleaned = re.sub(r'[^a-zA-ZёЁäöüßÄÖÜ]', '', word)
+        cleaned = re.sub(r'[^a-zA-ZёЁäöüßÄÖÜ]|[aoeuiAOEUIyёäöüЁÄÖÜ]', '', word)
         if cleaned:
             tokens.append(cleaned.lower())
 
@@ -106,7 +106,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
-    if not isinstance(top_n,int):
+    if not isinstance(top_n, int):
         return None
     if not isinstance(freq_dict, dict):
         return None
