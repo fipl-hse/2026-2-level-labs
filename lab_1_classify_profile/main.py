@@ -291,8 +291,8 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if not predicted:
         return 0.0
 
-    sum_of_squares: float = sum((y - p) ** 2 for y, p in zip(predicted, actual))
-    count: int = len(predicted)
+    sum_of_squares = sum((y - p) ** 2 for y, p in zip(predicted, actual))
+    count = len(predicted)
     return sum_of_squares / count
 
 
