@@ -307,12 +307,13 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return 0.0
 
     error_sum = 0.0
-    for p_val, a_val in zip(predicted, actual):
-        if not isinstance(p_val, (int, float)) or isinstance(p_val, bool):
+    for i, pred_val in enumerate(predicted):
+        if not isinstance(pred_val, (int, float)) or isinstance(pred_val, bool):
             return None
-    if not isinstance(a_val, (int, float)) or isinstance(a_val, bool):
-        return None
-    error_sum += (p_val - a_val) ** 2
+        if not isinstance(actual[i], (int, float)) or isinstance(actual[i], bool):
+            return None
+
+        error_sum += (pred_val - actual[i]) ** 2
 
     return float(error_sum / len(predicted))
 
@@ -367,6 +368,7 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
+
     if (not check_profile(unknown_profile) or
             not check_profile(profile_1) or
             not check_profile(profile_2)):
