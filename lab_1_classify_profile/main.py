@@ -293,7 +293,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
     sum_of_squares = sum((y - p) ** 2 for y, p in zip(predicted, actual))
     count = len(predicted)
-    return sum_of_squares / count
+    return float(sum_of_squares / count)
 
 
 def compare_profiles_by_mse(
