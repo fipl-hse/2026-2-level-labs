@@ -30,11 +30,11 @@ def tokenize(text: str) -> Sequence[str] | None:
         return None
 
     tokens = []
-    for symbol in text.split():    #делит текст на пробельные символы
+    for symbol in text.split():
         word = ''
-        for symbol in incoming_words:
-            if symbol.isalpha():      #проверяет состоит ли строка из буквенных символов
-                word += symbol.lower()  #кладем в переменную слова нижнего регистра
+        for letter in symbol:
+            if letter.isalpha():
+                word += letter.lower()
         if word:
             tokens.append(word)
 
