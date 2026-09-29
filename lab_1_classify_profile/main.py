@@ -376,15 +376,6 @@ def compare_profiles_by_mse(
 
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
-    freq_dict_unknown = unknown_profile[1]
-    freq_dict_to_compare = profile_to_compare[1]
-
-    all_tokens = set(freq_dict_unknown) | set(freq_dict_to_compare)
-
-    predicted = [freq_dict_unknown.get(token, 0.0) for token in all_tokens]
-    actual = [freq_dict_to_compare.get(token, 0.0) for token in all_tokens]
-
-    return calculate_mse(predicted, actual)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
@@ -486,21 +477,6 @@ def load_profile(path_to_file: str) -> ProfileType | None:
 
     return profile
 
-    with open(path_to_file, "r", encoding="utf-8") as file:
-        language_data = json.load(file)
-
-    if not isinstance(language_data, dict):
-        return None
-
-    if not all(key in language_data for key in ("name", "freq", "n_words")):
-        return None
-
-    profile = (language_data["name"], language_data["freq"], language_data["n_words"])
-
-    if not check_profile(profile):
-        return None
-
-    return profile
 
 def collect_profiles(paths_to_profiles: Sequence[str]) -> Sequence[ProfileType] | None:
     """
@@ -583,27 +559,6 @@ def detect_language_advanced(
 
     return sorted_list
 
-    result = []
-    for known_profile in known_profiles:
-        if not check_profile(known_profile):
-            return None
-        language = known_profile[0]
-        top_n_score = compare_profiles_by_top_n(unknown_profile, known_profile, top_n)
-        mse_score = compare_profiles_by_mse(unknown_profile, known_profile)
-
-        if top_n_score is None or mse_score is None:
-            return None
-
-        scores = {
-            "MSE": mse_score,
-            "Top-N": top_n_score,
-        }
-
-        result.append((language, scores))
-
-    result.sort(key=lambda i: (i[1]["MSE"], -i[1]["Top-N"], i[0]))
-
-    return result
 
 def print_report(
     unknown_profile: ProfileType, metrics_stats: Sequence[tuple[str, dict[str, float]]], top_n: int
