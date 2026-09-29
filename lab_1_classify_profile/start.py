@@ -1,19 +1,6 @@
 """
 Language detection starter.
 """
-from lab_1_classify_profile.main import (
-    calculate_frequencies,
-    collect_profiles,
-    create_language_profile,
-    detect_language_advanced,
-    detect_language_by_mse,
-    detect_language_by_top_n,
-    get_top_n_words,
-    print_report,
-    remove_stop_words,
-    save_profile,
-    tokenize,
-)
 
 # pylint: disable=unused-variable, duplicate-code, too-many-return-statements
 from lab_1_classify_profile.main import (
@@ -40,7 +27,7 @@ def main() -> None:
     with open("lab_1_classify_profile/assets/texts/unknown.txt", "r", encoding="utf-8") as file:
         unknown_text = file.read()
     with open("lab_1_classify_profile/assets/stopwords.txt", "r", encoding="utf-8") as file:
-        stopwords = [word.lower() for word in file.read().splitlines() if word.strip()]
+        stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
 
