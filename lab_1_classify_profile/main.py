@@ -63,24 +63,11 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
 
     return cleaned_text
 
-    if not isinstance(tokens, Sequence) or not isinstance(stop_words, Sequence):
-        return None
-
-    if not all(isinstance(token, str) for token in tokens):
-        return None
-
-    if not all(isinstance(word, str) for word in stop_words):
-        return None
-    filtered_tokens = []
-    for i in tokens:
-        if i not in stop_words:
-            filtered_tokens.append(i)
-    return filtered_tokens
-
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
+
     Args:
         tokens (Sequence[str]): Sequence of tokens
     Returns:
@@ -100,22 +87,6 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         frequency[element] = frequency.get(element, 0.0) + 1.0 / overall_words
 
     return frequency
-
-    if not isinstance (tokens, Sequence):
-        return None
-    if not all(isinstance(token, str) for token in tokens):
-        return None
-
-    freq_dict = {}
-    total = len(tokens)
-
-    for i in tokens:
-        if i not in freq_dict:
-            freq_dict[i] = 1 / total
-        else:
-            freq_dict[i] += 1 / total
-
-    return freq_dict
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -311,21 +282,7 @@ def detect_language_by_top_n(
 
     return sorted_list[0]
 
-    intersection_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
-    intersection_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
-    if intersection_1 is None or intersection_2 is None:
-        return None
-    if intersection_1 > intersection_2:
-        result = profile_1[0]
-    elif intersection_2 > intersection_1:
-        result = profile_2[0]
-    else:
-        if profile_1[0] < profile_2[0]:
-            result = profile_1[0]
-        else:
-            result = profile_2[0]
 
-    return result
 # Mark 8
 
 
@@ -370,24 +327,6 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
     return sum(diffs) / len(actual)
 
-    if len(predicted) != len(actual):
-        return None
-
-    if not all(isinstance(value, float) for value in predicted):
-        return None
-
-    if not all(isinstance(value, float) for value in actual):
-        return None
-
-    if len(predicted) == 0:
-        return 0.0
-
-    squares = 0.0
-
-    for i, prediction in enumerate(predicted):
-        squares += (prediction - actual[i]) ** 2
-
-    return squares / len(predicted)
 
 def compare_profiles_by_mse(
     unknown_profile: ProfileType, profile_to_compare: ProfileType
@@ -437,24 +376,6 @@ def compare_profiles_by_mse(
 
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
-    all_profile_tokens = set(unknown_profile[1]) | set(profile_to_compare[1])
-
-    values_1 = []
-    values_2 = []
-
-    for token in all_profile_tokens:
-        if token in unknown_profile[1]:
-            values_1.append(unknown_profile[1][token])
-        else:
-            values_1.append(0.0)
-
-        if token in profile_to_compare[1]:
-            values_2.append(profile_to_compare[1][token])
-        else:
-            values_2.append(0.0)
-
-    total = calculate_mse(values_1, values_2)
-    return total
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
