@@ -37,7 +37,6 @@ def tokenize(text: str) -> Sequence[str] | None:
 
     return tokens
 
-    return tokens
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
