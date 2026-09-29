@@ -37,16 +37,6 @@ def tokenize(text: str) -> Sequence[str] | None:
 
     return tokens
 
-    if not isinstance(text, str):
-        return None
-
-    tokens = []
-    for word in text.split():
-        cleaned = ''.join(char for char in word if char.isalpha())
-        if cleaned:
-            tokens.append(cleaned.lower())
-    return tokens
-
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
     """
@@ -72,21 +62,6 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
     cleaned_text = [word for word in tokens if word not in stop_words]
 
     return cleaned_text
-
-    if not isinstance(tokens, Sequence):
-        return None
-    for token in tokens:
-        if not isinstance(token, str):
-            return None
-    if not isinstance(stop_words, Sequence):
-        return None
-
-    for word in stop_words:
-        if not isinstance (word, str):
-            return None
-
-    stop_set = set(stop_words)
-    return [token for token in tokens if token not in stop_set]
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
@@ -220,17 +195,6 @@ def check_profile(profile: ProfileType) -> bool:
 
     return True
 
-    language, freq, n_words = profile
-    if (not isinstance(language, str)
-        or not isinstance(freq, dict)
-        or not isinstance(n_words, int)):
-        return False
-
-    if not all(isinstance(key, str) and isinstance(value, float)
-                for key, value in freq.items()):
-        return False
-
-    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -412,36 +376,6 @@ def compare_profiles_by_mse(
 
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
-    if not check_profile(profile_to_compare):
-        return None
-
-    dict_unknown = unknown_profile[1]
-    dict_compare = profile_to_compare[1]
-
-    tokens_unknown = []
-    tokens_compare = []
-
-    for key in dict_unknown:
-        tokens_unknown.append(key)
-    for key in dict_compare:
-        tokens_compare.append(key)
-
-    set_dict_unknown = set(tokens_unknown)
-    set_dict_compare = set(tokens_compare)
-
-    all_tokens = set_dict_unknown | set_dict_compare
-
-    actual_val = []
-    predicted_val = []
-
-    for token in all_tokens:
-        actual = dict_unknown.get(token, 0.0)
-        predicted = dict_compare.get(token, 0.0)
-
-        actual_val.append(actual)
-        predicted_val.append(predicted)
-
-    return calculate_mse(predicted_val, actual_val)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
