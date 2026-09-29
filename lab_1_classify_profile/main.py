@@ -22,7 +22,7 @@ def tokenize(text: str) -> Sequence[str] | None:
     removes punctuation and other symbols from words
 
     Args:
-        text (str): Text
+       text (str): Text
 
     Returns:
         Sequence[str] | None: Sequence of lower-cased tokens without punctuation.
@@ -35,19 +35,6 @@ def tokenize(text: str) -> Sequence[str] | None:
     text = re.sub(r"[^\w\s]|\d", "", text)
     tokens = list(text.split())
 
-    return tokens
-
-    if not isinstance(text, str):
-        return None
-
-    tokens = []
-    for word in text.lower().split():
-        token = ''
-        for letter in word:
-            if letter.isalpha():
-                token = token + letter
-        if token:
-            tokens.append(token)
     return tokens
 
 
@@ -76,11 +63,6 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
 
     return cleaned_text
 
-    result = []
-    for token in tokens:
-        if token not in stop_words:
-            result.append(token)
-    return result
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
@@ -184,19 +166,6 @@ def create_language_profile(
 
     return language, freq_dict, n_words
 
-    tokens = tokenize(text)
-    if tokens is None:
-        return None
-
-    filtered_tokens = remove_stop_words(tokens, stop_words)
-    if filtered_tokens is None:
-        return None
-
-    frequency = calculate_frequencies(filtered_tokens)
-    if frequency is None:
-        return None
-
-    return (language, frequency, len(frequency))
 
 def check_profile(profile: ProfileType) -> bool:
     """
@@ -226,18 +195,6 @@ def check_profile(profile: ProfileType) -> bool:
 
     return True
 
-    language, freq_dict, n_words = profile
-
-    if not isinstance(language, str) or not isinstance(freq_dict, dict):
-        return False
-    if not isinstance(n_words, int):
-        return False
-    if not all(isinstance(word, str) for word in freq_dict):
-        return False
-    if not all(isinstance(value, float) for value in freq_dict.values()):
-        return False
-
-    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -281,19 +238,6 @@ def compare_profiles_by_top_n(
 
     return result
 
-    unknown_words = get_top_n_words(unknown_profile[1], top_n)
-    compare_words = get_top_n_words(profile_to_compare[1], top_n)
-
-    if unknown_words is None or compare_words is None:
-        return None
-
-    unknown_set = set(unknown_words)
-    compare_set = set(compare_words)
-
-    if not unknown_set:
-        return 0.0
-
-    return len(unknown_set.intersection(compare_set)) / len(unknown_set)
 
 def detect_language_by_top_n(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType, top_n: int
@@ -432,18 +376,6 @@ def compare_profiles_by_mse(
 
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
-    unknown_freq = unknown_profile[1]
-    known_freq = profile_to_compare[1]
-
-    all_tokens = set(unknown_freq).union(set(known_freq))
-
-    unknown_values = []
-    known_values = []
-    for token in all_tokens:
-        unknown_values.append(unknown_freq.get(token, 0.0))
-        known_values.append(known_freq.get(token, 0.0))
-
-    return calculate_mse(unknown_values, known_values)
 
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
