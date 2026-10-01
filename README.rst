@@ -29,7 +29,7 @@
 1. `Лабораторная работа №2. Кодирование текста с помощью алгоритма BPE <https://github.com/fipl-hse/2026-2-level-labs/tree/main/lab_2_tokenize_by_bpe>`__
 
    1. Контрольная отсечка: **9 октября**
-   2. Дедлайн: **16 октября**
+   2. Дедлайн: **19 октября**
 
 История занятий
 ---------------
@@ -61,7 +61,7 @@
    Python <https://teach-in.ru/course/python-programming-and-data-analysis-basics>`__. 2022.
 
 Ресурсы
--------
+--------
 
 1. `Таблица успеваемости <https://docs.google.com/spreadsheets/d/1t5A5ZFMJelFWN35U2_LOlDXWBg-rT72usA5SiHyvnnU/edit?usp=sharing>`__
 2. `Сайт дисциплины <https://fipl-hse.github.io/docs/labs_2026/index.html>`__ с описанием лабораторных работ и полезными материалами
