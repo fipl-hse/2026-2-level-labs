@@ -78,6 +78,46 @@
             }
         },
         {
+            "name": "[SEMINAR 4] Learn str",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_4_strings.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "[SEMINAR 5] Learn list",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_5_lists.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "[SEMINAR 6] Learn dict",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_6_dicts.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "[SEMINAR 7] Learn sets",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_7_sets.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
             "name": "[ADMIN] Run tests",
             "type": "debugpy",
             "request": "launch",
