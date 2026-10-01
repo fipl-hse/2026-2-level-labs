@@ -38,6 +38,7 @@ def main() -> None:
 
     top_words = get_top_n_words(freq_dict, 7)
     assert top_words, "Calculation of top words failed"
+    print(top_words)
 
     unknown_profile = create_language_profile("unk", unknown_text, stopwords)
     assert unknown_profile, "Creating profile of unknown language failed"
@@ -50,9 +51,11 @@ def main() -> None:
 
     result_by_top_n = detect_language_by_top_n(unknown_profile, de_profile, en_profile, 15)
     assert result_by_top_n, "Detection result is None"
+    print(result_by_top_n)
 
     result_by_mse = detect_language_by_mse(unknown_profile, de_profile, en_profile)
     assert result_by_mse, "Detection result is None"
+    print(result_by_mse)
 
 
 if __name__ == "__main__":
