@@ -184,7 +184,11 @@ def train(
             break
         sorted_pairs = sorted(
             pairs.items(),
-            key=lambda item: (-item[1], -len(item[0][0] + item[0][1]), item[0][0] + item[0][1]),
+            key=lambda item: (
+                -item[1],
+                -len(item[0][0] + item[0][1]),
+                item[0][0] + item[0][1]
+            ),
         )
         best_pair = sorted_pairs[0][0]
         result = merge_tokens(word_frequencies, best_pair)
