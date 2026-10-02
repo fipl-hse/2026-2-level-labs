@@ -24,6 +24,33 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not all([isinstance(raw_word, str),
+        any([isinstance(start_of_word, str),
+             not start_of_word]),
+        any([isinstance(end_of_word, str),
+             not end_of_word
+        ])]):
+        return None
+
+    if any([isinstance(end_of_word, (tuple, list, dict)),
+          start_of_word == 0,
+          isinstance(start_of_word, (tuple, list, dict)),
+          end_of_word == 0
+          ]):
+        return None
+
+    list_of_tokens = []
+
+    if start_of_word:
+        list_of_tokens.append(start_of_word)
+
+    for letter in raw_word:
+        list_of_tokens.append(letter)
+
+    if end_of_word:
+        list_of_tokens.append(end_of_word)
+
+    return tuple(list_of_tokens)
 
 
 def collect_frequencies(
@@ -44,6 +71,40 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not all([isinstance(text, str),
+                any([isinstance(start_of_word, str),
+                    not start_of_word]),
+                isinstance(end_of_word, str)]):
+        return None
+
+    list_with_repetitions = text.split()
+    list_without_repetitions = []
+    for word in list_with_repetitions:
+        if word not in list_without_repetitions:
+            list_without_repetitions.append(word)
+
+    list_of_frequencies = []
+    for word in list_without_repetitions:
+        list_of_frequencies.append(
+            list_with_repetitions.count(word)
+            )
+
+    for element in list_without_repetitions:
+        if not isinstance(
+            prepare_word(element, start_of_word, end_of_word),
+            tuple):
+            return None
+
+    list_of_tokens = [
+        prepare_word(word, start_of_word, end_of_word)
+        for word
+        in list_without_repetitions
+    ]
+
+    dict_of_frequencies = dict(zip(list_of_tokens,
+                                   list_of_frequencies))
+
+    return dict_of_frequencies
 
 
 def count_tokens_pairs(
@@ -62,6 +123,18 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    list_of_tokens = []
+    for key in word_frequencies:
+        for letter in key:
+            if key.index(letter) > 0:
+                list_of_tokens.append((key[(key.index(letter) - 1)], key))
+                if len(key)-1 >= key.index(letter) + 1:
+                    list_of_tokens.append((key, key[(key.index(letter) + 1)]))
+    #сделала список с повторяющимися парами, сделать чистый без повторений для записи в словрь
+    #через каунт посчитаьь частотность, потом тоже почистить список и зипнуть
+    #я помню про то что нельзя оставлять комментарии на русском я удалю попозже когда докумекаю до функции
 
 
 def merge_tokens(
