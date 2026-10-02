@@ -17,6 +17,7 @@ def main() -> None:
         translation_encoded_raw = text_file.read()
     result = None
     assert result, "Translation not working"
+    return result
 
 
 if __name__ == "__main__":

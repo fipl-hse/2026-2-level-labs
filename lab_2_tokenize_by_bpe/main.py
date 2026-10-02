@@ -24,6 +24,7 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    return True
 
 
 def collect_frequencies(
