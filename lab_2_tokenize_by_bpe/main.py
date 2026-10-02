@@ -246,7 +246,31 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(unknown_token, str)
+        or not isinstance(word_frequencies, dict)
+    ):
+        return None
+    for key, value in word_frequencies.items():
+        if not isinstance(key, tuple):
+            return None
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+        if not all(isinstance(s, str) for s in key):
+            return None
 
+    unique_tokens = set()
+    for word in word_frequencies:
+        for token in word:
+            unique_tokens.add(token)
+            unique_tokens.update(token)
+
+    unique_tokens.add(unknown_token)
+    sorted_uniq_tokens = sorted(unique_tokens, key=lambda token: (-len(token), token))
+
+    tokens_id_dict = {token: i for i, token in enumerate(sorted_uniq_tokens)}
+
+    return tokens_id_dict
 
 
 def decode(
@@ -268,7 +292,29 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(encoded_text, Sequence)
+        or not encoded_text
+        or not isinstance(vocabulary, dict)
+        or (end_of_word_token is not None and not isinstance(end_of_word_token,str))
+        or not all(isinstance(i, int) for i in encoded_text)
+    ):
+        return None
+    for key, value in vocabulary.items():
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+        if not isinstance(key, str):
+            return None
 
+    swapped_vocab = {v: k for k, v in vocabulary.items()}
+    decoded_text = ""
+    for token_id in encoded_text:
+        if swapped_vocab[token_id] == end_of_word_token:
+            decoded_text += ' '
+        else:
+            decoded_text += swapped_vocab[token_id]
+
+    return decoded_text
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
