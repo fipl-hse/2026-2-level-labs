@@ -23,13 +23,11 @@ def main() -> None:
         translation_encoded_raw = [int(x) for x in text_file.read().split()]
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         secret_text = [int(x) for x in text_file.read().split()]
-    with open("lab_2_tokenize_by_bpe/assets/vocab.json", "r", encoding="utf-8") as text_file:
-        tokens_vocab = json.load(text_file)
 
-    freq_by_words = collect_frequencies(text, None, '/s')
-    #print(freq_by_words)
+    freq_by_words = collect_frequencies(text, None, "</s>")
     tokenized_words = train(freq_by_words, 100)
-    result = decode(secret_text,tokens_vocab,"</s>")
+    ru_vocab = get_vocabulary(tokenized_words, "<unk>")
+    result = decode(secret_text, ru_vocab, "</s>")
     print(result)
     assert result, "Translation not working"
 

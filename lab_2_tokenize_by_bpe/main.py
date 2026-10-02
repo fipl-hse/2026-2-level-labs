@@ -157,7 +157,7 @@ def merge_tokens(
         i = 0
         new_key = []
         while i < len(key):
-            if i < len(key) - 1 and (key[i],key[i+1]) == pair:
+            if i < len(key) - 1 and (key[i], key[i+1]) == pair:
                 new_key.append(f'{pair[0]}{pair[1]}')
                 i += 2
             else:
@@ -306,15 +306,13 @@ def decode(
         if not isinstance(key, str):
             return None
 
-    swapped_vocab = {v: k for k, v in vocabulary.items()}
-    decoded_text = ""
-    for token_id in encoded_text:
-        if swapped_vocab[token_id] == end_of_word_token:
-            decoded_text += ' '
-        else:
-            decoded_text += swapped_vocab[token_id]
+    id_to_token = {v: k for k, v in vocabulary.items()}
+    decoded_text =''.join(id_to_token[t] for t in encoded_text)
 
-    return decoded_text
+    if end_of_word_token is not None:
+        decoded_text = decoded_text.replace(end_of_word_token, ' ')
+
+    return decoded_text.strip()
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
