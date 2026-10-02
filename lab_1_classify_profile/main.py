@@ -377,6 +377,7 @@ def compare_profiles_by_mse(
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
 
+
 def detect_language_by_mse(
     unknown_profile: ProfileType, profile_1: ProfileType, profile_2: ProfileType
 ) -> str | None:
