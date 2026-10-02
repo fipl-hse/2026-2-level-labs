@@ -9,6 +9,7 @@ import json
 import re
 from typing import Sequence
 
+
 FreqDictType = dict[str, float]
 "Frequency dictionary. Contains pairs of token and its frequency."
 ProfileType = tuple[str, FreqDictType, int]

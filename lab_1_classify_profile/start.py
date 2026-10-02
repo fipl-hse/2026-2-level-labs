@@ -50,9 +50,11 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
 
-    if (unk_profile is None
-        or de_profile is None
-        or en_profile is None):
+    if unk_profile is None:
+        return None
+    if de_profile is None:
+        return None
+    if en_profile is None:
         return None
 
     print(get_top_n_words(calculated_frequencies, 7))
@@ -71,7 +73,8 @@ def main() -> None:
     if collected_profiles is None:
         return None
 
-    advanced_detection = detect_language_advanced(unk_profile, collected_profiles, 15)
+    advanced_detection = detect_language_advanced(
+        unk_profile, collected_profiles, 15)
 
     if advanced_detection is None:
         return None
