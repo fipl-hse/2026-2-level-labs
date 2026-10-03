@@ -24,6 +24,22 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance (raw_word, str) or\
+    not isinstance(start_of_word, str | None) or\
+    not isinstance(end_of_word, str | None):
+        return None
+
+    tokens = []
+
+    if start_of_word is not None:
+        tokens.append(start_of_word)
+
+    tokens.extend(list(raw_word))
+
+    if end_of_word is not None:
+        tokens.append(end_of_word)
+
+    return tuple(tokens)
 
 
 def collect_frequencies(
@@ -44,6 +60,25 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance (text, str) or\
+    not isinstance(start_of_word, str | None) or\
+    not isinstance(end_of_word, str):
+        return None
+
+    freq_dict = {}
+
+    words_of_text = text.split()
+
+    for word in words_of_text:
+        prepared_word = prepare_word(word, start_of_word, end_of_word)
+
+        if prepared_word is None:
+            return None
+
+        key = tuple(prepared_word)
+        freq_dict[key] = freq_dict.get(key, 0) + 1
+
+    return freq_dict
 
 
 def count_tokens_pairs(
@@ -62,7 +97,26 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance (word_frequencies, dict):
+        return None
+    for key, value in word_frequencies.items():
+        if not isinstance (key, tuple):
+            return None
+        if not isinstance(value, int):
+            return None
+        if not key:
+            return None
+        if not all(isinstance(el, str) for el in key):
+            return None
 
+    pairs_frequencies = {}
+
+    for word, frequency in word_frequencies.items():
+        for i in range(len(word) - 1):
+            pair = (word[i], word[i+1])
+            pairs_frequencies[pair] = pairs_frequencies.get(pair, 0) + frequency
+
+    return pairs_frequencies
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
