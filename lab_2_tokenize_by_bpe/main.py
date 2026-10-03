@@ -64,7 +64,6 @@ def collect_frequencies(
     not isinstance(end_of_word, str):
         return None
 
-    tokens_in_text  = []
     dict_tokens = {}
 
     for word in text.split():

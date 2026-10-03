@@ -293,7 +293,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     if not predicted or not actual:
         return 0.0
 
-    results_mse = [(a - p) ** 2 for a, p in zip(actual, predicted)]
+    results_mse = [(float(a) - float(p)) ** 2 for a, p in zip(actual, predicted)]
     total_mse = sum(results_mse)
     mse = total_mse / len(actual)
 
