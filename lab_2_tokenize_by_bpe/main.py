@@ -33,8 +33,7 @@ def prepare_word(
     if start_of_word is not None:
         res.append(start_of_word)
 
-    for char in raw_word:
-        res.append(char)
+    res.extend(list(raw_word))
 
     if end_of_word is not None:
         res.append(end_of_word)
@@ -95,7 +94,7 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     if (not all(isinstance(k,  tuple)
-                    and isinstance(v, int)
+                    and (isinstance(v, int) or isinstance(v, bool))
                     and isinstance(token, str)
                     for k, v in word_frequencies.items() for token in k)
             ):
@@ -103,7 +102,7 @@ def count_tokens_pairs(
 
     res = {}
     for word, freq in word_frequencies.items():
-        for pos, el in enumerate(word[1:], 1):
+        for pos, _ in enumerate(word[1:], 1):
             pair = (word[pos - 1], word[pos])
             res[pair] = res.get(pair, 0) + freq
 
@@ -127,18 +126,31 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+    if (
+        not isinstance(word_frequencies, dict)
+        or not isinstance(pair, tuple)
+        or not all(isinstance(token, str) for token in pair)
+        or len(pair) != 2
+    ):
         return None
     if (not all(isinstance(k,  tuple)
-                and isinstance(v, int)
-                and isinstance(token, str)
-                for k, v in word_frequencies.items() for token in k)
-        or not all(
-        isinstance(el1, str)
-        and isinstance(el2, str)
-        for el1, el2 in pair)
-        ):
+                    and (isinstance(v, int) or isinstance(v, bool))
+                    and isinstance(token, str)
+                    for k, v in word_frequencies.items() for token in k)
+            ):
         return None
+
+    pair_conv_to_str = pair[0] + pair[1]
+    res = {}
+
+    for word, freq in word_frequencies.items():
+        joined_word = " ".join(word)
+        replaced_word = joined_word.replace(
+            pair[0] + " " + pair[1], pair_conv_to_str
+        )
+        res[tuple(replaced_word.split())] = freq
+
+    return res
 
 
 def train(
