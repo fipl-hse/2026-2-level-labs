@@ -110,7 +110,7 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
 
     for key, value in freq_dict.items():
         if not all([isinstance(key, str),
-                isinstance(value, float)]):
+                    isinstance(value, float)]):
             return None
 
     freq_tuples = list(freq_dict.items())
@@ -147,7 +147,8 @@ def create_language_profile(
     if not tokenized_text:
         return None
 
-    tokenized_text_without_stopwords = remove_stop_words(tokenized_text, stop_words)
+    tokenized_text_without_stopwords = remove_stop_words(
+        tokenized_text, stop_words)
     if not tokenized_text_without_stopwords:
         return None
 
@@ -184,9 +185,9 @@ def check_profile(profile: ProfileType) -> bool:
     if not len(profile) == 3:
         return False
 
-    if not all ([isinstance(profile[0], str),
-              isinstance(profile[1], dict),
-              isinstance(profile[2], int)]):
+    if not all([isinstance(profile[0], str),
+                isinstance(profile[1], dict),
+                isinstance(profile[2], int)]):
         return False
 
     for keys, values in profile[1].items():
@@ -211,7 +212,7 @@ def compare_profiles_by_top_n(
         Returns None in case of incorrect input types.
     """
     if not all([check_profile(unknown_profile),
-                check_profile (profile_to_compare)]):
+                check_profile(profile_to_compare)]):
         return None
 
     if not isinstance(top_n, int):
@@ -229,7 +230,8 @@ def compare_profiles_by_top_n(
             and isinstance(top_words_sec, (list, tuple))):
         return None
 
-    list_of_common_words = [word for word in top_words_unk if word in top_words_sec]
+    list_of_common_words = [
+        word for word in top_words_unk if word in top_words_sec]
 
     num_of_common_words = len(list_of_common_words)
 
@@ -261,14 +263,16 @@ def detect_language_by_top_n(
     if not (check_profile(unknown_profile)
             and check_profile(profile_1)
             and check_profile(profile_2)
-            and top_n>0):
+            and top_n > 0):
         return None
 
-    compared_unk_n_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
-    compared_unk_n_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
+    compared_unk_n_1 = compare_profiles_by_top_n(
+        unknown_profile, profile_1, top_n)
+    compared_unk_n_2 = compare_profiles_by_top_n(
+        unknown_profile, profile_2, top_n)
 
     if (compared_unk_n_1 is None
-        or compared_unk_n_2 is None):
+            or compared_unk_n_2 is None):
         return None
 
     if compared_unk_n_1 > compared_unk_n_2:
@@ -300,7 +304,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         In case of empty inputs, returns 0.0.
     """
     if not all([isinstance(predicted, (tuple, list)),
-                    isinstance(actual, (list, tuple))]):
+                isinstance(actual, (list, tuple))]):
         return None
 
     if len(predicted) != len(actual):
@@ -344,7 +348,7 @@ def compare_profiles_by_mse(
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
     if not all([check_profile(unknown_profile),
-              check_profile (profile_to_compare)]):
+                check_profile(profile_to_compare)]):
         return None
 
     list_of_unk = []
@@ -365,14 +369,14 @@ def compare_profiles_by_mse(
         if i in list_of_unk
         else 0.0
         for i in list_of_tokens
-        ]
+    ]
 
     list_of_mse_sec = [
         profile_to_compare[1][i]
         if i in list_of_second
         else 0.0
         for i in list_of_tokens
-        ]
+    ]
 
     return calculate_mse(list_of_mse_unk, list_of_mse_sec)
 
@@ -402,7 +406,7 @@ def detect_language_by_mse(
     compared_2 = compare_profiles_by_mse(unknown_profile, profile_2)
 
     if (compared_1 is None
-        or compared_2 is None):
+            or compared_2 is None):
         return None
 
     if compared_1 > compared_2:
@@ -528,9 +532,9 @@ def detect_language_advanced(
         Returns None in case of incorrect input types.
     """
     if not all([isinstance(unknown_profile, tuple),
-            isinstance(known_profiles, (list, tuple)),
-            isinstance(top_n, int),
-            check_profile(unknown_profile)]):
+                isinstance(known_profiles, (list, tuple)),
+                isinstance(top_n, int),
+                check_profile(unknown_profile)]):
         return None
 
     if top_n <= 0:
@@ -542,7 +546,8 @@ def detect_language_advanced(
             return None
 
         compared_by_mse = compare_profiles_by_mse(unknown_profile, profile)
-        compared_by_top_n = compare_profiles_by_top_n(unknown_profile, profile, top_n)
+        compared_by_top_n = compare_profiles_by_top_n(
+            unknown_profile, profile, top_n)
         if not (isinstance(compared_by_top_n, float)
                 and isinstance(compared_by_mse, float)):
             return None
@@ -550,12 +555,12 @@ def detect_language_advanced(
         dicts = {
             "MSE": compared_by_mse,
             "Top-N": compared_by_top_n
-            }
+        }
         prof = (profile[0], dicts)
         full_list.append(prof)
 
     sorted_list = sorted(full_list, key=lambda x:
-                        (x[1]["MSE"], -x[1]["Top-N"]))
+                         (x[1]["MSE"], -x[1]["Top-N"]))
 
     return sorted_list
 
@@ -575,9 +580,9 @@ def print_report(
     In case of incorrect type inputs, does not print anything.
     """
     if not all([check_profile(unknown_profile),
-              isinstance(metrics_stats, (list, tuple)),
-              isinstance(top_n, int),
-              ]):
+                isinstance(metrics_stats, (list, tuple)),
+                isinstance(top_n, int),
+                ]):
         return None
 
     if not top_n > 0:
@@ -619,6 +624,7 @@ def print_report(
     print("Language scores")
     print("---------------")
     for ele in metrics_stats:
-        print(f"{ele[0]}: MSE {ele[1]["MSE"]:.5f}  Top-N Score {ele[1]["Top-N"]:.5f}")
+        print(
+            f"{ele[0]}: MSE {ele[1]["MSE"]:.5f}  Top-N Score {ele[1]["Top-N"]:.5f}")
 
     return None
