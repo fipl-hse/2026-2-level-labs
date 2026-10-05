@@ -1,7 +1,7 @@
 """
 Programming 2026.
 
-Seminar 7.
+Seminar 8.
 
 Functions.
 """
