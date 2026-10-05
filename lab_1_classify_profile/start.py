@@ -50,11 +50,9 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
 
-    if unk_profile is None:
-        return None
-    if de_profile is None:
-        return None
-    if en_profile is None:
+    if (unk_profile is None
+        or de_profile is None
+            or en_profile is None):
         return None
 
     print(get_top_n_words(calculated_frequencies, 7))
