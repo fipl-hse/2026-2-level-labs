@@ -108,6 +108,16 @@
             }
         },
         {
+            "name": "[SEMINAR 6] Learn functions",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_8_functions.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
             "name": "[ADMIN] Run tests",
             "type": "debugpy",
             "request": "launch",
