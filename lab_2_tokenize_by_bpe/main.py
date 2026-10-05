@@ -74,7 +74,7 @@ def collect_frequencies(
         if prep_word is None:
             return None
 
-        if prep_word in freq_dict:
+        if freq_dict.get(prep_word):
             freq_dict[prep_word] += 1
         else:
             freq_dict[prep_word] = 1
@@ -108,12 +108,12 @@ def count_tokens_pairs(
             return None
 
     pairs_freq = {}
-    for key in word_frequencies:
-        for pair in zip(key, key[1:]):
+    for word, freq in word_frequencies.items():
+        for pair in zip(word, word[1:]):
             if pair in pairs_freq:
-                pairs_freq[pair] += word_frequencies[key]
+                pairs_freq[pair] += freq
             else:
-                pairs_freq[pair] = word_frequencies[key]
+                pairs_freq[pair] = freq
 
     return pairs_freq
 
@@ -151,22 +151,23 @@ def merge_tokens(
         if not all(isinstance(s, str) for s in key):
             return None
 
-    upd_dict = {}
+    upd_word_freq = {}
+    s_pair = ''.join(pair)
 
-    for key in word_frequencies:
+    for word, freq in word_frequencies.items():
         i = 0
-        new_key = []
-        while i < len(key):
-            if i < len(key) - 1 and (key[i], key[i+1]) == pair:
-                new_key.append(f'{pair[0]}{pair[1]}')
+        new_word = []
+        while i < len(word):
+            if i < len(word) - 1 and (word[i], word[i+1]) == pair:
+                new_word.append(s_pair)
                 i += 2
             else:
-                new_key.append(key[i])
+                new_word.append(word[i])
                 i += 1
 
-        upd_dict[tuple(new_key)] = word_frequencies[key]
+        upd_word_freq[tuple(new_word)] = freq
 
-    return upd_dict
+    return upd_word_freq
 
 
 def train(
@@ -205,28 +206,21 @@ def train(
 
     for _ in range(num_merges):
         pairs_dict = count_tokens_pairs(tokenized_text)
-        if not pairs_dict:
-            break
         if pairs_dict is None:
             return None
+        if not pairs_dict:
+            break
 
-        sorted_pairs = sorted(
+        merge_pair = min(
             pairs_dict.items(),
             key=lambda item: (
                 -item[1],
-                -len(item[0][0] + item[0][1]),
-                item[0][0] + item[0][1]
+                -len(''.join(item[0])),
+                ''.join(item[0])
             )
-            )
+            )[0]
 
-        merge_pair = sorted_pairs[0][0]
-
-        new_tokenized_text = merge_tokens(tokenized_text, merge_pair)
-        if new_tokenized_text is None:
-            return None
-        if new_tokenized_text == tokenized_text:
-            break
-        tokenized_text = new_tokenized_text
+        tokenized_text = merge_tokens(tokenized_text, merge_pair)
 
     return tokenized_text
 
@@ -259,13 +253,12 @@ def get_vocabulary(
         if not all(isinstance(s, str) for s in key):
             return None
 
-    unique_tokens = set()
+    unique_tokens = {unknown_token,}
     for word in word_frequencies:
         for token in word:
             unique_tokens.add(token)
             unique_tokens.update(token)
 
-    unique_tokens.add(unknown_token)
     sorted_uniq_tokens = sorted(unique_tokens, key=lambda token: (-len(token), token))
 
     tokens_id_dict = {token: i for i, token in enumerate(sorted_uniq_tokens)}
@@ -296,23 +289,23 @@ def decode(
         not isinstance(encoded_text, Sequence)
         or not encoded_text
         or not isinstance(vocabulary, dict)
-        or (end_of_word_token is not None and not isinstance(end_of_word_token,str))
+        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
         or not all(isinstance(i, int) for i in encoded_text)
     ):
         return None
-    for key, value in vocabulary.items():
-        if not isinstance(value, int) or isinstance(value, bool):
+    for token, identifier in vocabulary.items():
+        if not isinstance(identifier, int) or isinstance(identifier, bool):
             return None
-        if not isinstance(key, str):
+        if not isinstance(token, str):
             return None
 
-    id_to_token = {v: k for k, v in vocabulary.items()}
-    decoded_text =''.join(id_to_token[t] for t in encoded_text)
+    id_to_token = {identifier: token for token, identifier in vocabulary.items()}
+    decoded_text = ''.join(id_to_token[i] for i in encoded_text)
 
     if end_of_word_token is not None:
         decoded_text = decoded_text.replace(end_of_word_token, ' ')
 
-    return decoded_text.strip()
+    return decoded_text
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
