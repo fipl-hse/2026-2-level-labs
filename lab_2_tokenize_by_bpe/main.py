@@ -24,7 +24,16 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
-
+    if not isinstance(raw_word, str):
+        return None
+    if not all(token is None or isinstance(token, str) for token in (start_of_word, end_of_word)):
+        return None
+    word = list(raw_word)
+    if start_of_word is not None:
+        word = [start_of_word] + word
+    if end_of_word is not None:
+        word.append(end_of_word)
+    return tuple(word)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -44,7 +53,21 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-
+    if not isinstance(text, str):
+        return None
+    if start_of_word is not None and not isinstance(start_of_word, str):
+        return None
+    if not isinstance(end_of_word, str):
+        return None
+    word_frequencies = {}
+    for raw_word in text.split():
+        right_word = prepare_word(raw_word, start_of_word, end_of_word)
+        if right_word is None:
+            return None
+        if right_word not in word_frequencies:
+            word_frequencies[right_word] = 0
+        word_frequencies[right_word] += 1
+    return word_frequencies
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int],
