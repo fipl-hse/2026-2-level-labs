@@ -29,17 +29,17 @@ def prepare_word(
     not isinstance(end_of_word, str | None):
         return None
 
-    prepared_word = []
+    list_raw_word = list(raw_word)
 
     if start_of_word is not None:
-        prepared_word.append(start_of_word)
+        list_raw_word.append(start_of_word)
 
-    prepared_word.extend([el for el in raw_word])
+    list_raw_word.extend([el for el in raw_word])
 
     if end_of_word is not None:
-        prepared_word.append(end_of_word)
+        list_raw_word.append(end_of_word)
 
-    return tuple(prepared_word)
+    return tuple(list_raw_word)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -92,6 +92,7 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def merge_tokens(
