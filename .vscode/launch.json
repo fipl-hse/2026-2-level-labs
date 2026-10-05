@@ -88,7 +88,7 @@
             }
         },
         {
-            "name": "[SEMINAR 5] Learn dict",
+            "name": "[SEMINAR 6] Learn dict",
             "type": "debugpy",
             "request": "launch",
             "program": "seminars/listing_6_dicts.py",
@@ -98,10 +98,20 @@
             }
         },
         {
-            "name": "[SEMINAR 5] Learn sets",
+            "name": "[SEMINAR 7] Learn sets",
             "type": "debugpy",
             "request": "launch",
             "program": "seminars/listing_7_sets.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "[SEMINAR 8] Learn functions",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "seminars/listing_8_functions.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
