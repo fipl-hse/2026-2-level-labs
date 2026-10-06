@@ -24,6 +24,21 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(raw_word, str):
+        return None
+    if not isinstance(start_of_word, str) and start_of_word is not None:
+        return None
+    if not isinstance(end_of_word, str) and end_of_word is not None:
+            return None
+    res = []
+    if start_of_word is not None:
+        res.append(start_of_word)
+    for i in range(len(raw_word)):
+        res.append(raw_word[i])
+    if end_of_word is not None:
+        res.append(end_of_word)
+    return tuple(res)
+
 
 
 def collect_frequencies(
