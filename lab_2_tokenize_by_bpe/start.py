@@ -2,7 +2,7 @@
 BPE Tokenizer starter
 """
 
-from main import (
+from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
     encode,
@@ -28,7 +28,10 @@ def main() -> None:
         reference = [int(i) for i in text_file.read().split()]
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = [int(x) for x in text_file.read().split()]
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt",
+        "r",
+        encoding="utf-8") as text_file:
         secret_text = [int(x) for x in text_file.read().split()]
 
     freq_by_words = collect_frequencies(text, None, "</s>")

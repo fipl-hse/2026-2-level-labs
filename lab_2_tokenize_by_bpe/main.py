@@ -222,6 +222,8 @@ def train(
             )[0]
 
         tokenized_text = merge_tokens(tokenized_text, merge_pair)
+        if tokenized_text is None:
+            return None
 
     return tokenized_text
 
@@ -291,8 +293,9 @@ def decode(
         or not encoded_text
         or not isinstance(vocabulary, dict)
         or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
-        or not all(isinstance(i, int) for i in encoded_text)
     ):
+        return None
+    if not all(isinstance(i, int) for i in encoded_text):
         return None
     for token, identifier in vocabulary.items():
         if not isinstance(identifier, int) or isinstance(identifier, bool):
@@ -330,10 +333,10 @@ def tokenize_word(
         or not isinstance(vocabulary, dict)
         or (not isinstance(end_of_word, str) and end_of_word is not None)
         or not isinstance(unknown_token, str)
+        or not all(isinstance(s, str) for s in word)
     ):
         return None
-    if not all(isinstance(s, str) for s in word):
-        return None
+
     for token, identifier in vocabulary.items():
         if not isinstance(identifier, int) or isinstance(identifier, bool):
             return None
@@ -346,7 +349,6 @@ def tokenize_word(
     t_segments = []
 
     for token in sorted_tokens:
-        t_id = vocabulary[token]
         searh_start_idx = 0
 
         while True:
@@ -358,15 +360,14 @@ def tokenize_word(
             if not any(covered[t_start_idx:t_end_idx]):
                 for i in range(t_start_idx, t_end_idx):
                     covered[i] = True
-                t_segments.append((t_start_idx, t_end_idx, t_id))
+                t_segments.append((t_start_idx, t_end_idx, vocabulary[token]))
                 searh_start_idx = t_end_idx
             else:
                 searh_start_idx = t_start_idx + 1
 
-    unknown_t_id = vocabulary[unknown_token]
     for i, is_covered in enumerate(covered):
         if not is_covered:
-            t_segments.append((i, i + 1, unknown_t_id))
+            t_segments.append((i, i + 1, vocabulary[unknown_token]))
 
     t_segments.sort(key=lambda x: x[0])
 
@@ -391,7 +392,7 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
         return None
 
     with open(vocab_path, "r", encoding="utf-8") as file:
-            vocabulary = json.load(file)
+        vocabulary = json.load(file)
 
     if not isinstance(vocabulary, dict):
         return None
