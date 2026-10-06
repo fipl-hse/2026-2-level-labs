@@ -39,7 +39,7 @@ def main() -> None:
 
     secret3 = [int(number) for number in secret3.split()]
     secret = decode(secret3, vocabulary, '</s>')
-    assert decode, "Decode is None"
+    assert secret, "Decode is None"
     print(secret)
 
 

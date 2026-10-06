@@ -151,14 +151,18 @@ def merge_tokens(
     new_word_frequencies = {}
 
     for key, value in word_frequencies.items():
-        new_key = key
+        new_key_lst = []
 
-        for i, token in enumerate(key):
-            if i + 1 < len(key):
-                if token == pair[0] and key[i+1] == pair[1]:
-                    new_key = key[:i] + (new_token,) + key[i+2:]
-
-        new_word_frequencies[new_key] = value
+        i = 0
+        while i < len(key):
+            if i + 1 < len(key) and key[i] == pair[0] and key[i + 1] == pair[1]:
+                new_key_lst.append(new_token)
+                i += 2
+            else:
+                new_key_lst.append(key[i])
+                i += 1
+        new_key = tuple(new_key_lst)
+        new_word_frequencies[new_key] = new_word_frequencies.get(new_key,0) + value
 
     return new_word_frequencies
 
@@ -213,7 +217,7 @@ def train(
 
         word_frequencies = new_frequencies
 
-    return new_frequencies
+    return word_frequencies
 
 
 
