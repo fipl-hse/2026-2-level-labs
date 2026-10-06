@@ -196,9 +196,11 @@ def train(
     ):
         return None
     for key, value in word_frequencies.items():
-        if not isinstance(key, tuple):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
+        if (
+            not isinstance(key, tuple)
+            or not isinstance(value, int)
+            or isinstance(value, bool)
+        ):
             return None
         if not all(isinstance(s, str) for s in key):
             return None
@@ -221,9 +223,10 @@ def train(
             )
             )[0]
 
-        tokenized_text = merge_tokens(tokenized_text, merge_pair)
-        if tokenized_text is None:
+        new_tokenized_text = merge_tokens(tokenized_text, merge_pair)
+        if new_tokenized_text is None:
             return None
+        tokenized_text =new_tokenized_text
 
     return tokenized_text
 
@@ -333,14 +336,18 @@ def tokenize_word(
         or not isinstance(vocabulary, dict)
         or (not isinstance(end_of_word, str) and end_of_word is not None)
         or not isinstance(unknown_token, str)
-        or not all(isinstance(s, str) for s in word)
     ):
         return None
 
+    if not all(isinstance(s, str) for s in word):
+        return None
+
     for token, identifier in vocabulary.items():
-        if not isinstance(identifier, int) or isinstance(identifier, bool):
-            return None
-        if not isinstance(token, str):
+        if (
+            not isinstance(identifier, int)
+            or isinstance(identifier, bool)
+            or not isinstance(token, str)
+        ):
             return None
 
     sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))

@@ -36,7 +36,11 @@ def main() -> None:
 
     freq_by_words = collect_frequencies(text, None, "</s>")
     tokenized_words = train(freq_by_words, 100)
+    if tokenized_words is None:
+        return None
     ru_vocab = get_vocabulary(tokenized_words, "<unk>")
+    if ru_vocab is None:
+        return None
     decoded_secret = decode(secret_text, ru_vocab, "</s>")
     print(decoded_secret)
 
@@ -44,8 +48,12 @@ def main() -> None:
 
     translation_vocab = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
     result = encode(text_to_translate, translation_vocab, "\u2581", None, "<unk>")
+    if result is None:
+        return None
     print(all(result[i] == reference[i] for i in range(20)))
+
     assert result, "Translation not working"
+    return None
 
 
 if __name__ == "__main__":
