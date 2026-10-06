@@ -24,6 +24,19 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not(
+        (isinstance(raw_word, str) and raw_word)
+        and (isinstance(start_of_word, str) or start_of_word is None)
+        and (isinstance(end_of_word, str) or end_of_word is None)
+    ):
+        return None
+
+    word_by_sym = list(raw_word.strip())
+    if start_of_word is not None:
+        word_by_sym.insert(0, start_of_word)
+    if end_of_word is not None:
+        word_by_sym.append(end_of_word)
+    return tuple(word_by_sym)
 
 
 def collect_frequencies(
@@ -44,6 +57,21 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not(
+        (isinstance(text, str) and text)
+        and (isinstance(start_of_word, str) or start_of_word is None)
+        and isinstance(end_of_word, str)
+    ):
+        return None
+
+    list_of_words = text.split()
+    word_frequencies = {}
+    for word in list_of_words:
+        word_by_sym = prepare_word(word, start_of_word, end_of_word)
+        if word_by_sym is None:
+            return None
+        word_frequencies[word_by_sym] = list_of_words.count(word)
+    return word_frequencies
 
 
 def count_tokens_pairs(
@@ -62,6 +90,23 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not(
+        isinstance(word_frequencies, dict)
+        and all(((
+            isinstance(word_by_sym, tuple)
+            and all((isinstance(sym, str) for sym in word_by_sym))
+        ) for word_by_sym in word_frequencies))
+        and all((isinstance(frequency, int) for frequency in word_frequencies.values()))
+    ):
+        return None
+
+    pairs = []
+    for word, frequency in word_frequencies.items():
+        for ind in range(len(word) - 1):
+            pair = word[ind], word[ind + 1]
+            for _ in range(frequency):
+                pairs.append(pair)
+    return {pair: pairs.count(pair) for pair in pairs}
 
 
 def merge_tokens(
@@ -81,6 +126,32 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not(
+        isinstance(word_frequencies, dict)
+        and all(((
+            isinstance(word_by_sym, tuple)
+            and all((isinstance(sym, str) for sym in word_by_sym))
+        ) for word_by_sym in word_frequencies))
+        and all((isinstance(frequency, int) for frequency in word_frequencies.values()))
+        and (isinstance(pair, tuple) and len(pair) == 2)
+        and all((isinstance(sym, str) for sym in pair))
+    ):
+        return None
+
+    new_token = "".join(pair)
+    upd_word_frequencies = {}
+    for word in word_frequencies:
+        word_to_upd_dict = []
+        ind = 0
+        while ind < len(word):
+            if ind < len(word) - 1 and (word[ind], word[ind + 1]) == pair:
+                word_to_upd_dict.append(new_token)
+                ind += 2
+            else:
+                word_to_upd_dict.append(word[ind])
+                ind += 1
+        upd_word_frequencies[tuple(word_to_upd_dict)] = word_frequencies.get(word)
+    return upd_word_frequencies
 
 
 def train(
@@ -101,6 +172,35 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not(
+        ((
+            isinstance(word_frequencies, dict)
+            and all(((
+                isinstance(word_by_sym, tuple)
+                and all((isinstance(sym, str) for sym in word_by_sym))
+            ) for word_by_sym in word_frequencies))
+            and all((isinstance(frequency, int) for frequency in word_frequencies.values()))
+        ) and word_frequencies)
+        and isinstance(num_merges, int)
+    ):
+        return None
+
+    for _ in range(num_merges):
+        pairs = count_tokens_pairs(word_frequencies)
+        if pairs is None:
+            return None
+        if not pairs:
+            break
+        sorted_pairs = sorted(
+            pairs.items(),
+            key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))
+        ) if pairs is not None else None
+        word_frequencies = (
+            merge_tokens(word_frequencies, sorted_pairs[0][0])
+            if sorted_pairs is not None
+            else None
+        )
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -119,6 +219,24 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not(
+        isinstance(word_frequencies, dict)
+        and all(((
+            isinstance(word_by_sym, tuple)
+            and all((isinstance(sym, str) for sym in word_by_sym))
+        ) for word_by_sym in word_frequencies))
+        and all((isinstance(frequency, int) for frequency in word_frequencies.values()))
+        and isinstance(unknown_token, str)
+    ):
+        return None
+
+    vocabulary = {unknown_token}
+    for word in word_frequencies:
+        for token in word:
+            vocabulary.add(token)
+            vocabulary.update(token)
+    sorted_vocabulary = sorted(vocabulary, key=lambda token: (-len(token), token))
+    return {token: ident for ident, token in enumerate(sorted_vocabulary)}
 
 
 def decode(
@@ -140,6 +258,28 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if not(
+        ((
+            isinstance(encoded_text, Sequence)
+            and all((isinstance(num, int) for num in encoded_text))
+        ) and encoded_text)
+        and ((
+            isinstance(vocabulary, dict)
+            and all((
+                isinstance(item[0], str) and isinstance(item[1], int)
+                for item in vocabulary.items()
+            ))
+        ) and vocabulary)
+        and (isinstance(end_of_word_token, str) or end_of_word_token is None)
+    ):
+        return None
+
+    reversed_vocabulary = {ident: token for token, ident in vocabulary.items()}
+    decoded_tokens = [reversed_vocabulary.get(ident) for ident in encoded_text]
+    decoded_text = "".join(decoded_tokens)
+    if end_of_word_token is not None:
+        decoded_text = decoded_text.replace(end_of_word_token, " ")
+    return decoded_text
 
 
 def tokenize_word(
