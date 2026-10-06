@@ -57,6 +57,20 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not all((
+        isinstance(text, str),
+        isinstance(start_of_word, (str, type(None))),
+        isinstance(end_of_word, str),
+    )):
+        return None
+
+    frequencies = {}
+    for raw_word in text.split():
+        prepared = prepare_word(raw_word, start_of_word, end_of_word)
+        if prepared is None:
+            return None
+        frequencies[prepared] = frequencies.get(prepared, 0) + 1
+    return frequencies
 
 
 def count_tokens_pairs(
@@ -75,7 +89,17 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
 
+    pairs = {}
+    for word, count in word_frequencies.items():
+        if not isinstance(word, tuple) or not isinstance(count, int):
+            return None
+        for i in range(len(word) - 1):
+            pair = (word[i], word[i + 1])
+            pairs[pair] = pairs.get(pair, 0) + count
+    return pairs
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
@@ -94,6 +118,38 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(pair, tuple) or len(pair) != 2:
+        return None
+
+    merged_token = pair[0] + pair[1]
+    merged_frequencies = {}
+
+    for tokens, frequency in word_frequencies.items():
+        if not isinstance(tokens, tuple) or not isinstance(frequency, int):
+            return None
+
+        merged_word = []
+        position = 0
+        while position < len(tokens):
+            is_pair_here = (
+                position < len(tokens) - 1
+                and tokens[position] == pair[0]
+                and tokens[position + 1] == pair[1]
+            )
+            if is_pair_here:
+                merged_word.append(merged_token)
+                position += 2
+            else:
+                merged_word.append(tokens[position])
+                position += 1
+
+        merged_word_tuple = tuple(merged_word)
+        merged_frequencies[merged_word_tuple] = (
+            merged_frequencies.get(merged_word_tuple, 0) + frequency
+        )
+    return merged_frequencies
 
 
 def train(
