@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
 
 
@@ -363,15 +364,9 @@ def tokenize_word(
                 searh_start_idx = t_start_idx + 1
 
     unknown_t_id = vocabulary[unknown_token]
-    searh_start_idx = 0
-    while searh_start_idx < len(s_word):
-        unk_t_start_idx = searh_start_idx
-        if not covered[searh_start_idx]:
-            while searh_start_idx < len(s_word) and not covered[searh_start_idx]:
-                searh_start_idx += 1
-            t_segments.append(( unk_t_start_idx, searh_start_idx, unknown_t_id))
-        else:
-            searh_start_idx += 1
+    for i, is_covered in enumerate(covered):
+        if not is_covered:
+            t_segments.append((i, i + 1, unknown_t_id))
 
     t_segments.sort(key=lambda x: x[0])
 
@@ -392,7 +387,21 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
 
+    with open(vocab_path, "r", encoding="utf-8") as file:
+            vocabulary = json.load(file)
+
+    if not isinstance(vocabulary, dict):
+        return None
+    for key, value in vocabulary.items():
+        if not isinstance(key, str):
+            return None
+        if not isinstance(value, int):
+            return None
+
+    return vocabulary
 
 def encode(
     original_text: str,
@@ -417,7 +426,35 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(original_text, str)
+        or not isinstance(vocabulary, dict)
+        or not (isinstance(start_of_word_token, str) or start_of_word_token is None)
+        or not (isinstance(end_of_word_token, str) or end_of_word_token is None)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
+    for key, value in vocabulary.items():
+        if not isinstance(key, str):
+            return None
+        if not isinstance(value, int):
+            return None
 
+    word_tokens = original_text.strip().split()
+    encoded = []
+
+    for word in word_tokens:
+        preprocessed_word = prepare_word(word, start_of_word_token,
+                                         end_of_word_token)
+        if preprocessed_word is None:
+            return None
+        enc_word = tokenize_word(preprocessed_word, vocabulary,
+                                 end_of_word_token, unknown_token)
+        if enc_word is None:
+            return None
+        encoded.extend(enc_word)
+
+    return encoded
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
