@@ -324,6 +324,60 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word, tuple)
+        or not isinstance(vocabulary, dict)
+        or (not isinstance(end_of_word, str) and end_of_word is not None)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
+    if not all(isinstance(s, str) for s in word):
+        return None
+    for token, identifier in vocabulary.items():
+        if not isinstance(identifier, int) or isinstance(identifier, bool):
+            return None
+        if not isinstance(token, str):
+            return None
+
+    sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
+    s_word = ''.join(word)
+    covered = [False] * len(s_word)
+    t_segments = []
+
+    for token in sorted_tokens:
+        t_id = vocabulary[token]
+        searh_start_idx = 0
+
+        while True:
+            t_start_idx = s_word.find(token, searh_start_idx)
+            if t_start_idx == -1:
+                break
+            t_end_idx = t_start_idx + len(token)
+
+            if not any(covered[t_start_idx:t_end_idx]):
+                for i in range(t_start_idx, t_end_idx):
+                    covered[i] = True
+                t_segments.append((t_start_idx, t_end_idx, t_id))
+                searh_start_idx = t_end_idx
+            else:
+                searh_start_idx = t_start_idx + 1
+
+    unknown_t_id = vocabulary[unknown_token]
+    searh_start_idx = 0
+    while searh_start_idx < len(s_word):
+        unk_t_start_idx = searh_start_idx
+        if not covered[searh_start_idx]:
+            while searh_start_idx < len(s_word) and not covered[searh_start_idx]:
+                searh_start_idx += 1
+            t_segments.append(( unk_t_start_idx, searh_start_idx, unknown_t_id))
+        else:
+            searh_start_idx += 1
+
+    t_segments.sort(key=lambda x: x[0])
+
+    return [token_id for _, _, token_id in t_segments]
+
+
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
