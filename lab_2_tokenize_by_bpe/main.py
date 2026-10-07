@@ -37,6 +37,7 @@ def prepare_word(
         res.append(raw_word[i])
     if end_of_word is not None:
         res.append(end_of_word)
+
     return tuple(res)
 
 
@@ -59,6 +60,26 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(text, str):
+        return None
+    if not isinstance(start_of_word, str) and start_of_word is not None:
+            return None
+    if not isinstance(end_of_word, str):
+                return None
+    words = []
+    freq_dict = {}
+    for word in text.split():
+        token = prepare_word(word, start_of_word, end_of_word)
+        if token is None:
+            return None
+        if token in freq_dict:
+            freq_dict[token] +=1
+        else:
+            freq_dict[token] =1
+    return freq_dict
+
+
+
 
 
 def count_tokens_pairs(
