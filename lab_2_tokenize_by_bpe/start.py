@@ -2,7 +2,7 @@
 BPE Tokenizer starter
 """
 
-from main import (
+from lab_2_tokenize_by_bpe.main import (
     calculate_bleu,
     collect_frequencies,
     decode,
