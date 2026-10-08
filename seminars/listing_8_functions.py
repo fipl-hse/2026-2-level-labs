@@ -248,7 +248,7 @@ def is_allowed_to_drive() -> bool:
 
 
 # Task 7
-def get_fibonacci_sequence() -> list:
+def get_fibonacci_sequence(length) -> list:
     """
     Return Fibonacci sequence of the specified length.
 
@@ -258,6 +258,13 @@ def get_fibonacci_sequence() -> list:
     Returns:
         list: Fibonacci sequence
     """
+    x1 = 0
+    x2 = 1
+    for i in range(length):
+        x2 = x1 + x2
+        x3 = x1
+
+
     # student implementation goes here
 
 
