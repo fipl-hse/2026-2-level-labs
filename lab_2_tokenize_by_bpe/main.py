@@ -5,7 +5,13 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
+
+Word = tuple[str, ...]
+FrequencyDict = dict[Word, int]
+PairDict = dict[tuple[str, str], int]
+Vocabulary = dict[str, int]
 
 
 def prepare_word(
@@ -25,6 +31,14 @@ def prepare_word(
     In case of corrupt input arguments, None is returned
     """
 
+    tokens: list[str] = []
+    if start_of_word is not None:
+        tokens.append(start_of_word)
+    for char in raw_word:
+        tokens.append(char)
+    if end_of_word is not None:
+        tokens.append(end_of_word)
+    return tuple(tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -45,6 +59,13 @@ def collect_frequencies(
     None is returned
     """
 
+    frequencies: FrequencyDict = {}
+    for raw_word in text.split():
+        prepared = prepare_word(raw_word, start_of_word, end_of_word)
+        frequencies[prepared] += 1
+    else:
+        frequencies[prepared] = 1
+    return frequencies
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int],
@@ -63,6 +84,15 @@ def count_tokens_pairs(
     In case of corrupt input arguments, None is returned
     """
 
+    pair_counts: PairDict = {}
+    for word, word_count in word_frequencies.items():
+        for index in range(len(word) - 1):
+            pair = (word[index], word[index + 1])
+            if pair in pair_counts:
+                pair_counts[pair] += word_count
+            else:
+                pair_counts[pair] = word_count
+    return pair_counts
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
