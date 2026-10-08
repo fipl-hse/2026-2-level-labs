@@ -160,7 +160,6 @@ def calculate_power() -> int:
     """
     # student implementation goes here
 
-
 # Function calls with expected result:
 # calculate_power(2, 3) -> 8
 # calculate_power(7, 2) -> 49
@@ -200,7 +199,6 @@ def encode_message() -> list:
         list: list of digits as an encoded message
     """
     # student implementation goes here
-
 
 # Function calls with expected result:
 # encode_message("hello", {"h": 1, "e": 2, "l": 3, "o": 4}) -> [1, 2, 3, 3, 4]
