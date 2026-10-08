@@ -2,7 +2,8 @@
 BPE Tokenizer starter
 """
 
-from lab_2_tokenize_by_bpe.main import (
+from main import (
+    calculate_bleu,
     collect_frequencies,
     decode,
     encode,
@@ -23,9 +24,9 @@ def main() -> None:
     with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
-        text_to_translate = text_file.read()
+        ru_text = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as text_file:
-        reference = [int(i) for i in text_file.read().split()]
+        encoding_ref = [int(i) for i in text_file.read().split()]
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = [int(x) for x in text_file.read().split()]
     with open(
@@ -47,10 +48,33 @@ def main() -> None:
     print()
 
     translation_vocab = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
-    result = encode(text_to_translate, translation_vocab, "\u2581", None, "<unk>")
-    if result is None:
+    ru_encoded = encode(
+        ru_text,
+        translation_vocab,
+        start_of_word_token="\u2581",
+        end_of_word_token=None,
+        unknown_token="<unk>"
+    )
+    if ru_encoded is None:
         return None
-    print(all(result[i] == reference[i] for i in range(20)))
+    print(all(ru_encoded[i] == encoding_ref[i] for i in range(20)))
+
+    decoded_predictions = decode(
+        translation_encoded_raw,
+        translation_vocab,
+        None
+    )
+
+    if decoded_predictions is None:
+        return None
+    decoded_predictions = decoded_predictions.replace("\u2581", " ")
+
+    result = calculate_bleu(
+        decoded_predictions,
+        text_reference_translation,
+    )
+    print(decoded_predictions)
+    print(result)
 
     assert result, "Translation not working"
     return None
