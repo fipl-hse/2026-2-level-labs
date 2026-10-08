@@ -160,8 +160,6 @@ def merge_tokens(
                 i += 1
         new_word_frequencies[tuple(key_lst)] = value
 
-
-    print(new_word_frequencies)
     return new_word_frequencies
 
 def train(
