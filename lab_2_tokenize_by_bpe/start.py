@@ -6,6 +6,7 @@ BPE Tokenizer starter
 
 from lab_2_tokenize_by_bpe.main import collect_frequencies, train
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -17,11 +18,17 @@ def main() -> None:
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
 
+    result = None
+
     freq_dict = collect_frequencies(text, None, "</s>")
     print(f"Demonstration of frequency dictionary: {freq_dict}")
 
-    trains = train(freq_dict, 100)
-    print(f"Demonstration of trained tokenizer: {trains}")
+    result = train(freq_dict, 100)
+    print(f"Demonstration of trained tokenizer: {result}")
+
+    assert result, "Translation not working"
+
+    return None
 
 if __name__ == "__main__":
     main()
