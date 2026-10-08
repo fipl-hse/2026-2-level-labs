@@ -34,7 +34,7 @@ def prepare_word(
     if start_of_word is not None:
         tokens.append(start_of_word)
 
-    tokens.extend([el for el in raw_word])
+    tokens = list(raw_word)
 
     if end_of_word is not None:
         tokens.append(end_of_word)
@@ -136,12 +136,12 @@ def merge_tokens(
         return None
 
     for key, value in word_frequencies.items():
-            if not isinstance(key, tuple) or\
+        if not isinstance(key, tuple) or\
             not isinstance(value, int):
-                return None
-            if not key or\
+            return None
+        if not key or\
             not all(isinstance(el, str) for el in key):
-                return None
+            return None
 
     if not isinstance(pair, tuple) or\
     not all(isinstance(el, str) for el in pair):
@@ -183,7 +183,7 @@ def train(
     None is returned
     """
     if not isinstance(word_frequencies, dict):
-            return None
+        return None
 
     for key, value in word_frequencies.items():
         if not isinstance(key, tuple) or\
@@ -209,7 +209,7 @@ def train(
         most_common_pair_list = []
         most_common_pair = max(pairs_freq.values())
         for key, value in pairs_freq.items():
-            if value == max(pairs_freq.values()):
+            if value == most_common_pair:
                 most_common_pair_list.append(key)
 
         longest_pair_list = []
@@ -218,6 +218,7 @@ def train(
             if len(word[0] + word[1]) == longest_pair:
                 longest_pair_list.append(word)
 
+        best_word = None
         lexical_longest = min(word[0] + word[1] for word in longest_pair_list)
         for word in longest_pair_list:
             if word[0] + word[1] == lexical_longest:
