@@ -59,6 +59,13 @@ def main() -> None:
     print(detect_language_by_top_n(unk_profile, en_profile, de_profile, 15))
     result = detect_language_by_mse(unk_profile, en_profile, de_profile)
 
+    result = detect_language_by_mse(
+        unknown_profile=unk_profile,
+        profile_1=en_profile,
+        profile_2=de_profile
+    )
+    print(f"Итоговый вывод языка: {result}")
+
     save_profile(unk_profile, 'lab_1_classify_profile/assets/profiles')
     save_profile(de_profile, 'lab_1_classify_profile/assets/profiles')
     save_profile(en_profile, 'lab_1_classify_profile/assets/profiles')
