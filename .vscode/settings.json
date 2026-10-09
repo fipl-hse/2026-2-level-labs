@@ -1,7 +1,7 @@
 {
     "files.trimTrailingWhitespace": true,
     "python.testing.pytestArgs": [
-        "."
+        "lab_2_tokenize_by_bpe"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

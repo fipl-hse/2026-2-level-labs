@@ -24,6 +24,26 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(raw_word, str) or
+        (start_of_word is not None and not isinstance(start_of_word, str)) or
+        (end_of_word is not None and not isinstance(end_of_word, str))
+    ):
+        return None
+
+    if start_of_word is not None:
+        start = (start_of_word,)
+    else:
+        start = ()
+    if end_of_word is not None:
+        end = (end_of_word,)
+    else:
+        end = ()
+
+    return start + tuple(raw_word) + end
+
+
+
 
 
 def collect_frequencies(
@@ -44,6 +64,25 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (not isinstance(text, str) or
+        (start_of_word is not None and not isinstance(start_of_word, str)) or
+        (not isinstance(end_of_word, str))
+    ):
+        return None
+
+    freq_dict = {}
+
+    for raw_word in text.split():
+        word = prepare_word(raw_word, start_of_word, end_of_word)
+        if word is None:
+            return None
+        freq_dict[word] = freq_dict.get(word, 0) + 1
+
+    return freq_dict
+
+
+
+
 
 
 def count_tokens_pairs(
@@ -62,6 +101,18 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+
+    pair_dict = {}
+    for key in word_frequencies.keys():
+        for i in range(len(key)-1):
+            counter = word_frequencies[key]
+            pair_dict[(key[i], key[i+1])] = pair_dict.get((key[i], key[i+1]), 0) + counter
+    return pair_dict
+
+
+
 
 
 def merge_tokens(
@@ -81,6 +132,27 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(pair, tuple):
+        return None
+
+    merged_dict = {}
+    for key, value in word_frequencies.items():
+        new_key = []
+        i = 0
+        while i < len(key):
+            if i < len(key) - 1 and key[i] == pair[0] and key[i + 1] == pair[1]:
+                new_key.append(key[i] + key[i + 1])
+                i += 2
+            else:
+                new_key.append(key[i])
+                i += 1
+
+        new_key_tuple = tuple(new_key)
+        merged_dict[new_key_tuple] = merged_dict.get(new_key_tuple, 0) + value
+
+    return merged_dict
 
 
 def train(
