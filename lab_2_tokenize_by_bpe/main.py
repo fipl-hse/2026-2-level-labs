@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
 
 
@@ -141,9 +142,9 @@ def merge_tokens(
                 position += 1
 
         merged_word_tuple = tuple(merged_word)
-        merged_frequencies[merged_word_tuple] = (
-            merged_frequencies.get(merged_word_tuple, 0) + frequency
-        )
+        current_count = merged_frequencies.get(merged_word_tuple, 0)
+        merged_frequencies[merged_word_tuple] = current_count + frequency
+
     return merged_frequencies
 
 
@@ -170,10 +171,10 @@ def train(
     if not isinstance(num_merges, int) or num_merges < 0:
         return None
 
-    def sort_key(pair_and_frequency):
-        pair, frequency = pair_and_frequency
-        merged_token = pair[0] + pair[1]
-        return (-frequency, -len(merged_token), merged_token)
+    def pair_key(item):
+        pair, frequency = item
+        merged = pair[0] + pair[1]
+        return (-frequency, -len(merged), merged)
 
     current_frequencies = dict(word_frequencies)
 
@@ -182,8 +183,8 @@ def train(
         if not pair_frequencies:
             break
 
-        best_item = min(pair_frequencies.items(), key=sort_key)
-        pair_to_merge = best_item[0]
+        best_pair_and_frequency = min(pair_frequencies.items(), key=pair_key)
+        pair_to_merge = best_pair_and_frequency[0]
 
         current_frequencies = merge_tokens(current_frequencies, pair_to_merge)
         if current_frequencies is None:
@@ -259,7 +260,7 @@ def decode(
             return None
         id_to_token[identifier] = token
 
-    parts = []
+    decoded_parts = []
     for identifier in encoded_text:
         if not isinstance(identifier, int):
             return None
@@ -269,11 +270,11 @@ def decode(
         token = id_to_token[identifier]
 
         if token == end_of_word_token:
-            parts.append(" ")
+            decoded_parts.append(' ')
         else:
-            parts.append(token)
+            decoded_parts.append(token)
 
-    return ''.join(parts)
+    return ''.join(decoded_parts)
 
 
 def tokenize_word(
@@ -293,6 +294,38 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not all((
+        isinstance(word, tuple),
+        isinstance(vocabulary, dict),
+        isinstance(end_of_word, (str, type(None))),
+        isinstance(unknown_token, str),
+    )):
+        return None
+    if unknown_token not in vocabulary:
+        return None
+
+    token_to_id = vocabulary
+    tokens_by_length = sorted(token_to_id.keys(), key=lambda token: (-len(token), token))
+    word_as_string = ''.join(word)
+
+    token_identifiers = []
+    current_position = 0
+
+    while current_position < len(word_as_string):
+        found_token = None
+        for token in tokens_by_length:
+            if token and word_as_string.startswith(token, current_position):
+                found_token = token
+                break
+
+        if found_token is not None:
+            token_identifiers.append(token_to_id[found_token])
+            current_position += len(found_token)
+        else:
+            token_identifiers.append(token_to_id[unknown_token])
+            current_position += 1
+
+    return token_identifiers
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:

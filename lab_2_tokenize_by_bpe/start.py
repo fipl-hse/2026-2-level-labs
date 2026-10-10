@@ -18,6 +18,7 @@ def main() -> None:
     """
     with open("lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
+
     word_frequencies = collect_frequencies(text, None, "</s>")
     print("Word frequencies:", word_frequencies)
 
@@ -32,8 +33,10 @@ def main() -> None:
         return
 
     secrets_folder = "lab_2_tokenize_by_bpe/assets/secrets"
-    secret_files = sorted(os.listdir(secrets_folder))
+    if not os.path.isdir(secrets_folder):
+        return
 
+    secret_files = sorted(os.listdir(secrets_folder))
     if not secret_files:
         return
 
@@ -41,7 +44,13 @@ def main() -> None:
     with open(secret_path, "r", encoding="utf-8") as secret_file:
         raw_content = secret_file.read()
 
-    encoded_text = [int(value) for value in raw_content.split()]
+    encoded_text = []
+    for value in raw_content.split():
+        if value.lstrip("-").isdigit():
+            encoded_text.append(int(value))
+
+    if not encoded_text:
+        return
 
     decoded = decode(encoded_text, vocabulary, "</s>")
     print("Decoded secret:", decoded)
