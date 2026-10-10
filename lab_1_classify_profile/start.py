@@ -78,10 +78,9 @@ def main() -> None:
 
     print_report(unk_profile, advanced_detection, 15)
 
-    assert result, "Detection result is None"
+    assert result, "Detection result's None"
     return None
 
 
 if __name__ == "__main__":
     main()
-    
