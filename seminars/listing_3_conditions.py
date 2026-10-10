@@ -101,11 +101,9 @@ def is_positive(n: int) -> bool:
     Returns:
         bool: True if n > 0, False otherwise
     """
-    if n < 0:
-        return False
-    else:
-        return True
-print(is_positive(5))
+    # student implementation goes here
+
+
 # is_positive(5) → True
 # is_positive(-3) → False
 # is_positive(0) → False
@@ -123,7 +121,6 @@ def number_sign(n: int) -> str:
         str: "positive", "negative", or "zero"
     """
     # student implementation goes here
-
 
 
 # number_sign(5) → "positive"
@@ -144,9 +141,7 @@ def max_of_two(a: int, b: int) -> int:
         int: The larger of a and b
     """
     # student implementation goes here
-    return max(a, b)
-print(max_of_two(3, 7))
-print(max_of_two(10, 2))
+
 
 # max_of_two(3, 7) → 7
 # max_of_two(10, 2) → 10
@@ -170,17 +165,8 @@ def grade(score: int) -> str:
         str: Letter grade
     """
     # student implementation goes here
-    if score > 89 and score <= 100:
-        return("A")
-    if score > 79 and score <= 89:
-        return("B")
-    if score > 69 and score <= 79:
-        return("C")
-    if score > 59 and score <= 69:
-        return("D")
-    return("F")
-print(grade(95))
-print(grade(72))
+
+
 # grade(95) → "A"
 # grade(72) → "C"
 # grade(59) → "F"
@@ -200,11 +186,8 @@ def is_in_range(n: int, low: int, high: int) -> bool:
         bool: True if low <= n <= high, False otherwise
     """
     # student implementation goes here
-    if low <= n <= high:
-        return True
-    return False
-print(is_in_range(5, 1, 10))
-print(is_in_range(0, 1, 10))
+
+
 # is_in_range(5, 1, 10) → True
 # is_in_range(0, 1, 10) → False
 # is_in_range(10, 1, 10) → True
@@ -225,8 +208,8 @@ def complex_condition(a: bool, b: bool, c: bool) -> bool:
         bool: Result of the expression
     """
     # student implementation goes here
-    return (a and b) or (not c)
-print(complex_condition(True, True, False))
+
+
 # complex_condition(True, True, False) → True
 # complex_condition(False, True, True) → False
 # complex_condition(False, False, False) → True
@@ -248,11 +231,8 @@ def leap_year(year: int) -> bool:
         bool: True if leap year, False otherwise
     """
     # student implementation goes here
-    if year//4 == 0 and year//400 == 0:
-        return True
-    return False
-print(leap_year(2000))
-print(leap_year(1900))
+
+
 # leap_year(2000) → True
 # leap_year(1900) → False
 # leap_year(2024) → True
