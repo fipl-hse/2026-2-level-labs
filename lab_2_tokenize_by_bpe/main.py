@@ -34,7 +34,7 @@ def prepare_word(
     if start_of_word is not None:
         tokens.append(start_of_word)
 
-    tokens.extend([el for el in raw_word])
+    tokens += raw_word
 
     if end_of_word is not None:
         tokens.append(end_of_word)
