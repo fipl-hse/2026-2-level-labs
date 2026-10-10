@@ -244,6 +244,35 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+            return None
+
+    for key, value in word_frequencies.items():
+        if not isinstance(key, tuple) or\
+        not isinstance(value, int):
+            return None
+        if not key or\
+        not all(isinstance(el, str) for el in key):
+            return None
+
+    if not isinstance(unknown_token, str):
+        return None
+
+    unique_tokens = set()
+    for word in word_frequencies:
+        for token in word:
+            unique_tokens.add(token)
+            for char in token:
+                unique_tokens.add(char)
+    unique_tokens.add(unknown_token)
+
+    sorted_word_freq = sorted(unique_tokens, key=lambda x: (-len(x), x))
+
+    dict_sorted = {}
+    for i, key in enumerate(sorted_word_freq):
+        dict_sorted[key] = i
+
+    return dict_sorted
 
 
 def decode(
