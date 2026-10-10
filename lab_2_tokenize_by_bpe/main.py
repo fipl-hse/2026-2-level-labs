@@ -207,16 +207,15 @@ def train(
             break
 
         most_common_pair_list = []
-        most_common_pair = max(pairs_freq.values())
         for key, value in pairs_freq.items():
             if value == max(pairs_freq.values()):
                 most_common_pair_list.append(key)
 
-        longest_pair_list = []
         longest_pair = max(len(word[0] + word[1]) for word in most_common_pair_list)
-        for word in most_common_pair_list:
-            if len(word[0] + word[1]) == longest_pair:
-                longest_pair_list.append(word)
+        longest_pair_list = [
+            word for word in most_common_pair_list
+            if len(word[0] + word[1]) == longest_pair
+        ]
 
         best_word = None
         lexical_longest = min(word[0] + word[1] for word in longest_pair_list)
