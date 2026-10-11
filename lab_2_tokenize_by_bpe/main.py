@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 import json
+import math
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -166,9 +167,9 @@ def train(
     None is returned
     """
 
-    if not isinstance(word_frequencies, dict):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
-    if not isinstance(num_merges, int) or num_merges < 0:
+    if num_merges < 0:
         return None
 
     for _ in range(num_merges):
@@ -178,14 +179,31 @@ def train(
         if not pairs:
             break
 
-        best_pair = sorted(
-            pairs.items(),
-            key=lambda item: (
-                -item[1],
-                -len(item[0][0] + item[0][1]),
-                item[0][0] + item[0][1],
-            ),
-        )[0][0]
+        best_pair: tuple[str, str] | None = None
+        best_frequency = -1
+        best_merged = ""
+
+        for pair, frequency in pairs.items():
+            merged = pair[0] + pair[1]
+            longer = len(merged) > len(best_merged)
+            same_length_but_earlier = len(merged) == len(best_merged) and merged < best_merged
+            more_frequent = frequency > best_frequency
+            same_frequency = frequency == best_frequency
+
+            is_better = (
+                best_pair is None
+                or more_frequent
+                or (same_frequency and longer)
+                or (same_frequency and same_length_but_earlier)
+            )
+
+            if is_better:
+                best_pair = pair
+                best_frequency = frequency
+                best_merged = merged
+
+        if best_pair is None:
+            break
 
         result = merge_tokens(word_frequencies, best_pair)
         if result is None:
@@ -303,24 +321,46 @@ def tokenize_word(
         return None
 
     word_str = "".join(word)
-    sorted_tokens = sorted(vocabulary.keys(), key=lambda t: (-len(t), t))
 
-    result = []
+    sorted_tokens = sorted(
+        (t for t in vocabulary if t not in (unknown_token, "")),
+        key=lambda t: (-len(t), t),
+    )
+
+    used = [False] * len(word_str)
+    tokens: list[str | None] = [None] * len(word_str)
+
+    for token in sorted_tokens:
+        length = len(token)
+        i = 0
+        while i <= len(word_str) - length:
+            if not used[i] and word_str[i : i + length] == token:
+                already_used = False
+                for j in range(i, i + length):
+                    if used[j]:
+                        already_used = True
+                        break
+                if not already_used:
+                    tokens[i] = token
+                    for j in range(i, i + length):
+                        used[j] = True
+                    i += length
+                    continue
+            i += 1
+
+    result: list[int] = []
     i = 0
     while i < len(word_str):
-        found = None
-        for token in sorted_tokens:
-            if token == unknown_token:
-                continue
-            if word_str.startswith(token, i):
-                found = token
-                break
-        if found is not None:
-            result.append(vocabulary[found])
-            i += len(found)
+        current = tokens[i]
+        if current is not None:
+            result.append(vocabulary[current])
+            i += len(current)
         else:
+            if unknown_token not in vocabulary:
+                return None
             result.append(vocabulary[unknown_token])
             i += 1
+
     return result
 
 
@@ -412,6 +452,16 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if not isinstance(text, str):
+        return None
+    if not isinstance(order, int) or order <= 0:
+        return None
+
+    ngrams = []
+    for i in range(len(text) - order + 1):
+        ngrams.append(tuple(text[i : i + order]))
+    return ngrams
+
 
 def calculate_precision(
     actual: Sequence[tuple[str, ...]], reference: Sequence[tuple[str, ...]]
@@ -429,6 +479,29 @@ def calculate_precision(
     In case of corrupt input arguments, None is returned.
     """
 
+    if not isinstance(actual, list) or not isinstance(reference, list):
+        return None
+    if len(actual) == 0:
+        return 0.0
+
+    reference_unique = set()
+    for ngram in reference:
+        if not isinstance(ngram, tuple):
+            return None
+        reference_unique.add(ngram)
+
+    if len(reference_unique) == 0:
+        return 0.0
+
+    actual_unique = set()
+    for ngram in actual:
+        if not isinstance(ngram, tuple):
+            return None
+        actual_unique.add(ngram)
+
+    matches = len(actual_unique & reference_unique)
+    return matches / len(reference_unique)
+
 
 def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | None:
     """
@@ -443,6 +516,21 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
 
     In case of corrupt input arguments, None is returned
     """
+
+    if not isinstance(precisions, list):
+        return None
+    if not isinstance(max_order, int) or isinstance(max_order, bool) or max_order <= 0:
+        return None
+
+    sum_ln = 0.0
+    for p in precisions:
+        if not isinstance(p, (int, float)) or isinstance(p, bool):
+            return None
+        if p <= 0:
+            return 0.0
+        sum_ln += math.log(p)
+
+    return math.exp(sum_ln / max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -460,3 +548,28 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+
+    if (
+        not isinstance(actual, str)
+        or not isinstance(reference, str)
+        or not isinstance(max_order, int)
+        or max_order <= 0
+    ):
+        return None
+
+    precisions = []
+    for i in range(1, max_order + 1):
+        actual_ngrams = collect_ngrams(actual, i)
+        reference_ngrams = collect_ngrams(reference, i)
+        if actual_ngrams is None or reference_ngrams is None:
+            return None
+        precision = calculate_precision(actual_ngrams, reference_ngrams)
+        if precision is None:
+            return None
+        precisions.append(precision)
+
+    geo_mean = calculate_geo_mean(precisions, max_order)
+    if geo_mean is None:
+        return None
+
+    return geo_mean * 100
