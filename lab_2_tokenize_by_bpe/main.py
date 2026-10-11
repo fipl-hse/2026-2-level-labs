@@ -127,6 +127,32 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple) or len(pair) != 2:
+        return None
+    for item in pair:
+        if not isinstance(item, str):
+            return None
+
+    merged_token = pair[0] + pair[1]
+    new_frequencies = {}
+
+    for word, freq in word_frequencies.items():
+        if not isinstance(word, tuple) or not isinstance(freq, int):
+            return None
+
+        new_word = []
+        i = 0
+        while i < len(word):
+            if i < len(word) - 1 and word[i] == pair[0] and word[i + 1] == pair[1]:
+                new_word.append(merged_token)
+                i += 2
+            else:
+                new_word.append(word[i])
+                i += 1
+
+        new_frequencies[tuple(new_word)] = new_frequencies.get(tuple(new_word), 0) + freq
+
+    return new_frequencies
 
 
 def train(
@@ -147,6 +173,52 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int) or num_merges < 0:
+        return None
+
+    current_frequencies = word_frequencies
+    for _ in range(num_merges):
+        token_pairs = count_tokens_pairs(current_frequencies)
+        if not token_pairs:
+            break
+
+        best_pair = None
+        max_freq = -1
+        max_len = -1
+
+        for pair, freq in token_pairs.items():
+            merged_len = len(pair[0] + pair[1])
+            merged_str = pair[0] + pair[1]
+
+            if best_pair is None:
+                best_pair = pair
+                max_freq = freq
+                max_len = merged_len
+            else:
+                best_best_str = best_pair[0] + best_pair[1]
+                best_best_len = len(best_best_str)
+
+                if freq > max_freq:
+                    best_pair = pair
+                    max_freq = freq
+                    max_len = merged_len
+                elif freq == max_freq:
+                    if merged_len > max_len:
+                        best_pair = pair
+                        max_len = merged_len
+                    elif merged_len == max_len:
+                        if merged_str < best_best_str:
+                            best_pair = pair
+
+        if best_pair is None:
+            break
+
+        updated_frequencies = merge_tokens(current_frequencies, best_pair)
+        if updated_frequencies is None:
+            return None
+        current_frequencies = updated_frequencies
+
+    return current_frequencies
 
 
 def get_vocabulary(
