@@ -278,6 +278,7 @@ def find_first_digit(input_string: str) -> str | None:
     """
     # student implementation goes here
 
+
 # find_first_digit("abc123") → "1"
 # find_first_digit("no digits") → None
 
