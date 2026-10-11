@@ -184,9 +184,10 @@ def train(
             key=lambda item: (-item[1], -len(item[0][0] + item[0][1]), item[0][0] + item[0][1]))
         pair_to_merge = best_item[0]
 
-        current_frequencies = merge_tokens(current_frequencies, pair_to_merge)
-        if current_frequencies is None:
+        new_frequencies = merge_tokens(current_frequencies, pair_to_merge)
+        if new_frequencies is None:
             return None
+        current_frequencies = new_frequencies
 
     return current_frequencies
 
@@ -258,9 +259,7 @@ def decode(
 
     decoded_parts = []
     for identifier in encoded_text:
-        if not isinstance(identifier, int):
-            return None
-        if identifier not in id_to_token:
+        if not isinstance(identifier, int) or identifier not in id_to_token:
             return None
 
         token = id_to_token[identifier]
@@ -375,13 +374,13 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if not all((
-        isinstance(original_text, str),
-        isinstance(vocabulary, dict),
-        isinstance(start_of_word_token, (str, type(None))),
-        isinstance(end_of_word_token, (str, type(None))),
-        isinstance(unknown_token, str),
-    )):
+    if (not isinstance(original_text, str)
+            or not isinstance(vocabulary, dict)):
+        return None
+    if (start_of_word_token is not None and not isinstance(start_of_word_token, str)
+            or end_of_word_token is not None and not isinstance(end_of_word_token, str)):
+        return None
+    if not isinstance(unknown_token, str):
         return None
 
     all_token_ids = []
