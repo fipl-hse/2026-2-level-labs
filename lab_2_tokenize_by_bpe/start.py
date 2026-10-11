@@ -1,7 +1,6 @@
 """
 BPE Tokenizer starter
 """
-
 # pylint:disable=too-many-locals, unused-variable
 import os
 
@@ -11,6 +10,7 @@ from lab_2_tokenize_by_bpe.main import (
     get_vocabulary,
     train,
 )
+
 
 def main() -> None:
     """

@@ -97,8 +97,7 @@ def count_tokens_pairs(
     for tokens, frequency in word_frequencies.items():
         if not isinstance(tokens, tuple) or not isinstance(frequency, int):
             return None
-        for index in range(len(tokens) - 1):
-            pair = (tokens[index], tokens[index + 1])
+        for pair in zip(tokens, tokens[1:]):
             pair_frequencies[pair] = pair_frequencies.get(pair, 0) + frequency
     return pair_frequencies
 
@@ -171,20 +170,19 @@ def train(
     if not isinstance(num_merges, int) or num_merges < 0:
         return None
 
-    def pair_key(item):
-        pair, frequency = item
-        merged = pair[0] + pair[1]
-        return (-frequency, -len(merged), merged)
-
     current_frequencies = dict(word_frequencies)
 
     for _ in range(num_merges):
         pair_frequencies = count_tokens_pairs(current_frequencies)
+        if pair_frequencies is None:
+            return None
         if not pair_frequencies:
             break
 
-        best_pair_and_frequency = min(pair_frequencies.items(), key=pair_key)
-        pair_to_merge = best_pair_and_frequency[0]
+        best_item = min(
+            pair_frequencies.items(),
+            key=lambda item: (-item[1], -len(item[0][0] + item[0][1]), item[0][0] + item[0][1]))
+        pair_to_merge = best_item[0]
 
         current_frequencies = merge_tokens(current_frequencies, pair_to_merge)
         if current_frequencies is None:
@@ -245,9 +243,7 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(encoded_text, (list, tuple)):
-        return None
-    if not encoded_text:
+    if not isinstance(encoded_text, (list, tuple)) or not encoded_text:
         return None
     if not isinstance(vocabulary, dict):
         return None
@@ -304,29 +300,26 @@ def tokenize_word(
     if unknown_token not in vocabulary:
         return None
 
-    token_to_id = vocabulary
-    tokens_by_length = sorted(token_to_id.keys(), key=lambda token: (-len(token), token))
-    word_as_string = ''.join(word)
+    tokens_by_length = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
+    word_text = ''.join(word)
 
-    token_identifiers = []
-    current_position = 0
-
-    while current_position < len(word_as_string):
-        found_token = None
+    result = []
+    position = 0
+    while position < len(word_text):
+        matched = None
         for token in tokens_by_length:
-            if token and word_as_string.startswith(token, current_position):
-                found_token = token
+            if token and word_text.startswith(token, position):
+                matched = token
                 break
 
-        if found_token is not None:
-            token_identifiers.append(token_to_id[found_token])
-            current_position += len(found_token)
+        if matched is not None:
+            result.append(vocabulary[matched])
+            position += len(matched)
         else:
-            token_identifiers.append(token_to_id[unknown_token])
-            current_position += 1
+            result.append(vocabulary[unknown_token])
+            position += 1
 
-    return token_identifiers
-
+    return result
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -340,6 +333,23 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    try:
+        with open(vocab_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+    except (OSError, ValueError):
+        return None
+
+    if not isinstance(data, dict):
+        return None
+
+    for token, identifier in data.items():
+        if not isinstance(token, str) or not isinstance(identifier, int):
+            return None
+
+    return data
 
 
 def encode(
@@ -365,7 +375,30 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not all((
+        isinstance(original_text, str),
+        isinstance(vocabulary, dict),
+        isinstance(start_of_word_token, (str, type(None))),
+        isinstance(end_of_word_token, (str, type(None))),
+        isinstance(unknown_token, str),
+    )):
+        return None
 
+    all_token_ids = []
+    for word in original_text.split():
+        tokenized_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if tokenized_word is None:
+            return None
+
+        current_word_ids = tokenize_word(
+            tokenized_word, vocabulary, end_of_word_token, unknown_token
+        )
+        if current_word_ids is None:
+            return None
+
+        all_token_ids.extend(current_word_ids)
+
+    return all_token_ids
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
