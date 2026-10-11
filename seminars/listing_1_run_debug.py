@@ -23,7 +23,6 @@ Running python application and debugging.
 first_num = 15
 second_num = 0
 
-
 print(f"Numbers: {first_num} and {second_num}")
 
 # Case1: the first exception trigger:
