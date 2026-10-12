@@ -31,7 +31,7 @@ def prepare_word(
     if not isinstance(end_of_word, str) and end_of_word is not None:
             return None
     res = []
-    if start_of_word is not None:
+    if start_of_word:
         res.append(start_of_word)
     for i in range(len(raw_word)):
         res.append(raw_word[i])
