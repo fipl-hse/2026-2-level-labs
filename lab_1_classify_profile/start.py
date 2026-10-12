@@ -6,6 +6,8 @@ Language detection starter.
 
 from lab_1_classify_profile.main import (
     calculate_frequencies,
+    check_profile,
+    compare_profiles_by_top_n,
     create_language_profile,
     detect_language_by_top_n,
     get_top_n_words,
@@ -27,6 +29,7 @@ def main() -> None:
     with open("lab_1_classify_profile/assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().splitlines()
 
+    # Шаги 1-4
     tokens = tokenize(en_text)
     filtered_tokens = remove_stop_words(tokens, stopwords)
     freq_dict = calculate_frequencies(filtered_tokens)
@@ -36,6 +39,7 @@ def main() -> None:
     print("Без стоп-слов (первые 20):", filtered_tokens[:20])
     print("Топ-7 популярных слов:", top_7)
 
+    # Шаг 5: профили
     en_profile = create_language_profile("en", en_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
@@ -44,6 +48,16 @@ def main() -> None:
         print("Не удалось создать профили")
         return
 
+    # Шаг 5.2: проверка профиля
+    print("Профиль en корректен:", check_profile(en_profile))
+
+    # Шаг 6: сравнение по топ-15
+    en_score = compare_profiles_by_top_n(unknown_profile, en_profile, 15)
+    de_score = compare_profiles_by_top_n(unknown_profile, de_profile, 15)
+    print("Доля пересечения с en:", en_score)
+    print("Доля пересечения с de:", de_score)
+
+    # Шаг 7: определение языка
     detected = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
 
     if detected is None:
