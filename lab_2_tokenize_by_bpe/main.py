@@ -75,12 +75,14 @@ def collect_frequencies(
         if not isinstance(word, str):
             return None
 
+    for word in prepared_text:
+        if prepare_word(word, None, "</s>") is None:
+            return None
+
     frequencies_dict = {}
     for word in prepared_text:
         prepared_word = prepare_word(word, None, "</s>")
-        if prepared_word is None:
-            return None
-        elif prepared_word and prepared_word not in frequencies_dict:
+        if prepared_word and prepared_word not in frequencies_dict:
             frequencies_dict[prepared_word] = 1
         else:
             frequencies_dict[prepared_word] += 1
@@ -105,8 +107,7 @@ def count_tokens_pairs(
     """
     if not (
     isinstance(word_frequencies, dict) and
-    all(isinstance(key, tuple) for key in word_frequencies.keys()) and
-    all(isinstance(value, int) for value in word_frequencies.values()) and
+    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
     all(isinstance(el, str) for key in word_frequencies for el in key)
     ):
         return None
@@ -140,8 +141,7 @@ def merge_tokens(
     """
     if not (isinstance(word_frequencies, dict) and
     isinstance(pair, tuple) and
-    all(isinstance(key, tuple) for key in word_frequencies.keys()) and
-    all(isinstance(value, int) for value in word_frequencies.values()) and
+    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
     all(isinstance(word, str) for key in word_frequencies for word in key) and
     all(isinstance(token, str) for token in pair)
     ):
@@ -180,6 +180,48 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+
+    if not (isinstance(word_frequencies, dict) and
+    isinstance(num_merges, int) and
+    all(isinstance(key, tuple) for key in word_frequencies.keys()) and
+    all(isinstance(value, int) for value in word_frequencies.values()) and
+    all(isinstance(word, str) for key in word_frequencies for word in key)
+    ):
+        return None
+
+    while num_merges > 0:
+        if count_tokens_pairs(word_frequencies) is None:
+            return None
+
+        pair_frequencies = count_tokens_pairs(word_frequencies)
+        if not pair_frequencies:
+            break
+
+        max_freq = max(pair_frequencies.values())
+        popular_tokens = []
+
+        for key, value in pair_frequencies.items():
+            if value == max_freq:
+                popular_tokens.append(key)
+
+        max_len = 0
+        for a, b in popular_tokens:
+            max_len = max(max_len, len(a + b))
+
+        longest = []
+        for a,b in popular_tokens:
+            if len(a+b) == max_len:
+                longest.append((a+b, (a, b)))
+
+        popular_pair = min(longest)[1]
+
+        if merge_tokens(word_frequencies, popular_pair) is None:
+            return None
+
+        word_frequencies = merge_tokens(word_frequencies, popular_pair)
+        num_merges -= 1
+
+    return word_frequencies
 
 
 def get_vocabulary(
