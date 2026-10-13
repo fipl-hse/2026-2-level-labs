@@ -294,6 +294,33 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(encoded_text, Sequence | None) or \
+    not encoded_text or \
+    not isinstance(vocabulary, dict | None) or \
+    not vocabulary or \
+    not isinstance(end_of_word_token, str | None):
+        return None
+    if encoded_text is not None:
+        if not all (isinstance(item, int) for item in encoded_text):
+            return None
+    if vocabulary is not None:
+        for token, identifier in vocabulary.items():
+            if not isinstance(token, str) or not isinstance(identifier, int):
+                return None
+
+    decode_dict = {identifier: token for token, identifier in vocabulary.items()}
+    decoded_text = []
+    for token_encoded in encoded_text:
+        if token_encoded in decode_dict:
+            decoded_text.append(decode_dict[token_encoded])
+        else:
+            decoded_text.append("<unk>")
+
+    result = "".join(decoded_text)
+    if end_of_word_token is not None:
+        result = result.replace(end_of_word_token, ' ')
+
+    return result
 
 
 def tokenize_word(
