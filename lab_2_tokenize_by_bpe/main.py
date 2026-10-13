@@ -5,8 +5,9 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
-from typing import Sequence
 import json
+from typing import Sequence
+
 
 
 def prepare_word(
