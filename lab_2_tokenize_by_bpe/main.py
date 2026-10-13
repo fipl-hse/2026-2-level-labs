@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
 
 
@@ -146,7 +147,7 @@ def merge_tokens(
     ):
         return None
 
-    new_token = pair[0] + pair[1]
+    new_token = "".join(pair)
 
     new_word_frequencies = {}
 
@@ -206,8 +207,8 @@ def train(
         sorted_pair_frequencies = sorted(pairs_frequencies.items(),
                                         key=lambda item: (
             -item[1],
-            -len(item[0][0] + item[0][1]),
-            item[0][0] + item[0][1],
+            -len("".join(item[0])),
+            "".join(item[0])
         ))
 
         new_frequencies = merge_tokens(word_frequencies, sorted_pair_frequencies[0][0])
@@ -251,18 +252,12 @@ def get_vocabulary(
     for key in word_frequencies:
         for token in key:
             tokens.add(token)
-            for symbol in token:
-                tokens.add(symbol)
+            tokens.update(token)
 
     tokens.add(unknown_token)
     sorted_tokens = sorted(tokens,key=lambda x: (-len(x), x))
 
-    vocabulary = {}
-
-    for i, token in enumerate(sorted_tokens):
-        vocabulary[token] = i
-
-    return vocabulary
+    return {token: i for i, token in enumerate(sorted_tokens)}
 
 def decode(
     encoded_text: Sequence[int] | None,
@@ -328,6 +323,44 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+    not isinstance(word, tuple)
+    or not all(isinstance(i, str) for i in word)
+    or not (end_of_word is None or isinstance(end_of_word, str))
+    or not isinstance(unknown_token, str)
+    ):
+        return None
+    if (
+    not isinstance(vocabulary, dict)
+    or not all(isinstance(k, str) for k in vocabulary)
+    or not all(isinstance(v, int) for v in vocabulary.values())
+    ):
+        return None
+
+    text = "".join(word)
+    if end_of_word is not None and not text.endswith(end_of_word):
+        text += end_of_word
+
+    sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
+
+    result = []
+    i = 0
+    n = len(text)
+
+    while i < n:
+        token = next(
+            (t for t in sorted_tokens if t and text.find(t, i) == i),
+            None,
+        )
+        if token is not None:
+            result.append(vocabulary[token])
+            i += len(token)
+
+        else:
+            result.append(vocabulary[unknown_token])
+            i += 1
+
+    return result
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -342,6 +375,16 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(vocab_path, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    data = json.loads(content)
+    if not isinstance(data, dict):
+        return None
+    return data
 
 
 def encode(
@@ -367,7 +410,35 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+    not isinstance(original_text, str)
+    or not (start_of_word_token is None or isinstance(start_of_word_token, str))
+    or not (end_of_word_token is None or isinstance(end_of_word_token, str))
+    or not isinstance(unknown_token, str)
+    ):
+        return None
+    if (
+    not isinstance(vocabulary, dict)
+    or not all(isinstance(k, str) for k in vocabulary)
+    or not all(isinstance(v, int) for v in vocabulary.values())
+    ):
+        return None
 
+    encoded = []
+
+    for raw_word in original_text.split():
+        prepared_word = prepare_word(raw_word, start_of_word_token, end_of_word_token)
+
+        if prepared_word is None:
+            return None
+
+        tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if tokenized_word is None:
+                return None
+
+        encoded.extend(tokenized_word)
+
+    return encoded
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
