@@ -3,12 +3,13 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-from .main import (
+from main import (
     prepare_word,
-    collect_frequencies
+    collect_frequencies,
+    count_tokens_pairs,
+    merge_tokens,
+    train
 )
-
-
 
 def main() -> None:
     """
@@ -23,11 +24,13 @@ def main() -> None:
     # result = None
     # assert result, "Translation not working"
 
-    text = "It's far, farther, farthest and old, older, oldest"
+    # Mark 4
     frequencies = collect_frequencies(text, None, "</s>")
-    print(frequencies)
+    # print(frequencies)
 
-
+    # Mark 6
+    train_tokenizer = train(frequencies, 100)
+    print(train_tokenizer)
 
 if __name__ == "__main__":
     main()
