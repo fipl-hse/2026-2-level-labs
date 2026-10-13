@@ -183,8 +183,7 @@ def train(
 
     if not (isinstance(word_frequencies, dict) and
     isinstance(num_merges, int) and
-    all(isinstance(key, tuple) for key in word_frequencies.keys()) and
-    all(isinstance(value, int) for value in word_frequencies.values()) and
+    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
     all(isinstance(word, str) for key in word_frequencies for word in key)
     ):
         return None
@@ -240,7 +239,30 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(word_frequencies, dict) and
+    isinstance(unknown_token, str) and
+    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
+    all(isinstance(word, str) for key in word_frequencies for word in key)
+    ):
+        return None
 
+    vocabulary_lst = [el for key in word_frequencies.keys() for el in key]
+    print(vocabulary_lst)
+
+    for token in vocabulary_lst:
+        if len(token) > 1:
+            vocabulary_lst.extend(token.split(""))
+    vocabulary_lst.append(unknown_token)
+    print(vocabulary_lst)
+
+    vocabulary_lst = sorted(vocabulary_lst, key = len, reverse = True)
+    vocabulary_lst = sorted(vocabulary_lst)
+    print(vocabulary_lst)
+
+    vocabulary = {key:i for key,i in enumerate(vocabulary_lst)}
+
+    print(vocabulary)
+    return vocabulary
 
 def decode(
     encoded_text: Sequence[int] | None,
@@ -261,6 +283,7 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def tokenize_word(
