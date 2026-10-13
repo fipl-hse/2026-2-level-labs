@@ -222,8 +222,8 @@ print("*" * 15 + " TASKS " + "*" * 15)
 
 
 # Task 4
-# medium level
-# class Student:
+ medium level
+ class Student:
 #     """
 #     If I have less than three deadlines, my mood is Good!
 #     If I have from 3 to 5 deadlines, my mood is So-so...
@@ -240,16 +240,15 @@ print("*" * 15 + " TASKS " + "*" * 15)
 # print(student.mood())  # Bad
 
 # Task 5
-# medium level
-# class Square:
-#
-#     def __init__(self, side_length: float) -> None:
+ medium level
+class Square:
+    def __init__(self, side_length: float) -> None:
 #         ...
 #
-#     def get_area(self) -> float:
+     def get_area(self) -> float:
 #         ...
 #
-#     def get_perimeter(self) -> float:
+     def get_perimeter(self) -> float:
 #         ...
 
 # square1 = Square(side_length=2)

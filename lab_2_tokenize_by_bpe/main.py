@@ -6,6 +6,7 @@ BPE and machine translation evaluation
 
 # pylint:disable=unused-argument
 from typing import Sequence
+import json
 
 
 def prepare_word(
@@ -279,6 +280,7 @@ def tokenize_word(
         return None
     if end_of_word is not None and not isinstance(end_of_word, str):
         return None
+
     word_str = "".join(word)
     sorted_tokens = sorted(vocabulary.keys(), key=lambda x: (-len(x), x))
     result = [word_str]
@@ -302,7 +304,9 @@ def tokenize_word(
         if isinstance(item, int):
             final_ids.append(item)
         else:
-            final_ids.append(vocabulary.get(unknown_token, 0))
+            # Исправление: теперь мы заменяем каждый неизвестный символ по отдельности
+            for char in item:
+                final_ids.append(vocabulary.get(unknown_token, 0))
 
     return final_ids
 
@@ -319,6 +323,17 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(vocab_path, 'r', encoding='utf-8') as f:
+        vocabulary = json.load(f)
+
+    if not isinstance(vocabulary, dict):
+        return None
+
+    return vocabulary
+
 
 
 def encode(
@@ -344,6 +359,27 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict) or not isinstance(unknown_token, str):
+        return None
+    if start_of_word_token is not None and not isinstance(start_of_word_token, str):
+        return None
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+        return None
+
+    encoded_text = []
+
+    for word in original_text.split():
+        prepared = prepare_word(word, start_of_word_token, end_of_word_token)
+        if prepared is None:
+            return None
+
+        tokenized = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
+        if tokenized is None:
+            return None
+
+        encoded_text.extend(tokenized)
+
+    return encoded_text
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
