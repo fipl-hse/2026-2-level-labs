@@ -251,15 +251,20 @@ def get_vocabulary(
 
     for token in vocabulary_lst:
         if len(token) > 1:
-            vocabulary_lst.extend(token.split(""))
+            vocabulary_lst.extend(list(token))
     vocabulary_lst.append(unknown_token)
     print(vocabulary_lst)
 
-    vocabulary_lst = sorted(vocabulary_lst, key = len, reverse = True)
     vocabulary_lst = sorted(vocabulary_lst)
+    vocabulary_lst = sorted(vocabulary_lst, key = len, reverse = True)
     print(vocabulary_lst)
 
-    vocabulary = {key:i for key,i in enumerate(vocabulary_lst)}
+    vocabulary = {}
+    i = 0
+    for el in vocabulary_lst:
+        if el not in vocabulary:
+            vocabulary[el] = i
+            i+=1
 
     print(vocabulary)
     return vocabulary
@@ -283,7 +288,25 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(encoded_text, list) and
+    isinstance(vocabulary, dict) and
+    all(isinstance(key, str) and isinstance(value, int) for key,value in vocabulary.items()) and
+    isinstance(end_of_word_token, str | None)
+    ):
+        return None
 
+    result = ""
+    keys_lst = list(vocabulary.keys())
+    value_lst = list(vocabulary.values())
+    for ch in encoded_text:
+        token_ind = value_lst.index(ch)
+        token = keys_lst[token_ind]
+        if token is None or token == end_of_word_token:
+            result += " "
+        else:
+            result += token
+
+    return result
 
 
 def tokenize_word(
