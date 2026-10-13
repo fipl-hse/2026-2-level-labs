@@ -11,6 +11,7 @@ from main import (
     train,
 )
 
+
 def main() -> None:
     """
     Launches an implementation
