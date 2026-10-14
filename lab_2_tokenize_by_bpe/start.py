@@ -31,9 +31,11 @@ def main() -> None:
     assert trained_tokenizator
 
     vocabulary = get_vocabulary(trained_tokenizator, "<unk>")
+    assert vocabulary
 
     secret_text = [int(el) for el in secret_text.split()]
     decoded_text = decode(secret_text, vocabulary, "</s>")
+    assert decoded_text
 
     print(decoded_text)
     return None
