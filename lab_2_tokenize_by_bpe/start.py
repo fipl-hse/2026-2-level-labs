@@ -22,10 +22,11 @@ def main() -> None:
         text = text_file.read()
 
     word_frequencies = collect_frequencies(text, None, "</s>")
-    print("Word frequencies:", word_frequencies)
-
     trained_frequencies = train(word_frequencies, 100)
-    print("Trained frequencies:", trained_frequencies)
+
+    if trained_frequencies is None:
+        return
+    print("Trained, tokens count:", len(trained_frequencies))
 
     vocabulary = get_vocabulary(trained_frequencies, "<unk>") if trained_frequencies else None
     if vocabulary is None:
@@ -74,8 +75,8 @@ def main() -> None:
     if encoded is None:
         return
 
-    print("Encoded (первые 20):", encoded[:20])
-    print("Reference (первые 20):", reference[:20])
+    print("Encoded first 20:", encoded[:20])
+    print("Reference first 20:", reference[:20])
 
     compare_len = min(20, len(encoded), len(reference))
     is_match = all(encoded[i] == reference[i] for i in range(compare_len))
