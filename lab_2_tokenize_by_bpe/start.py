@@ -7,6 +7,7 @@ from lab_2_tokenize_by_bpe.main import (
     train,
 )
 
+
 def main() -> None:
     """
     Launches an implementation
