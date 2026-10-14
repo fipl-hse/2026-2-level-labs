@@ -401,7 +401,6 @@ def detect_language_by_mse(
     return profile_2[0]
 
 
-
 # Mark 10
 
 

@@ -11,6 +11,7 @@ from lab_1_classify_profile.main import (
     get_top_n_words,
     remove_stop_words,
     tokenize,
+    calculate_mse
 )
 
 
