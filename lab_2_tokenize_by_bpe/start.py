@@ -37,7 +37,7 @@ def main() -> None:
     result = decode(secret_text, vocabulary, "</s>")
     assert result, "Text can not be decoded"
 
-    print(decoded_text)
+    print(result)
     return None
 
 
