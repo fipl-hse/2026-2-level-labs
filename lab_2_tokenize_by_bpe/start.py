@@ -34,8 +34,8 @@ def main() -> None:
     assert vocabulary
 
     secret_text = [int(el) for el in secret_text.split()]
-    decoded_text = decode(secret_text, vocabulary, "</s>")
-    assert decoded_text
+    result = decode(secret_text, vocabulary, "</s>")
+    assert result, "Text can not be decoded"
 
     print(decoded_text)
     return None
