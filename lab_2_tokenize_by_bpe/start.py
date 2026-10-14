@@ -37,7 +37,7 @@ def main() -> None:
     decoded_text = decode(secret_text, vocabulary, "</s>")
 
     print(decoded_text)
-    return decoded_text
+    return None
 
 
 if __name__ == "__main__":
