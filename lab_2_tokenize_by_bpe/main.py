@@ -63,7 +63,7 @@ def collect_frequencies(
     if not isinstance(end_of_word, str):
         return None
 
-    frequencies: dict[tuple[str, ...], int] = {}
+    frequencies = {}
     for raw_word in text.split():
         word = prepare_word(raw_word, start_of_word, end_of_word)
         if word is None:
