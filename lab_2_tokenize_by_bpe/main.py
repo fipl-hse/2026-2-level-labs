@@ -142,9 +142,24 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if (not isinstance(pair, tuple)
+        or len(pair) !=2
+        or not isinstance(word_frequencies, dict)
+    ):
+        return None
+    if not all(isinstance(token, str) for token in pair):
+        return None
     merged_token = pair[0] + pair[1]
     new_words_frequencies = {}
     for word, frequency in word_frequencies.items():
+        if (
+            not isinstance(word, tuple)
+            or not isinstance(frequency, int)
+        ):
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
         new_words = []
         i = 0
         while i < len(word):
@@ -154,9 +169,12 @@ def merge_tokens(
                 and word[i+1] == pair[1]
             ):
                 new_words.append(merged_token)
-                i +=1
-    new_keys = tuple(new_words)
-    new_words_frequencies[new_keys] = (new_words_frequencies.get(new_keys, 0) + frequency)
+                i +=2
+            else:
+                new_words.append(word[i])
+                i+=1
+        new_keys = tuple(new_words)
+        new_words_frequencies[new_keys] = (new_words_frequencies.get(new_keys, 0) + frequency)
     return new_words_frequencies
 
 
@@ -184,6 +202,34 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(word_frequencies, dict)
+        or not isinstance(num_merges, int)
+        or num_merges <0
+    ):
+        return None
+    new = word_frequencies
+    for _ in range(num_merges):
+        counts = count_tokens_pairs(new)
+        if counts is None:
+            return None
+        if not counts:
+            break
+        best_pair = min(counts,
+                        key=lambda p:(
+                        -counts[p],
+                        -len(p[0]+p[1]),
+                        p[0]+p[1]
+                        )
+                    )
+        merged = merge_tokens(new, best_pair)
+        if merged is None:
+            return None
+        new = merged
+    return new
+
+
+
 
 
 def get_vocabulary(
@@ -202,6 +248,7 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def decode(
