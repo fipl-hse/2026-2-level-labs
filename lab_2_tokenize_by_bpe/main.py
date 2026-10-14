@@ -179,9 +179,13 @@ def train(
         if not pair_frequencies:
             break
 
-        best_item = min(
-            pair_frequencies.items(),
-            key=lambda item: (-item[1], -len(item[0][0] + item[0][1]), item[0][0] + item[0][1]))
+        best_item = min (pair_frequencies.items(),
+            key=lambda item: (
+                -item[1],
+                -len(item[0][0] + item[0][1]),
+                item[0][0] + item[0][1],
+            ),
+        )
         pair_to_merge = best_item[0]
 
         new_frequencies = merge_tokens(current_frequencies, pair_to_merge)
@@ -207,9 +211,7 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(word_frequencies, dict):
-        return None
-    if not isinstance(unknown_token, str):
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
         return None
 
     unique_tokens = {unknown_token}
@@ -374,14 +376,14 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if (not isinstance(original_text, str)
-            or not isinstance(vocabulary, dict)):
-        return None
-    if (start_of_word_token is not None and not isinstance(start_of_word_token, str)
-            or end_of_word_token is not None and not isinstance(end_of_word_token, str)):
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict):
         return None
     if not isinstance(unknown_token, str):
         return None
+
+    for token in (start_of_word_token, end_of_word_token):
+        if token is not None and not isinstance(token, str):
+            return None
 
     all_token_ids = []
     for word in original_text.split():
@@ -398,6 +400,7 @@ def encode(
         all_token_ids.extend(current_word_ids)
 
     return all_token_ids
+
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
