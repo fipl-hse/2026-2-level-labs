@@ -247,17 +247,14 @@ def get_vocabulary(
         return None
 
     vocabulary_lst = [el for key in word_frequencies.keys() for el in key]
-    print(vocabulary_lst)
 
     for token in vocabulary_lst:
         if len(token) > 1:
             vocabulary_lst.extend(list(token))
     vocabulary_lst.append(unknown_token)
-    print(vocabulary_lst)
 
     vocabulary_lst = sorted(vocabulary_lst)
     vocabulary_lst = sorted(vocabulary_lst, key = len, reverse = True)
-    print(vocabulary_lst)
 
     vocabulary = {}
     i = 0
@@ -266,7 +263,6 @@ def get_vocabulary(
             vocabulary[el] = i
             i+=1
 
-    print(vocabulary)
     return vocabulary
 
 def decode(
@@ -301,10 +297,10 @@ def decode(
     for ch in encoded_text:
         token_ind = value_lst.index(ch)
         token = keys_lst[token_ind]
-        if token is None or token == end_of_word_token:
-            result += " "
-        else:
-            result += token
+        result += token
+
+    if end_of_word_token is not None:
+        result = result.replace(end_of_word_token, " ")
 
     return result
 
