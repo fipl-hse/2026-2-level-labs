@@ -7,7 +7,6 @@ from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
     get_vocabulary,
-    prepare_word,
     train,
 )
 
