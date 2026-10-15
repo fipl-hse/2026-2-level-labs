@@ -80,8 +80,6 @@ def collect_frequencies(
 
 
 
-
-
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int],
 ) -> dict[tuple[str, str], int] | None:
@@ -119,9 +117,6 @@ def count_tokens_pairs(
             else:
                 counts[pair] = frequency
     return counts
-
-
-
 
 
 
@@ -179,11 +174,6 @@ def merge_tokens(
 
 
 
-
-
-
-
-
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
@@ -230,8 +220,6 @@ def train(
 
 
 
-
-
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
@@ -248,6 +236,33 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word_frequencies, dict)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
+    vocabulary = set()
+    for word, frequency in word_frequencies.items():
+        if (
+            not isinstance(word, tuple)
+            or not isinstance(frequency, int)
+        ):
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
+            vocabulary.add(token)
+    unique_symbols = set()
+    for token in vocabulary:
+        for symbol in token:
+            unique_symbols.add(symbol)
+    vocabulary |= unique_symbols
+    vocabulary.add(unknown_token)
+    sorted_vocabulary = sorted(vocabulary, key=lambda s:(-len(s), s))
+    result = {}
+    for identifier, token in enumerate(sorted_vocabulary):
+        result[token] = identifier
+    return result
 
 
 
@@ -270,6 +285,29 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(encoded_text, Sequence)
+        or isinstance(encoded_text, str)
+        or len(encoded_text) == 0
+        or not isinstance(vocabulary, dict)
+        or (end_of_word_token is not None
+        and not isinstance(end_of_word_token, str))
+    ):
+        return None
+    reverse_vocabulary = {identifier: token for token, identifier in vocabulary.items()}
+    res = []
+    for i in encoded_text:
+        if (not isinstance(i,int)
+            or not i in reverse_vocabulary
+        ):
+            return None
+        token = reverse_vocabulary[i]
+        if token == end_of_word_token:
+            res.append(' ')
+        else:
+            res.append(token)
+    return ''.join(res)
+
 
 
 def tokenize_word(
