@@ -237,6 +237,30 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+
+    tokens_set = set()
+    for word in word_frequencies.keys():
+        if not isinstance(word, tuple):
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
+            tokens_set.add(token)
+
+    base_chars = set()
+    for token in tokens_set:
+        for char in token:
+            base_chars.add(char)
+
+    all_tokens = tokens_set.union(base_chars)
+    all_tokens.add(unknown_token)
+
+    sorted_tokens = sorted(list(all_tokens), key=lambda x: (-len(x), x))
+
+    vocabulary = {token: idx for idx, token in enumerate(sorted_tokens)}
+    return vocabulary
 
 
 def decode(
@@ -258,6 +282,28 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(encoded_text, (list, tuple)) or not isinstance(vocabulary, dict):
+        return None
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+        return None
+
+    # Строим обратный словарь: ID -> токен
+    id_to_token = {idx: token for token, idx in vocabulary.items()}
+    decoded_parts = []
+
+    for token_id in encoded_text:
+        if not isinstance(token_id, int) or token_id not in id_to_token:
+            return None
+
+        token = id_to_token[token_id]
+
+        # Заменяем токен конца слова на пробел
+        if end_of_word_token is not None and token == end_of_word_token:
+            decoded_parts.append(" ")
+        else:
+            decoded_parts.append(token)
+
+    return "".join(decoded_parts)
 
 
 def tokenize_word(

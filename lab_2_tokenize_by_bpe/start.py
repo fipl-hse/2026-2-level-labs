@@ -4,11 +4,14 @@ BPE Tokenizer starter
 
 # pylint:disable=too-many-locals, unused-variable
 
-from lab_2_tokenize_by_bpe.main import (
+from main import (
+    prepare_word,
     collect_frequencies,
     count_tokens_pairs,
     merge_tokens,
     train,
+    get_vocabulary,
+    decode,
 )
 
 
@@ -22,25 +25,28 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-
-
     result = None
 
     word_frequencies = collect_frequencies(text, start_of_word=None, end_of_word="</s>")
+    print("1. Частотный словарь слов")
+    print(word_frequencies)
 
-    token_pairs = count_tokens_pairs(word_frequencies) if word_frequencies else None
+    if word_frequencies is not None:
+        trained_frequencies = train(word_frequencies, num_merges=100)
+        print("2. Словарь после 100 слияний")
+        print(trained_frequencies)
 
-    merged_frequencies = None
-    if token_pairs:
-        # Находим самую частую пару для демонстрации merge_tokens
-        best_pair = max(token_pairs.items(), key=lambda x: x[1])[0] if token_pairs else None
-        if best_pair:
-            merged_frequencies = merge_tokens(word_frequencies, best_pair)
+        if trained_frequencies is not None:
+            vocabulary = get_vocabulary(trained_frequencies, unknown_token="<unk>")
 
-    result = train(word_frequencies, num_merges=100)
+            if vocabulary is not None:
+                with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+                    secret_content = secret_file.read().strip()
+                    encoded_secret = [int(token_id) for token_id in secret_content.replace(",", " ").split() if token_id.isdigit()]
 
-    print("Trained frequencies sample:", list(result.items()[:3]) if result else None)
-    assert result, "Translation not working"
+                    result = decode(encoded_secret, vocabulary, end_of_word_token = "</s>")
+                    print("3. Декодированный текст секретного файла")
+                    print(result)
     assert result, "Translation not working"
 
 
