@@ -8,6 +8,7 @@ BPE and machine translation evaluation
 import json
 from typing import Sequence
 
+
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
@@ -102,9 +103,6 @@ def count_tokens_pairs(
     pair_frequencies = {}
 
     for word, freq in word_frequencies.items():
-        if len(word) < 2:
-            continue
-
         for i in range(len(word) - 1):
             pair = (word[i], word[i + 1])
             pair_frequencies[pair] = pair_frequencies.get(pair, 0) + freq
@@ -244,7 +242,7 @@ def decode(
     if end_of_word_token is not None and not isinstance(end_of_word_token, str):
         return None
     inverted_vocab = {v: k for k, v in vocabulary.items()}
-    decoded_text = ""
+    decoded_tokens = []
 
     for token_id in encoded_text:
         token = inverted_vocab.get(token_id)
@@ -252,11 +250,11 @@ def decode(
             continue
 
         if token == end_of_word_token:
-            decoded_text += " "
+            decoded_tokens.append(" ")
         else:
-            decoded_text += token
+            decoded_tokens.append(token)
 
-    return decoded_text
+    return "".join(decoded_tokens)
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
@@ -280,34 +278,25 @@ def tokenize_word(
     if end_of_word is not None and not isinstance(end_of_word, str):
         return None
 
-    word_str = "".join(word)
     sorted_tokens = sorted(vocabulary.keys(), key=lambda x: (-len(x), x))
-    result = [word_str]
+    result_list = list(word)
 
     for token in sorted_tokens:
-        new_result = []
-        for item in result:
-            if isinstance(item, int):
-                new_result.append(item)
-            else:
-                parts = item.split(token)
-                for i, part in enumerate(parts):
-                    if part:
-                        new_result.append(part)
-                    if i < len(parts) - 1:
-                        new_result.append(vocabulary[token])
-        result = new_result
+        i = 0
+        while i < len(result_list):
+            span_str = ""
+            for j in range(i, len(result_list)):
+                span_str += result_list[j]
 
-    final_ids = []
-    for item in result:
-        if isinstance(item, int):
-            final_ids.append(item)
-        else:
-            # Исправление: теперь мы заменяем каждый неизвестный символ по отдельности
-            for char in item:
-                final_ids.append(vocabulary.get(unknown_token, 0))
+                if span_str == token:
+                    result_list[i:j + 1] = [token]
+                    break
+                elif len(span_str) > len(token):
+                    break
+            i += 1
 
-    return final_ids
+    return [vocabulary.get(token, vocabulary.get(unknown_token, 0)) for token in result_list]
+
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
