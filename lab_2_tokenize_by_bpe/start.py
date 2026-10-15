@@ -31,5 +31,8 @@ def main() -> None:
     train_tokenizer = train(frequencies, 100)
     print(train_tokenizer)
 
+    result = train_tokenizer
+    assert result, "Translation not working"
+
 if __name__ == "__main__":
     main()
