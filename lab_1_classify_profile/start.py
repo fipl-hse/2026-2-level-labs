@@ -2,10 +2,6 @@
 Language detection starter.
 """
 
-<<<<<<< HEAD
-# pylint: disable=unused-variable, duplicate-code
-from lab_1_classify_profile.main import create_language_profile, detect_language_by_mse, calculate_mse, calculate_rmse
-=======
 # pylint: disable=unused-variable, duplicate-code, too-many-return-statements
 from lab_1_classify_profile.main import (
     calculate_frequencies,
@@ -20,8 +16,6 @@ from lab_1_classify_profile.main import (
     save_profile,
     tokenize,
 )
->>>>>>> 1943729de781eaba73c1add1533c9fb09342cabe
-
 
 def main() -> None:
     """
@@ -35,26 +29,7 @@ def main() -> None:
         stopwords = file.read().split("\n")
     with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
         en_text = file.read()
-<<<<<<< HEAD
-    if en_profile and de_profile and unknown_profile:
-        # ... тут твой остальной код ...
 
-        # Демонстрация для защиты на реальных текстах
-        mse_en = compare_profiles_by_mse(unknown_profile, en_profile)
-        mse_de = compare_profiles_by_mse(unknown_profile, de_profile)
-
-        if mse_en is not None and mse_de is not None:
-            print("\n--- Сравнение метрик на реальных текстах ---")
-            print(f"С неизвестного на Английский -> MSE: {mse_en:.5f} | RMSE: {mse_en ** 0.5:.5f}")
-            print(f"С неизвестного на Немецкий   -> MSE: {mse_de:.5f} | RMSE: {mse_de ** 0.5:.5f}")
-    test_pred = [0.2, 0.5, 0.1]
-    test_actual = [0.1, 0.5, 0.4]
-    print("Сравнение работы метрик на одинаковых текстах:")
-    print(f"Результат MSE: {calculate_mse(test_pred, test_actual)}")
-    print(f"Результат RMSE: {calculate_rmse(test_pred, test_actual)}")
-=======
-
->>>>>>> 1943729de781eaba73c1add1533c9fb09342cabe
     result = None
 
     tokenized_text = tokenize(de_text)
@@ -104,7 +79,6 @@ def main() -> None:
 
     assert result, "Detection result is None"
     return None
-
 
 if __name__ == "__main__":
     main()
