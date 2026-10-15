@@ -157,19 +157,19 @@ def merge_tokens(
         return None
 
     new_word_frequencies = {}
-    token_1, token_2 = pair
-    merged_token = token_1 + token_2
+    first_token, second_token = pair
+    merged_token = first_token + second_token
 
     for word, freq in word_frequencies.items():
         new_word = []
         i = 0
         while i < len(word):
-            if i < len(word) - 1 and word[i] == token_1 and word[i + 1] == token_2:
+            if i < len(word) - 1 and word[i] == first_token and word[i + 1] == second_token:
                 new_word.append(merged_token)
                 i += 2
-            else:
-                new_word.append(word[i])
-                i += 1
+                continue
+            new_word.append(word[i])
+            i += 1
         new_word_frequencies[tuple(new_word)] = (
         new_word_frequencies.get(tuple(new_word), 0) + freq
         )
