@@ -24,6 +24,21 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(raw_word, str):
+        return None
+    if start_of_word is not None and not isinstance(start_of_word, str):
+        return None
+    if end_of_word is not None and not isinstance(end_of_word, str):
+        return None
+
+    tokens = list(raw_word)
+
+    if start_of_word is not None:
+        tokens.insert(0, start_of_word)
+    if end_of_word is not None:
+        tokens.append(end_of_word)
+
+    return tuple(tokens)
 
 
 def collect_frequencies(
@@ -44,6 +59,23 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(text, str) or not text:
+        return None
+    if start_of_word is not None and not isinstance(start_of_word, str):
+        return None
+    if not isinstance(end_of_word, str):
+        return None
+
+    frequencies = {}
+    words = text.split()
+
+    for word in words:
+        prepared = prepare_word(word, start_of_word, end_of_word)
+        if prepared is None:
+            return None
+        frequencies[prepared] = frequencies.get(prepared, 0) + 1
+
+    return frequencies
 
 
 def count_tokens_pairs(
@@ -62,6 +94,20 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+
+    pairs_frequencies = {}
+
+    for word, freq in word_frequencies.items():
+        if not isinstance(word, tuple) or not isinstance(freq, int):
+            return None
+
+        for i in range(len(word) - 1):
+            pair = (word[i], word[i + 1])
+            pairs_frequencies[pair] = pairs_frequencies.get(pair, 0) + freq
+
+    return pairs_frequencies
 
 
 def merge_tokens(
@@ -81,6 +127,32 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple) or len(pair) != 2:
+        return None
+    for item in pair:
+        if not isinstance(item, str):
+            return None
+
+    merged_token = pair[0] + pair[1]
+    new_frequencies = {}
+
+    for word, freq in word_frequencies.items():
+        if not isinstance(word, tuple) or not isinstance(freq, int):
+            return None
+
+        new_word = []
+        i = 0
+        while i < len(word):
+            if i < len(word) - 1 and word[i] == pair[0] and word[i + 1] == pair[1]:
+                new_word.append(merged_token)
+                i += 2
+            else:
+                new_word.append(word[i])
+                i += 1
+
+        new_frequencies[tuple(new_word)] = new_frequencies.get(tuple(new_word), 0) + freq
+
+    return new_frequencies
 
 
 def train(
@@ -101,6 +173,52 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int) or num_merges < 0:
+        return None
+
+    current_frequencies = word_frequencies
+    for _ in range(num_merges):
+        token_pairs = count_tokens_pairs(current_frequencies)
+        if not token_pairs:
+            break
+
+        best_pair = None
+        max_freq = -1
+        max_len = -1
+
+        for pair, freq in token_pairs.items():
+            merged_len = len(pair[0] + pair[1])
+            merged_str = pair[0] + pair[1]
+
+            if best_pair is None:
+                best_pair = pair
+                max_freq = freq
+                max_len = merged_len
+            else:
+                best_best_str = best_pair[0] + best_pair[1]
+                best_best_len = len(best_best_str)
+
+                if freq > max_freq:
+                    best_pair = pair
+                    max_freq = freq
+                    max_len = merged_len
+                elif freq == max_freq:
+                    if merged_len > max_len:
+                        best_pair = pair
+                        max_len = merged_len
+                    elif merged_len == max_len:
+                        if merged_str < best_best_str:
+                            best_pair = pair
+
+        if best_pair is None:
+            break
+
+        updated_frequencies = merge_tokens(current_frequencies, best_pair)
+        if updated_frequencies is None:
+            return None
+        current_frequencies = updated_frequencies
+
+    return current_frequencies
 
 
 def get_vocabulary(
@@ -119,6 +237,30 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+
+    tokens_set = set()
+    for word in word_frequencies.keys():
+        if not isinstance(word, tuple):
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
+            tokens_set.add(token)
+
+    base_chars = set()
+    for token in tokens_set:
+        for char in token:
+            base_chars.add(char)
+
+    all_tokens = tokens_set.union(base_chars)
+    all_tokens.add(unknown_token)
+
+    sorted_tokens = sorted(list(all_tokens), key=lambda x: (-len(x), x))
+
+    vocabulary = {token: idx for idx, token in enumerate(sorted_tokens)}
+    return vocabulary
 
 
 def decode(
@@ -140,6 +282,28 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(encoded_text, (list, tuple)) or not isinstance(vocabulary, dict):
+        return None
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+        return None
+
+    # Строим обратный словарь: ID -> токен
+    id_to_token = {idx: token for token, idx in vocabulary.items()}
+    decoded_parts = []
+
+    for token_id in encoded_text:
+        if not isinstance(token_id, int) or token_id not in id_to_token:
+            return None
+
+        token = id_to_token[token_id]
+
+        # Заменяем токен конца слова на пробел
+        if end_of_word_token is not None and token == end_of_word_token:
+            decoded_parts.append(" ")
+        else:
+            decoded_parts.append(token)
+
+    return "".join(decoded_parts)
 
 
 def tokenize_word(
