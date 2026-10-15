@@ -64,7 +64,9 @@ def main() -> None:
 
     compare_len = min(20, len(encoded), len(reference))
     is_match = all(encoded[i] == reference[i] for i in range(compare_len))
-    print("Encode matches reference:", is_match)
+    print("Encode matches the reference:", is_match)
+
+    assert encoded, "Translation not working"
 
 
 if __name__ == "__main__":
