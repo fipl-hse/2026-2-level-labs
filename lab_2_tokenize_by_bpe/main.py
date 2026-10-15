@@ -179,7 +179,7 @@ def train(
         if not pairs:
             break
 
-        best_pair: tuple[str, str] | None = None
+        best_pair = None
         best_frequency = -1
         best_merged = ""
 
@@ -328,7 +328,7 @@ def tokenize_word(
     )
 
     used = [False] * len(word_str)
-    tokens: list[str | None] = [None] * len(word_str)
+    tokens = [""] * len(word_str)
 
     for token in sorted_tokens:
         length = len(token)
@@ -348,11 +348,11 @@ def tokenize_word(
                     continue
             i += 1
 
-    result: list[int] = []
+    result = []
     i = 0
     while i < len(word_str):
         current = tokens[i]
-        if current is not None:
+        if current != "":
             result.append(vocabulary[current])
             i += len(current)
         else:
@@ -522,10 +522,12 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
     if not isinstance(max_order, int) or isinstance(max_order, bool) or max_order <= 0:
         return None
 
-    sum_ln = 0.0
     for p in precisions:
         if not isinstance(p, (int, float)) or isinstance(p, bool):
             return None
+
+    sum_ln = 0.0
+    for p in precisions:
         if p <= 0:
             return 0.0
         sum_ln += math.log(p)

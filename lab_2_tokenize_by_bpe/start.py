@@ -24,28 +24,32 @@ def main() -> None:
     word_frequencies = collect_frequencies(text, start_of_word=None, end_of_word="</s>")
     if word_frequencies is None:
         print("Error: Failed to collect word frequencies.")
+        return
 
-    if word_frequencies is not None:
-        trained = train(word_frequencies, num_merges=100)
-        if trained is None:
-            print("Error: Failed to train tokenizer.")
-        else:
-            vocabulary = get_vocabulary(trained, unknown_token="<unk>")
-            if vocabulary is None:
-                print("Error: Failed to build vocabulary.")
+    trained = train(word_frequencies, num_merges=100)
+    if trained is None:
+        print("Error: Failed to train tokenizer.")
+        return
+
+    vocabulary = get_vocabulary(trained, unknown_token="<unk>")
+    if vocabulary is None:
+        print("Error: Failed to build vocabulary.")
+        return
 
     model_vocab = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
     if model_vocab is None:
         print("Error: Failed to load vocabulary.")
+        return
 
-    if model_vocab is not None:
-        with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as ru_file:
-            ru_text = ru_file.read()
-        encoded_ru = encode(ru_text, model_vocab, "\u2581", None, "<unk>")
-        if encoded_ru is None:
-            print("Error: Failed to encode Russian text.")
-        else:
-            result = encoded_ru
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as ru_file:
+        ru_text = ru_file.read()
+
+    encoded_ru = encode(ru_text, model_vocab, "\u2581", None, "<unk>")
+    if encoded_ru is None:
+        print("Error: Failed to encode Russian text.")
+        return
+
+    result = encoded_ru
 
     assert result, "Translation not working"
 
