@@ -37,41 +37,30 @@ def main() -> None:
             encoded_secret.append(int(value))
 
     word_frequencies = collect_frequencies(text, start_of_word=None, end_of_word="</s>")
-    if word_frequencies is None:
-        print("Error: collect_frequencies failed.")
+    assert word_frequencies, "collect_frequencies failed"
 
-    if word_frequencies is not None:
-        trained_frequencies = train(word_frequencies, num_merges=100)
-        if trained_frequencies is None:
-            print("Error: train failed.")
-        else:
-            vocabulary = get_vocabulary(trained_frequencies, unknown_token="<unk>")
-            if vocabulary is None:
-                print("Error: get_vocabulary failed.")
+    trained_frequencies = train(word_frequencies, num_merges=100)
+    assert trained_frequencies, "train failed"
 
-    if vocabulary is not None:
-        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
-        if decoded_secret is None:
-            print("Error: decode failed.")
-        else:
-            print("Decoded secret:", decoded_secret)
+    vocabulary = get_vocabulary(trained_frequencies, unknown_token="<unk>")
+    assert vocabulary, "get_vocabulary failed"
+
+    decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+    assert decoded_secret, "decode failed"
+    print("Decoded secret:", decoded_secret)
 
     translation_vocab = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
-    if translation_vocab is None:
-        print("Error: load_vocabulary failed.")
+    assert translation_vocab, "load_vocabulary failed"
 
-    if translation_vocab is not None:
-        encoded = encode(text_to_translate, translation_vocab, "\u2581", None, "<unk>")
-        if encoded is None:
-            print("Error: encode failed.")
-        else:
-            compare_len = min(20, len(encoded), len(reference))
-            is_match = all(encoded[i] == reference[i] for i in range(compare_len))
-            print("Encode matches reference:", is_match)
-            result = encoded
+    encoded = encode(text_to_translate, translation_vocab, "\u2581", None, "<unk>")
+    assert encoded, "encode failed"
 
+    compare_len = min(20, len(encoded), len(reference))
+    is_match = all(encoded[i] == reference[i] for i in range(compare_len))
+    print("Encode matches reference:", is_match)
+
+    result = encoded
     assert result, "Translation not working"
-
 
 if __name__ == "__main__":
     main()
