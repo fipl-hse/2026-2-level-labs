@@ -204,13 +204,13 @@ def train(
                 popular_tokens.append(key)
 
         max_len = 0
-        for a, b in popular_tokens:
-            max_len = max(max_len, len(a + b))
+        for token1, token2 in popular_tokens:
+            max_len = max(max_len, len(token1 + token2))
 
         longest = []
-        for a,b in popular_tokens:
-            if len(a+b) == max_len:
-                longest.append((a+b, (a, b)))
+        for token1, token2 in popular_tokens:
+            if len(token1+token2) == max_len:
+                longest.append((token1+token2, (token1, token2)))
 
         popular_pair = min(longest)[1]
 
