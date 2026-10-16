@@ -28,7 +28,7 @@ def prepare_word(
         not isinstance(raw_word, str)
         or not isinstance(start_of_word, str | None)
         or not isinstance(end_of_word, str | None)
-    ):
+        ):
         return None
 
     tokens = []
@@ -65,7 +65,7 @@ def collect_frequencies(
         not isinstance(text, str)
         or not isinstance(start_of_word, str | None)
         or not isinstance(end_of_word, str)
-    ):
+        ):
         return None
 
     dict_tokens = {}
@@ -140,23 +140,23 @@ def merge_tokens(
         return None
 
     for key, value in word_frequencies.items():
-    if (
-        not isinstance(key, tuple)
-        or not isinstance(value, int)
-    ):
-        return None
+        if (
+            not isinstance(key, tuple)
+            or not isinstance(value, int)
+            ):
+            return None
 
-    if (
-        not key
-        or not all(isinstance(el, str) for el in key)
-    ):
-        return None
+        if (
+            not key
+            or not all(isinstance(el, str) for el in key)
+            ):
+            return None
 
-    if (
-        not isinstance(pair, tuple)
-        or not all(isinstance(el, str) for el in pair)
-    ):
-        return None
+        if (
+            not isinstance(pair, tuple)
+            or not all(isinstance(el, str) for el in pair)
+            ):
+            return None
 
     merged_dict = {}
 
@@ -197,23 +197,23 @@ def train(
         return None
 
     for key, value in word_frequencies.items():
-    if (
-        not isinstance(key, tuple)
-        or not isinstance(value, int)
-    ):
-        return None
+        if (
+            not isinstance(key, tuple)
+            or not isinstance(value, int)
+            ):
+            return None
 
-    if (
-        not key
-        or not all(isinstance(el, str) for el in key)
-    ):
-        return None
+        if (
+            not key
+            or not all(isinstance(el, str) for el in key)
+            ):
+            return None
 
     if (
         not isinstance(num_merges, int)
         or isinstance(num_merges, bool)
         or num_merges < 0
-    ):
+        ):
         return None
 
     for _ in range(num_merges):
@@ -266,17 +266,17 @@ def get_vocabulary(
             return None
 
     for key, value in word_frequencies.items():
-    if (
-        not isinstance(key, tuple)
-        or not isinstance(value, int)
-    ):
-        return None
+        if (
+            not isinstance(key, tuple)
+            or not isinstance(value, int)
+        ):
+            return None
 
-    if (
-        not key
-        or not all(isinstance(el, str) for el in key)
-    ):
-        return None
+        if (
+            not key
+            or not all(isinstance(el, str) for el in key)
+        ):
+            return None
 
     if not isinstance(unknown_token, str):
         return None
@@ -359,7 +359,7 @@ def tokenize_word(
         word (tuple[str, ...]): Preprocessed word
         vocabulary (dict[str, int]): A dictionary where key - token, value - identifier
         end_of_word (str | None): An end-of-word token
-        unknown_token (str): A token that signifies unknown sequence
+        unknown_token (str): A token that signifies unknown sequenc
 
     Returns:
         list[int] | None: A list of token identifiers
