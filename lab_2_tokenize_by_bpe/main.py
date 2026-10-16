@@ -5,7 +5,13 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
+
+Word = tuple[str, ...]
+FrequencyDict = dict[Word, int]
+PairDict = dict[tuple[str, str], int]
+Vocabulary = dict[str, int]
 
 
 def prepare_word(
@@ -25,6 +31,13 @@ def prepare_word(
     In case of corrupt input arguments, None is returned
     """
 
+    tokens: list[str] = []
+    if start_of_word is not None:
+        tokens.append(start_of_word)
+    tokens.extend(raw_word)
+    if end_of_word is not None:
+        tokens.append(end_of_word)
+    return tuple(tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -45,6 +58,13 @@ def collect_frequencies(
     None is returned
     """
 
+    frequencies = {}
+    for raw_word in text.split():
+        prepared = prepare_word(raw_word, start_of_word, end_of_word)
+        if prepared is None:
+            return None
+        frequencies[prepared] = frequencies.get(prepared, 0) + 1
+    return frequencies
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int],
@@ -63,6 +83,12 @@ def count_tokens_pairs(
     In case of corrupt input arguments, None is returned
     """
 
+    pair_counts = {}
+    for word, word_count in word_frequencies.items():
+        for index in range(len(word) - 1):
+            pair = (word[index], word[index + 1])
+            pair_counts[pair] = pair.counts.get(pair, 0) + word_count
+    return pair_counts
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
@@ -82,6 +108,29 @@ def merge_tokens(
     In case of corrupt input arguments, None is returned
     """
 
+    first, second = pair
+    merged_token = first + second
+    new_frequencies = FreqDict = {}
+    for word, word_count in word_frequencies.items():
+        new_word: list[str] = []
+        index = 0
+        while index < len(word):
+            if (
+                index < len(word) - 1
+                and word[index] == first
+                and word[index + 1] == second
+            ):
+                new_word.append(merged_token)
+                index += 2
+            else:
+                new_word.append(word[index])
+                index += 1
+        new_key = tuple(new_word)
+        if new_key in new_frequencies:
+            new_frequencies[new_key] += word_count
+        else:
+            new_frequencies[new_key] = word_count
+    return new_frequencies
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
@@ -102,6 +151,11 @@ def train(
     None is returned
     """
 
+    current = word_frequencies
+    for _ in range(num_merges):
+        pair_counts = count_tokens_pairs(current)
+        current = merge_tokens(current)
+    return current
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
@@ -120,6 +174,16 @@ def get_vocabulary(
     In case of corrupt input arguments, None is returned
     """
 
+    unique_tokens = set()
+    for word in word_frequencies:
+        for token in word:
+            unique_tokens.add(token)
+    unique_tokens.add(unknown_token)
+    sorted_tokens = sorted(unique_tokens, key=lambda token: (-len(token), token))
+    vocabulary: Vocabulary = {}
+    for index, token in enumerate(sorted_tokens):
+        vocabulary[token] = index
+    return vocabulary
 
 def decode(
     encoded_text: Sequence[int] | None,
@@ -141,6 +205,21 @@ def decode(
     In case of corrupt input arguments, None is returned
     """
 
+    if encoded_text is None or vocabulary is None:
+        return None
+
+
+    id_to_token = {token_id: token for token, token_id in vocabulary.items()}
+    pieces: list[str] = []
+    for token_id in encoded_text:
+        token = id_to_token.get(token_id)
+    if token is None:
+        return None
+    pieces.append(token)
+    text = "".join(pieces)
+    if end_of_word_token is not None:
+        text = text.replace(end_of_word_token, " ")
+    return text
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
@@ -160,6 +239,40 @@ def tokenize_word(
     In case of corrupt input arguments, None is returned
     """
 
+    parts: list[str] = list(word)
+    candidates = sorted(
+        (token for token in vocabulary if token != unknown_token),
+        key=lambda token: (-len(token), token),
+    )
+    for candidate in candidates:
+        if not candidate:
+            continue
+        index = 0
+        merged: list[str] = []
+        while index < len(parts):
+            assembled = ""
+            cursor = index
+            matched = False
+            while cursor < len(parts) and len(assembled) < len(candidate):
+                assembled += parts[cursor]
+                cursor += 1
+                if assembled == candidate:
+                    merged.append(candidate)
+                    index = cursor
+                    matched = True
+                    break
+            if not matched:
+                merged.append(parts[index])
+                index += 1
+        parts = merged
+    token_ids: list[int] = []
+    unknown_id = vocabulary[unknown_token]
+    for part in parts:
+        if part in vocabulary:
+            token_ids.append(vocabulary[part])
+        else:
+            token_ids.append(unknown_id)
+    return token_ids
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -174,6 +287,12 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     In case of corrupt input arguments, None is returned
     """
 
+    with open(vocab_path, "r", encoding="utf-8") as file:
+        raw_data = json.load(file)
+    vocabulary: Vocabulary = {}
+    for token, token_id in raw_data.items():
+        vocabulary[token] = int(token_id)
+    return vocabulary
 
 def encode(
     original_text: str,
@@ -199,6 +318,20 @@ def encode(
     None is returned
     """
 
+    if original_text is None or vocabulary is None:
+        return None
+    encoded: list[int] = []
+    for raw_word in original_text.split():
+        prepared = prepare_word(raw_word, start_of_word_token, end_of_word_token)
+        if prepared is None:
+            return None
+        word_ids = tokenize_word(
+            prepared, vocabulary, end_of_word_token, unknown_token
+        )
+        if word_ids is None:
+            return None
+        encoded.extend(word_ids)
+    return encoded
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
