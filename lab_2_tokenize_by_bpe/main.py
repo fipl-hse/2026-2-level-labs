@@ -253,8 +253,7 @@ def get_vocabulary(
             vocabulary_lst.extend(list(token))
     vocabulary_lst.append(unknown_token)
 
-    vocabulary_lst = sorted(vocabulary_lst)
-    vocabulary_lst = sorted(vocabulary_lst, key = len, reverse = True)
+    vocabulary_lst = sorted(vocabulary_lst, key = lambda token: (-len(token), token))
 
     vocabulary = {}
     i = 0
@@ -322,6 +321,17 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+
+    if not (isinstance(word, tuple) and
+    all(isinstance(el, str) for el in word) and
+    isinstance(vocabulary, dict) and
+    all(isinstance(token, str) and isinstance(value, int) for token, value in vocabulary.items()) and
+    isinstance(end_of_word, str | None) and
+    isinstance(unknown_token, str)
+    ):
+        return None
+
+
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
