@@ -167,9 +167,9 @@ def merge_tokens(
             if i + 1 < len(word) and (word[i], word[i+1]) == pair:
                 merged_words.append(word[i] + word[i+1])
                 i += 2
-            else:
-                merged_words.append(word[i])
-                i += 1
+                continue
+            merged_words.append(word[i])
+            i += 1
 
         merged_dict[tuple(merged_words)] = frequencies
 
@@ -366,6 +366,47 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word, tuple)
+        or not isinstance(vocabulary, dict)
+        or (not isinstance(end_of_word, str) and end_of_word is not None)
+        or not isinstance(unknown_token, str)
+        ):
+        return None
+
+    if not all(isinstance(s, str) for s in word):
+        return None
+
+    vocab_tokens = sorted(vocabulary, key=lambda x: (-len(x), x))
+    word_str = "".join(word)
+    matches = []
+    selected_matches = []
+
+    for token in vocab_tokens:
+        if token not in word_str:
+            continue
+        search_start = 0
+        while True:
+            found_index = word_str.find(token, search_start)
+            if found_index == -1:
+                break
+            end_index = found_index + len(token)
+            matches.append((found_index, end_index, vocabulary[token]))
+            search_start = end_index
+
+    sorted_all_matches = sorted(matches, key=lambda match: -(match[1] - match[0]))
+
+    for match in sorted_all_matches:
+        new_start, new_end, _ = match
+        overlap = False
+        for final_piece in selected_matches:
+            old_start, old_end, _ = final_piece
+            if new_end > old_start and old_end > new_start:
+                overlap = True
+                break
+        if not overlap:
+            selected_matches.append(match)
+
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
