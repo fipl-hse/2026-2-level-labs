@@ -76,12 +76,12 @@ def collect_frequencies(
             return None
 
     for word in prepared_text:
-        if prepare_word(word, None, "</s>") is None:
+        if prepare_word(word, start_of_word, end_of_word) is None:
             return None
 
     frequencies_dict = {}
     for word in prepared_text:
-        prepared_word = prepare_word(word, None, "</s>")
+        prepared_word = prepare_word(word, start_of_word, end_of_word)
         if prepared_word and prepared_word not in frequencies_dict:
             frequencies_dict[prepared_word] = 1
         else:
