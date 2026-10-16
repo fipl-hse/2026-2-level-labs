@@ -151,17 +151,17 @@ def merge_tokens(
     new_word_frequencies = {}
 
     for key, value in word_frequencies.items():
-        new_key = []
+        new_key_list = []
         i = 0
         while i < len(key):
             if i + 1 < len(key) and key[i] == pair[0] and key[i + 1] == pair[1]:
-                new_key.append(new_token)
+                new_key_list.append(new_token)
                 i += 2
             else:
-                new_key.append(key[i])
+                new_key_list.append(key[i])
                 i += 1
-        new_key = tuple(new_key)
-        new_word_frequencies[new_key] = new_word_frequencies.get(new_key,0) + value
+        new_key = tuple(new_key_list)
+        new_word_frequencies[new_key] = new_word_frequencies.get(new_key, 0) + value
 
     return new_word_frequencies
 
@@ -343,18 +343,12 @@ def tokenize_word(
     ):
         return None
 
-    if unknown_token not in vocabulary:
-        return None
-
-    if end_of_word is not None and end_of_word not in vocabulary:
-        return None
-
     text = "".join(word)
 
     tokens = sorted(vocabulary, key=lambda item: (-len(item), item))
 
-    occupied = [False for _ in text]
-    token_starting_at = [None for _ in text]
+    occupied = [False] * len(text)
+    token_starting_at = [None] * len(text)
 
     for token in tokens:
         if token == unknown_token:
