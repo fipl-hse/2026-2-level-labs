@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
 
 
@@ -63,7 +64,7 @@ def collect_frequencies(
     """
     if(
     not isinstance (text, str)
-    or not isinstance (start_of_word, str | None)
+    or not isinstance (start_of_word, (str, type(None)))
     or not isinstance (end_of_word, str)
     ):
         return None
@@ -98,10 +99,9 @@ def count_tokens_pairs(
     In case of corrupt input arguments, None is returned
     """
     if(
-    not isinstance(word_frequencies, dict)
-    or not all(isinstance(key, tuple) for key in word_frequencies)
-    or not all(isinstance(value, int) for value in word_frequencies.values())
-    or not all(isinstance(j, str) for i in word_frequencies for j in i)
+        not isinstance(word_frequencies, dict)
+        or not all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items())
+        or not all(isinstance(j, str) for i in word_frequencies.keys() for j in i)
     ):
         return None
 
@@ -318,6 +318,64 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word, tuple)
+        or not all(isinstance(token, str) for token in word)
+        or not isinstance(vocabulary, dict)
+        or not all(isinstance(key, str) for key in vocabulary)
+        or not all(isinstance(value, int) for value in vocabulary.values())
+        or not isinstance(end_of_word, str | None)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
+
+    if unknown_token not in vocabulary:
+        return None
+
+    if end_of_word is not None and end_of_word not in vocabulary:
+        return None
+
+    text = "".join(word)
+
+    tokens = sorted(vocabulary, key=lambda item: (-len(item), item))
+
+    occupied = [False for _ in text]
+    token_starting_at = [None for _ in text]
+
+    for token in tokens:
+        if token == unknown_token:
+            continue
+
+        token_len = len(token)
+
+        for start in range(len(text) - token_len + 1):
+            if text[start:start + token_len] != token:
+                continue
+
+            positions = range(start, start + token_len)
+
+            if any(occupied[pos] for pos in positions):
+                continue
+
+            for pos in positions:
+                occupied[pos] = True
+
+            token_starting_at[start] = token
+
+    result = []
+    position = 0
+
+    while position < len(text):
+        token = token_starting_at[position]
+
+        if token is None:
+            result.append(vocabulary[unknown_token])
+            position += 1
+        else:
+            result.append(vocabulary[token])
+            position += len(token)
+
+    return result
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -332,6 +390,16 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(vocab_path, "r", encoding="utf-8") as file:
+        read_vocabulary = file.read()
+
+    result_voc = json.loads(read_vocabulary)
+    if not isinstance(result_voc, dict):
+        return None
+    return result_voc
 
 
 def encode(
@@ -357,6 +425,34 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+    not isinstance(original_text, str)
+    or not (start_of_word_token is None or isinstance(start_of_word_token, str))
+    or not (end_of_word_token is None or isinstance(end_of_word_token, str))
+    or not isinstance(unknown_token, str)
+    ):
+        return None
+    if (
+    not isinstance(vocabulary, dict)
+    or not all(isinstance(k, str) for k in vocabulary)
+    or not all(isinstance(v, int) for v in vocabulary.values())
+    ):
+        return None
+
+    encoded = []
+
+    for raw_word in original_text.split():
+        prepared_word = prepare_word(raw_word, start_of_word_token, end_of_word_token)
+
+        if prepared_word is None:
+            return None
+
+        tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if tokenized_word is None:
+                return None
+        encoded.extend(tokenized_word)
+
+    return encoded
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
