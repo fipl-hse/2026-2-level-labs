@@ -76,10 +76,7 @@ def collect_frequencies(
         if prep_word is None:
             return None
 
-        if freq_dict.get(prep_word):
-            freq_dict[prep_word] += 1
-        else:
-            freq_dict[prep_word] = 1
+        freq_dict[prep_word] = freq_dict.get(prep_word, 0) + 1
 
     return freq_dict
 
@@ -112,10 +109,7 @@ def count_tokens_pairs(
     pairs_freq = {}
     for word, freq in word_frequencies.items():
         for pair in zip(word, word[1:]):
-            if pair in pairs_freq:
-                pairs_freq[pair] += freq
-            else:
-                pairs_freq[pair] = freq
+            pairs_freq[pair] = pairs_freq.get(pair, 0) + freq
 
     return pairs_freq
 
@@ -227,7 +221,7 @@ def train(
         new_tokenized_text = merge_tokens(tokenized_text, merge_pair)
         if new_tokenized_text is None:
             return None
-        tokenized_text =new_tokenized_text
+        tokenized_text = new_tokenized_text
 
     return tokenized_text
 
@@ -376,18 +370,6 @@ def tokenize_word(
     for i, is_covered in enumerate(covered):
         if not is_covered:
             t_segments.append((i, i + 1, vocabulary[unknown_token]))
-
-    # searh_start_idx = 0
-    # while searh_start_idx < len(s_word):
-    #     unk_t_start_idx = searh_start_idx
-    #     if not covered[searh_start_idx]:
-    #         while searh_start_idx < len(s_word) and not covered[searh_start_idx]:
-    #             searh_start_idx += 1
-    #         t_segments.append(
-    #             unk_t_start_idx, searh_start_idx, vocabulary[unknown_token]
-    #         )
-    #     else:
-    #         searh_start_idx += 1
 
     t_segments.sort(key=lambda x: x[0])
 
@@ -552,18 +534,6 @@ def calculate_precision(
         return 0.0
 
     matches = len(set(actual) & (set(reference)))
-
-    # ref_freq = dict()
-
-    # for n_gram in reference:
-    #     ref_freq[n_gram] = ref_freq.get(n_gram, 0) + 1
-
-    # for n_gram in actual:
-    #     if ref_freq.get(n_gram, 0) > 0:
-    #         matches += 1
-    #         ref_freq[n_gram] -= 1
-
-
 
     return matches / len(set(actual))
 
