@@ -25,8 +25,8 @@ def prepare_word(
     In case of corrupt input arguments, None is returned
     """
     if not (isinstance(raw_word, str) and
-    isinstance(start_of_word, str | None) and
-    isinstance(end_of_word, str | None)
+        isinstance(start_of_word, str | None) and
+        isinstance(end_of_word, str | None)
     ):
         return None
 
@@ -65,8 +65,8 @@ def collect_frequencies(
     None is returned
     """
     if not (isinstance(text, str) and
-    isinstance(start_of_word, str | None) and
-    isinstance(end_of_word, str)
+        isinstance(start_of_word, str | None) and
+        isinstance(end_of_word, str)
     ):
         return None
 
@@ -105,10 +105,10 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (
-    isinstance(word_frequencies, dict) and
-    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
-    all(isinstance(el, str) for key in word_frequencies for el in key)
+    if not (isinstance(word_frequencies, dict) and
+        all(isinstance(key, tuple) and isinstance(value, int)
+            for key, value in word_frequencies.items()) and
+        all(isinstance(el, str) for key in word_frequencies for el in key)
     ):
         return None
 
@@ -140,25 +140,26 @@ def merge_tokens(
     In case of corrupt input arguments, None is returned
     """
     if not (isinstance(word_frequencies, dict) and
-    isinstance(pair, tuple) and
-    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
-    all(isinstance(word, str) for key in word_frequencies for word in key) and
-    all(isinstance(token, str) for token in pair)
+        isinstance(pair, tuple) and
+        all(isinstance(key, tuple) and isinstance(value, int)
+            for key, value in word_frequencies.items()) and
+        all(isinstance(word, str) for key in word_frequencies for word in key) and
+        all(isinstance(token, str) for token in pair)
     ):
         return None
 
     new_word_frequencies = {}
 
     for key, value in word_frequencies.items():
-        key_lst = list(key)
+        key_elements = list(key)
         i = 0
-        while i < len(key_lst)-1:
-            if key_lst[i] == pair[0] and key_lst[i+1] == pair[1]:
-                key_lst[i] = pair[0] + pair[1]
-                key_lst.pop(i+1)
+        while i < len(key_elements)-1:
+            if key_elements[i] == pair[0] and key_elements[i+1] == pair[1]:
+                key_elements[i] = pair[0] + pair[1]
+                key_elements.pop(i+1)
             else:
                 i += 1
-        new_word_frequencies[tuple(key_lst)] = value
+        new_word_frequencies[tuple(key_elements)] = value
 
     return new_word_frequencies
 
@@ -182,9 +183,10 @@ def train(
     """
 
     if not (isinstance(word_frequencies, dict) and
-    isinstance(num_merges, int) and
-    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
-    all(isinstance(word, str) for key in word_frequencies for word in key)
+        isinstance(num_merges, int) and
+        all(isinstance(key, tuple) and isinstance(value, int)
+            for key, value in word_frequencies.items()) and
+        all(isinstance(word, str) for key in word_frequencies for word in key)
     ):
         return None
 
@@ -204,13 +206,13 @@ def train(
                 popular_tokens.append(key)
 
         max_len = 0
-        for token1, token2 in popular_tokens:
-            max_len = max(max_len, len(token1 + token2))
+        for token_part_1, token_part_2 in popular_tokens:
+            max_len = max(max_len, len(token_part_1 + token_part_2))
 
         longest = []
-        for token1, token2 in popular_tokens:
-            if len(token1+token2) == max_len:
-                longest.append((token1+token2, (token1, token2)))
+        for token_part_1, token_part_2 in popular_tokens:
+            if len(token_part_1+token_part_2) == max_len:
+                longest.append((token_part_1+token_part_2, (token_part_1, token_part_2)))
 
         popular_pair = min(longest)[1]
 
@@ -240,9 +242,10 @@ def get_vocabulary(
     In case of corrupt input arguments, None is returned
     """
     if not (isinstance(word_frequencies, dict) and
-    isinstance(unknown_token, str) and
-    all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items()) and
-    all(isinstance(word, str) for key in word_frequencies for word in key)
+        isinstance(unknown_token, str) and
+        all(isinstance(key, tuple) and isinstance(value, int)
+            for key, value in word_frequencies.items()) and
+        all(isinstance(word, str) for key in word_frequencies for word in key)
     ):
         return None
 
@@ -284,9 +287,10 @@ def decode(
     In case of corrupt input arguments, None is returned
     """
     if not (isinstance(encoded_text, list) and
-    isinstance(vocabulary, dict) and
-    all(isinstance(key, str) and isinstance(value, int) for key,value in vocabulary.items()) and
-    isinstance(end_of_word_token, str | None)
+        isinstance(vocabulary, dict) and
+        all(isinstance(key, str) and isinstance(value, int)
+            for key,value in vocabulary.items()) and
+        isinstance(end_of_word_token, str | None)
     ):
         return None
 
@@ -323,16 +327,40 @@ def tokenize_word(
     """
 
     if not (isinstance(word, tuple) and
-    all(isinstance(el, str) for el in word) and
-    isinstance(vocabulary, dict) and
-    all(isinstance(token, str) and isinstance(value, int) for token, value in vocabulary.items()) and
-    isinstance(end_of_word, str | None) and
-    isinstance(unknown_token, str)
+        all(isinstance(el, str) for el in word) and
+        isinstance(vocabulary, dict)
     ):
         return None
 
+    if not(all(isinstance(token, str) and isinstance(value, int)
+            for token, value in vocabulary.items()) and
+        isinstance(end_of_word, str | None) and
+        isinstance(unknown_token, str)
+    ):
+        return None
 
+    word = "".join(word)
 
+    encoded_word = [word]
+    for token in vocabulary.keys():
+        parts_encoded_word = []
+        for el in encoded_word:
+            if isinstance(el, int) or token not in el:
+                parts_encoded_word.append(el)
+            else:
+                el = el.split(token)
+                for i, ch in enumerate(el):
+                    if i > 0:
+                        parts_encoded_word.append(vocabulary[token])
+                    if ch:
+                        parts_encoded_word.append(ch)
+        encoded_word = parts_encoded_word
+
+    for i, el in enumerate(encoded_word):
+        if not isinstance(el, int):
+            encoded_word[i] = vocabulary[unknown_token]
+
+    return encoded_word
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """

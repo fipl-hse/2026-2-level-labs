@@ -25,13 +25,13 @@ def main() -> None:
         secret_text = text_file.read()
 
     word_frequencies = collect_frequencies(text, None, "</s>")
-    assert word_frequencies, "Translation not working"
+    assert word_frequencies, "Impossible to collect frequencies of words"
 
     trained_tokenizator = train(word_frequencies, 100)
-    assert trained_tokenizator
+    assert trained_tokenizator, "Tokenizator can not be trained"
 
     vocabulary = get_vocabulary(trained_tokenizator, "<unk>")
-    assert vocabulary
+    assert vocabulary, "Impossible to git vocabulary"
 
     secret_text = [int(el) for el in secret_text.split()]
     result = decode(secret_text, vocabulary, "</s>")
