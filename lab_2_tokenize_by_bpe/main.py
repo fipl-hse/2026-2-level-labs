@@ -100,7 +100,8 @@ def count_tokens_pairs(
     """
     if(
         not isinstance(word_frequencies, dict)
-        or not all(isinstance(key, tuple) and isinstance(value, int) for key, value in word_frequencies.items())
+        or not all(isinstance(key, tuple)
+        and isinstance(value, int) for key, value in word_frequencies.items())
         or not all(isinstance(j, str) for i in word_frequencies.keys() for j in i)
     ):
         return None
@@ -137,8 +138,8 @@ def merge_tokens(
         or not all(isinstance(key, tuple) for key in word_frequencies)
         or not all(isinstance(value, int) for value in word_frequencies.values())
         or not all(isinstance(j, str) for i in word_frequencies for j in i)
-        ):
-            return None
+    ):
+        return None
 
     if(
         not isinstance(pair, tuple)
@@ -189,8 +190,8 @@ def train(
         or not all(isinstance(value, int) for value in word_frequencies.values())
         or not all(isinstance(j, str) for i in word_frequencies for j in i)
         or not isinstance(num_merges, int)
-        ):
-            return None
+    ):
+        return None
     for _ in range(num_merges):
         unsorted_pairs = count_tokens_pairs(word_frequencies)
 
@@ -200,7 +201,14 @@ def train(
         if unsorted_pairs is None:
             return None
 
-        sorted_pairs = sorted(unsorted_pairs.items(), key=lambda x:(-x[1], -len(x[0][0] +x[0][1]), x[0][0] +x[0][1]))
+        sorted_pairs = sorted(
+            unsorted_pairs.items(),
+            key=lambda x: (
+                -x[1],
+                -len(x[0][0] +x[0][1]),
+                x[0][0] +x[0][1]
+            )
+        )
         new_frequencies = merge_tokens(word_frequencies, sorted_pairs[0][0])
         if new_frequencies is None:
             return None
@@ -273,7 +281,10 @@ def decode(
     if(
         not isinstance(encoded_text, Sequence)
         or not all(isinstance(word,int) for word in encoded_text)
-        or not isinstance(vocabulary, dict)
+    ):
+        return None
+    if(
+        not isinstance(vocabulary, dict)
         or not all(isinstance(key, str) for key in vocabulary)
         or not all(isinstance(value, int) for value in vocabulary.values())
         or len(encoded_text) == 0
@@ -294,7 +305,7 @@ def decode(
     for token_id in encoded_text:
         token = id_to_tokens[token_id]
         if end_of_word_token is not None:
-         token = token.replace(end_of_word_token, " ")
+            token = token.replace(end_of_word_token, " ")
 
         decoded_symbols.append(token)
 
@@ -321,7 +332,10 @@ def tokenize_word(
     if (
         not isinstance(word, tuple)
         or not all(isinstance(token, str) for token in word)
-        or not isinstance(vocabulary, dict)
+    ):
+        return None
+    if (
+        not isinstance(vocabulary, dict)
         or not all(isinstance(key, str) for key in vocabulary)
         or not all(isinstance(value, int) for value in vocabulary.values())
         or not isinstance(end_of_word, str | None)
@@ -449,7 +463,7 @@ def encode(
 
         tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if tokenized_word is None:
-                return None
+            return None
         encoded.extend(tokenized_word)
 
     return encoded

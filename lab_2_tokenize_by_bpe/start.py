@@ -17,7 +17,11 @@ def main() -> None:
     """
     with open("lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/secrets/secret_5.txt",
+        "r",
+        encoding="utf-8"
+    ) as text_file:
         secret  = text_file.read()
     # with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
     #     text_reference_translation = text_file.read()
