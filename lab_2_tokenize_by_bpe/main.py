@@ -348,7 +348,7 @@ def tokenize_word(
     tokens = sorted(vocabulary, key=lambda item: (-len(item), item))
 
     occupied = [False] * len(text)
-    token_starting_at = [None] * len(text)
+    token_starting_at = [""]*len(text)
 
     for token in tokens:
         if token == unknown_token:
