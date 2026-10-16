@@ -2,6 +2,14 @@
 BPE Tokenizer starter
 """
 
+from lab_2_tokenize_by_bpe.main import (
+    collect_frequencies,
+    train,
+    get_vocabulary,
+    decode,
+)
+
+
 # pylint:disable=too-many-locals, unused-variable
 
 
@@ -15,7 +23,15 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-    result = None
+
+    frequencies = collect_frequencies(text, None, "</s>")
+    trained = train(frequencies, 100)
+    vocabulary = get_vocabulary(trained, "<unk>")
+
+    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as f:
+        encoded = [int(x) for x in f.read().split()]
+
+    result = decode(encoded, vocabulary, "</s>")
     assert result, "Translation not working"
 
 
