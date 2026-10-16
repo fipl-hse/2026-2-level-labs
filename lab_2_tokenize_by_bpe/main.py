@@ -24,7 +24,26 @@ def prepare_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(raw_word, str):
+        return None
 
+    if start_of_word is not None and not isinstance(start_of_word, str):
+        return None
+
+    if end_of_word is not None and not isinstance(end_of_word, str):
+        return None
+
+    result = []
+    if start_of_word is not None:
+        result.append(start_of_word)
+
+    for symbol in raw_word:
+        result.append(symbol)
+
+    if end_of_word is not None:
+        result.append(end_of_word)
+
+    return tuple(result)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -44,6 +63,24 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(text, str):
+        return None
+
+    if start_of_word is not None and not isinstance(start_of_word, str):
+        return None
+
+    if not isinstance(end_of_word, str):
+        return None
+
+    frequencies = {}
+
+    for raw_word in text.split():
+        word = prepare_word(raw_word, start_of_word, end_of_word)
+        if word is None:
+            return None
+        frequencies[word] = frequencies.get(word, 0) + 1
+
+    return frequencies
 
 
 def count_tokens_pairs(
@@ -62,7 +99,25 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
 
+    for key, value in word_frequencies.items():
+        if not isinstance(key, tuple):
+            return None
+        if not all(isinstance(token, str) for token in key):
+            return None
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+
+    pairs = {}
+
+    for word, frequency in word_frequencies.items():
+        for i in range(len(word) - 1):
+            pair = (word[i], word[i + 1])
+            pairs[pair] = pairs.get(pair, 0) + frequency
+
+    return pairs
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
@@ -81,7 +136,45 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
 
+    for key, value in word_frequencies.items():
+        if not isinstance(key, tuple):
+            return None
+        if not all(isinstance(token, str) for token in key):
+            return None
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+
+    if not isinstance(pair, tuple):
+        return None
+
+    if not all(isinstance(item, str) for item in pair):
+        return None
+
+    if len(pair) != 2:
+        return None
+
+    new_word_frequencies = {}
+    first_token, second_token = pair
+    merged_token = first_token + second_token
+
+    for word, freq in word_frequencies.items():
+        new_word = []
+        i = 0
+        while i < len(word):
+            if i < len(word) - 1 and word[i] == first_token and word[i + 1] == second_token:
+                new_word.append(merged_token)
+                i += 2
+                continue
+            new_word.append(word[i])
+            i += 1
+        new_word_frequencies[tuple(new_word)] = (
+        new_word_frequencies.get(tuple(new_word), 0) + freq
+        )
+
+    return new_word_frequencies
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
@@ -101,7 +194,30 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if word_frequencies is None or not isinstance(word_frequencies, dict):
+        return None
 
+    for key, value in word_frequencies.items():
+        if not isinstance(key, tuple):
+            return None
+        if not all(isinstance(token, str) for token in key):
+            return None
+        if not isinstance(value, int) or isinstance(value, bool):
+            return None
+
+    if not isinstance(num_merges, int):
+        return None
+
+    for i in range(num_merges):
+        collecting_pairs = count_tokens_pairs(word_frequencies)
+        if not collecting_pairs:
+            break
+        best_pair = sorted(collecting_pairs.items(), key=lambda pair: (-pair[1], -len(pair[0][0] + pair[0][1]), pair[0]))[0][0]
+        word_frequencies = merge_tokens(word_frequencies, best_pair)
+        if word_frequencies is None:
+            return None
+
+    return word_frequencies
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
