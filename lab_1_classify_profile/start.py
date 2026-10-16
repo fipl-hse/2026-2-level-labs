@@ -17,7 +17,6 @@ from lab_1_classify_profile.main import (
     tokenize,
 )
 
-
 def main() -> None:
     """
     Launches an implementation.
@@ -80,7 +79,6 @@ def main() -> None:
 
     assert result, "Detection result is None"
     return None
-
 
 if __name__ == "__main__":
     main()
