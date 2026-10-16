@@ -343,8 +343,11 @@ def tokenize_word(
 
     word = "".join(word)
 
+    vocabulary_lst = [key for key in vocabulary.keys() if key in word]
+    vocabulary_lst = sorted(vocabulary_lst, key = lambda token: (-len(token), token))
+
     encoded_word = [word]
-    for token in vocabulary.keys():
+    for token in vocabulary_lst:
         parts_encoded_word = []
         for el in encoded_word:
             if isinstance(el, int) or token not in el:
@@ -358,11 +361,14 @@ def tokenize_word(
                         parts_encoded_word.append(ch)
         encoded_word = parts_encoded_word
 
-    for i, el in enumerate(encoded_word):
-        if not isinstance(el, int):
-            encoded_word[i] = vocabulary[unknown_token]
+    result = []
+    for element in encoded_word:
+        if isinstance(element, int):
+            result.append(element)
+        else:
+            result.extend([vocabulary[unknown_token]]*len(element))
 
-    return encoded_word
+    return result
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -410,7 +416,40 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not(
+        isinstance(original_text, str) and
+        isinstance(vocabulary, dict)
+    ):
+        return None
 
+    if not all(
+        isinstance(key, str) and (value, int)
+        for key, value in vocabulary.items()
+    ):
+        return None
+
+    if not (
+        isinstance(start_of_word_token, str | None) and
+        isinstance(end_of_word_token, str | None) and
+        isinstance(unknown_token, str)
+    ):
+        return None
+
+    prepared_text = original_text.split()
+
+    encoded_text = []
+    for word in prepared_text:
+        prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if prepare_word is None:
+            return None
+
+        encoded_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if encoded_word is None:
+            return None
+
+        encoded_text.extend(encoded_word)
+
+    return encoded_text
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """

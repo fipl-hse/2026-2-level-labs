@@ -8,6 +8,8 @@ from lab_2_tokenize_by_bpe.main import (
     decode,
     get_vocabulary,
     train,
+    load_vocabulary,
+    encode,
 )
 
 
@@ -23,6 +25,10 @@ def main() -> None:
         translation_encoded_raw = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         secret_text = text_file.read()
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
+        ru_original_text = text_file.read()
+    with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as text_file:
+        ru_encoded_text = text_file.read()
 
     word_frequencies = collect_frequencies(text, None, "</s>")
     assert word_frequencies, "Impossible to collect frequencies of words"
@@ -36,10 +42,19 @@ def main() -> None:
     secret_text = [int(el) for el in secret_text.split()]
     result = decode(secret_text, vocabulary, "</s>")
     assert result, "Text can not be decoded"
-
     print(result)
-    return None
 
+    vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    assert vocabulary, "There is no vocabulary"
+
+    encoded_text = encode(ru_original_text, vocabulary, "\u2581", None, "<unk>")
+    assert encoded_text, "Impossible to encode text"
+
+    ru_encoded_text = [int(element) for element in ru_encoded_text.split()]
+    print(list(ru_encoded_text[:20]))
+    print(encoded_text[:20] == list(ru_encoded_text[:20]))
+
+    return None
 
 if __name__ == "__main__":
     main()
