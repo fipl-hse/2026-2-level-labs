@@ -101,12 +101,15 @@ def is_positive(n: int) -> bool:
     Returns:
         bool: True if n > 0, False otherwise
     """
-    # student implementation goes here
+    if n > 0:
+        return True
+    else :
+        return False
 
 
-# is_positive(5) → True
-# is_positive(-3) → False
-# is_positive(0) → False
+    print(is_positive(5))
+    print(is_positive(-3))
+    print(is_positive(0))
 
 
 # Task 2:
@@ -120,12 +123,16 @@ def number_sign(n: int) -> str:
     Returns:
         str: "positive", "negative", or "zero"
     """
-    # student implementation goes here
+    if n > 0:
+        return "positive"
+    elif n < 0:
+        return "negative"
+    else:
+        return "zero"
 
-
-# number_sign(5) → "positive"
-# number_sign(-3) → "negative"
-# number_sign(0) → "zero"
+    print(number_sign(5))
+    print(number_sign(-3))
+    print(number_sign(0))
 
 
 # Task 3:
@@ -140,12 +147,15 @@ def max_of_two(a: int, b: int) -> int:
     Returns:
         int: The larger of a and b
     """
-    # student implementation goes here
+    if a > b:
+        return a
+    else:
+        return b
 
 
-# max_of_two(3, 7) → 7
-# max_of_two(10, 2) → 10
-# max_of_two(5, 5) → 5
+    print(max_of_two(3, 7))
+    print(max_of_two(10, 2))
+    print(max_of_two(5, 5))
 
 
 # Task 4:
@@ -164,12 +174,21 @@ def grade(score: int) -> str:
     Returns:
         str: Letter grade
     """
-    # student implementation goes here
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    else:
+        return "F"
 
 
-# grade(95) → "A"
-# grade(72) → "C"
-# grade(59) → "F"
+    print(grade(95))
+    print(grade(72))
+    print(grade(59))
 
 
 # Task 5:
@@ -185,12 +204,16 @@ def is_in_range(n: int, low: int, high: int) -> bool:
     Returns:
         bool: True if low <= n <= high, False otherwise
     """
-    # student implementation goes here
+    if low <= n <= high:
+        return True
+    else:
+        return False
 
 
-# is_in_range(5, 1, 10) → True
-# is_in_range(0, 1, 10) → False
-# is_in_range(10, 1, 10) → True
+    print(is_in_range(5, 1, 10))
+    print(is_in_range(0, 1, 10))
+    print(is_in_range(10, 1, 10))
+
 
 
 # Task 6:
@@ -207,12 +230,12 @@ def complex_condition(a: bool, b: bool, c: bool) -> bool:
     Returns:
         bool: Result of the expression
     """
-    # student implementation goes here
+    return (a and b) or (not c)
 
 
-# complex_condition(True, True, False) → True
-# complex_condition(False, True, True) → False
-# complex_condition(False, False, False) → True
+    print(complex_condition(True, True, False))
+    print(complex_condition(False, True, True))
+    print(complex_condition(False, False, False))
 
 
 # Task 7 (advanced):
@@ -230,9 +253,16 @@ def leap_year(year: int) -> bool:
     Returns:
         bool: True if leap year, False otherwise
     """
-    # student implementation goes here
+    if year % 400 == 0:
+        return True
+    elif year % 100 == 0:
+        return False
+    elif year % 4 == 0:
+        return True
+    else:
+        return False
 
 
-# leap_year(2000) → True
-# leap_year(1900) → False
-# leap_year(2024) → True
+    print(leap_year(2000))
+    print(leap_year(1900))
+    print(leap_year(2024))
