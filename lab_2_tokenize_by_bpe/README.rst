@@ -5,9 +5,8 @@
 .. toctree::
     :maxdepth: 1
     :titlesonly:
-    :caption: Full API
 
-    lab_2_tokenize_by_bpe.api.rst
+    Full API <lab_2_tokenize_by_bpe.api.rst>
 
 
 Дано
@@ -15,11 +14,11 @@
 
 1. Текст на русском языке (``assets/text.txt``), который
    загружен и сохранен в переменную ``text`` в ``start.py``.
-2. Секретный зашифрованный текст.
+2. Секретные зашифрованные тексты.
 3. Обученный на большом корпусе текстов словарь
    токенов ``assets/vocab.json``.
 4. Нейросетевая языковая модель ``assets/nmt_demo`` (пример
-   обращения — ``assets/nmt_demo/demo.py``)
+   обращения — ``assets/nmt_demo/demo.py``).
 
 В ходе выполнения лабораторной работы Вы научитесь
 предобрабатывать текст при помощи алгоритма `Byte-Pair
@@ -70,8 +69,7 @@ Processing, NLP) является формализация языка таким
    в таком случае получается достаточно большим.
 2. Даже при таком очень большом словаре нередко
    приходится сталкиваться с проблемой
-   `Out-of-Vocabulary <https://blog.marketmuse.com/glossary/out-of-vocabulary-oov-definition/>`__
-   .
+   `Out-of-Vocabulary <https://blog.marketmuse.com/glossary/out-of-vocabulary-oov-definition/>`__.
 
 Это не позволяет сделать обработку универсальной и масштабируемой
 на большое количество дискурсов.
@@ -211,8 +209,8 @@ Processing, NLP) является формализация языка таким
 Шаг 0. Начать работу над лабораторной (вместе с преподавателем на практике)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Измените файлы ``main.py`` и ``start.py``
-2. Закоммитьте изменения и создайте новый Pull Request
+1. Измените файлы ``main.py`` и ``start.py``.
+2. Закоммитьте изменения и создайте новый Pull Request.
 
 .. important:: Код, выполняющий все требуемые действия, должен быть написан в
                функции ``main`` в модуле ``start.py``.
@@ -424,7 +422,9 @@ Processing, NLP) является формализация языка таким
 Токены, имеющие одинаковую длину, должны быть
 отсортированы лексикографически в порядке возрастания.
 Присвойте данной последовательности идентификаторы от 0 до n-1,
-где n — количество токенов.
+где n — количество токенов. Также разбейте все полученные токены
+на отдельные уникальные символы и добавьте их в словарь для
+обеспечения полного покрытия алфавита.
 
 Например, из набора токенов
 ``['far', 'old', 'th', 'er', 'est', '</s>', 'a', 'n', 'd']`` должен
@@ -432,7 +432,11 @@ Processing, NLP) является формализация языка таким
 
 .. code:: py
 
-   {'<unk>': 0, '</s>': 1, 'est': 2, 'far': 3, 'old': 4, 'er': 5, 'th': 6, 'a': 7, 'd': 8, 'n': 9}
+   {
+       '<unk>': 0, '</s>': 1, 'est': 2, 'far': 3, 'old': 4, 'er': 5,
+       'th': 6, '/': 7, '<': 8, '>': 9, 'a': 10, 'd': 11, 'e': 12,
+       'f': 13, 'h': 14, 'l': 15, 'n': 16, 'o': 17, 'r': 18, 's': 19, 't': 20
+   }
 
 Для этого реализуйте функцию :py:func:`lab_2_tokenize_by_bpe.main.get_vocabulary`.
 В возвращаемом словаре должны присутствовать специальные токены:
@@ -715,13 +719,12 @@ n-грамм порядка :math:`i`, причем :math:`i` принимает
 ---------------
 
 -  `Статья о BPE
-   алгоритме <https://psv4.userapi.com/s/v1/d2/svojheKI6rmlVj29RNbbAWAFVmJLG7FVQ1i0SJt7rElzDcbqUYuUqzZtRzCECD7oSNLliq5uiPhkYA_gb8jVOgFVSQhfCKyIKniJcSNo2DRh5OrcZrUud-82h0pxgU4uX0NVm1lsbArl/Philip_Gage_-_Novy_algoritm_szhatia_dannykh.pdf>`__
+   алгоритме <https://psv4.userapi.com/s/v1/d2/svojheKI6rmlVj29RNbbAWAFVmJLG7FVQ1i0SJt7rElzDcbqUYuUqzZtRzCECD7oSNLliq5uiPhkYA_gb8jVOgFVSQhfCKyIKniJcSNo2DRh5OrcZrUud-82h0pxgU4uX0NVm1lsbArl/Philip_Gage_-_Novy_algoritm_szhatia_dannykh.pdf>`__.
 -  `Описание формата хранения данных JSON <https://ru.wikipedia.org/wiki/JSON>`__
    и `документация библиотеки <https://pythonworld.ru/moduli/modul-json.html>`__
-   для работы с такими файлами
+   для работы с такими файлами.
 -  `Описание нейросетевой модели <https://huggingface.co/Helsinki-NLP/opus-mt-ru-en>`__,
-   чьи предсказания были использованы в настоящей
-   работе
+   чьи предсказания были использованы в настоящей работе.
 -  `Оригинальная статья о BLEU
    метрике <https://aclanthology.org/P02-1040.pdf>`__, используемой для
-   оценки качества машинного перевода
+   оценки качества машинного перевода.
