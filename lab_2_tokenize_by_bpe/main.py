@@ -511,8 +511,8 @@ def calculate_precision(
     In case of corrupt input arguments, None is returned.
     """
     if (
-        not isinstance(actual, (list))
-        or not isinstance(reference, (list))
+        not isinstance(actual, (list, tuple))
+        or not isinstance(reference, (list, tuple))
     ):
         return None
 
@@ -530,7 +530,7 @@ def calculate_precision(
         ):
             return None
 
-    if not actual:
+    if not actual or not reference:
         return 0.0
 
     matches = len(set(actual) & (set(reference)))
