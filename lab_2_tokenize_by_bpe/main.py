@@ -4,9 +4,10 @@ Lab 2.
 BPE and machine translation evaluation
 """
 
+import json
+
 # pylint:disable=unused-argument
 from typing import Sequence
-import json
 
 
 def prepare_word(
