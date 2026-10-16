@@ -30,17 +30,19 @@ def main() -> None:
     # print(result)
 
     bpe_train = train(result, 100)
-
-    assert bpe_train, "Train is None"
+    if bpe_train is None:
+        return
     # print(bpe_train)
 
     vocabulary = get_vocabulary(bpe_train,'<unk>')
-    assert vocabulary, "Voc is None"
+    if vocabulary is None:
+        return
 
     secret3 = [int(number) for number in secret3.split()]
     secret = decode(secret3, vocabulary, '</s>')
-    assert secret, "Decode is None"
-    print(secret)
+    if secret is None:
+        return
+    # print(secret)
 
 
 if __name__ == "__main__":

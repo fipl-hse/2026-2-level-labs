@@ -151,19 +151,19 @@ def merge_tokens(
 
     new_word_frequencies = {}
 
-    for key, value in word_frequencies.items():
+    for word, frequency in word_frequencies.items():
         new_key_lst = []
 
-        i = 0
-        while i < len(key):
-            if i + 1 < len(key) and key[i] == pair[0] and key[i + 1] == pair[1]:
+        position = 0
+        while position < len(word):
+            if word[position : position + 2] == pair:
                 new_key_lst.append(new_token)
-                i += 2
+                position += 2
             else:
-                new_key_lst.append(key[i])
-                i += 1
+                new_key_lst.append(word[position])
+                position += 1
         new_key = tuple(new_key_lst)
-        new_word_frequencies[new_key] = new_word_frequencies.get(new_key,0) + value
+        new_word_frequencies[new_key] = new_word_frequencies.get(new_key,0) + frequency
 
     return new_word_frequencies
 
@@ -198,9 +198,6 @@ def train(
     for _ in range(num_merges):
         pairs_frequencies = count_tokens_pairs(word_frequencies)
 
-        if pairs_frequencies is None:
-            return None
-
         if not pairs_frequencies:
             break
 
@@ -211,12 +208,10 @@ def train(
             "".join(item[0])
         ))
 
-        new_frequencies = merge_tokens(word_frequencies, sorted_pair_frequencies[0][0])
+        word_frequencies = merge_tokens(word_frequencies, sorted_pair_frequencies[0][0])
 
-        if new_frequencies is None:
+        if word_frequencies is None:
             return None
-
-        word_frequencies = new_frequencies
 
     return word_frequencies
 
@@ -326,7 +321,7 @@ def tokenize_word(
     if (
     not isinstance(word, tuple)
     or not all(isinstance(i, str) for i in word)
-    or not (end_of_word is None or isinstance(end_of_word, str))
+    or (end_of_word is not None and not isinstance(end_of_word, str))
     or not isinstance(unknown_token, str)
     ):
         return None
@@ -341,26 +336,46 @@ def tokenize_word(
     if end_of_word is not None and not text.endswith(end_of_word):
         text += end_of_word
 
-    sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
+    tokens_by_length = sorted(
+        vocabulary.keys(), key=lambda token: (-len(token), token)
+    )
 
-    result = []
-    i = 0
-    n = len(text)
+    occupied = [False] * len(text)
 
-    while i < n:
-        token = next(
-            (t for t in sorted_tokens if t and text.find(t, i) == i),
-            None,
-        )
+    token_starting_at = [None] * len(text)
+
+    for token in tokens_by_length:
+        if not token or token == unknown_token:
+            continue
+
+        token_len = len(token)
+
+        for start in range(len(text) - token_len + 1):
+            interval_is_free = not any(
+                occupied[start + token_pos] for token_pos in range(token_len)
+            )
+            if not interval_is_free:
+                continue
+
+            if text[start : start + token_len] != token:
+                continue
+
+            for token_pos in range(token_len):
+                occupied[start + token_pos] = True
+            token_starting_at[start] = token
+
+    encoded_ids = []
+    position = 0
+    while position < len(text):
+        token = token_starting_at[position]
         if token is not None:
-            result.append(vocabulary[token])
-            i += len(token)
-
+            encoded_ids.append(vocabulary[token])
+            position += len(token)
         else:
-            result.append(vocabulary[unknown_token])
-            i += 1
+            encoded_ids.append(vocabulary[unknown_token])
+            position += 1
 
-    return result
+    return encoded_ids
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -435,7 +450,6 @@ def encode(
         tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if tokenized_word is None:
                 return None
-
         encoded.extend(tokenized_word)
 
     return encoded
