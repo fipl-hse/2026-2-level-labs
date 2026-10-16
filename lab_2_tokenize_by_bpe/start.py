@@ -6,7 +6,9 @@ BPE Tokenizer starter
 from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
+    encode,
     get_vocabulary,
+    load_vocabulary,
     train,
 )
 
@@ -23,6 +25,14 @@ def main() -> None:
         encoding="utf-8"
     ) as text_file:
         secret  = text_file.read()
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
+        ru_raw = text_file.read()
+    with open(
+        "lab_2_tokenize_by_bpe/assets/ru_encoded.txt",
+        "r",
+        encoding="utf-8"
+    ) as text_file:
+        reference_encoded_raw = text_file.read()
     # with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
     #     text_reference_translation = text_file.read()
     # with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
@@ -43,14 +53,28 @@ def main() -> None:
    #print(result_1)
 
     #secret
-    vocabulary = get_vocabulary(result_1,'<unk>')
-    assert vocabulary, "Voc is None"
+    # vocabulary = get_vocabulary(result_1,'<unk>')
+    # assert vocabulary, "Voc is None"
 
-    secret_ids = [int(number) for number in secret.split()]
-    result_2 = decode(secret_ids, vocabulary, '</s>')
-    assert result_2, "Decode is None"
-    print(result_2)
+    # secret_ids = [int(number) for number in secret.split()]
+    # result_2 = decode(secret_ids, vocabulary, '</s>')
+    # assert result_2, "Decode is None"
+    # print(result_2)
 
+    #mark8
+    vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    if vocabulary is None:
+        return
+
+    encoded = encode (ru_raw, vocabulary, "\u2581", None, "<unk>")
+    if encoded is None:
+        return
+
+    reference_encoded = [int(x) for x in reference_encoded_raw.split()]
+    n = 20
+    print("полученные токены: ", encoded[:n])
+    print("эталонные токены: ", reference_encoded[:n])
+    print("совпадают ли токены:", encoded[:n] == reference_encoded[:n])
 
 
 if __name__ == "__main__":
