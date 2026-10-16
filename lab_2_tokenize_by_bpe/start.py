@@ -53,12 +53,12 @@ def main() -> None:
    #print(result_1)
 
     #secret
-    # vocabulary = get_vocabulary(result_1,'<unk>')
-    # assert vocabulary, "Voc is None"
+    vocabulary = get_vocabulary(result_1,'<unk>')
+    assert vocabulary, "Voc is None"
 
-    # secret_ids = [int(number) for number in secret.split()]
-    # result_2 = decode(secret_ids, vocabulary, '</s>')
-    # assert result_2, "Decode is None"
+    secret_ids = [int(number) for number in secret.split()]
+    result_2 = decode(secret_ids, vocabulary, '</s>')
+    assert result_2, "Decode is None"
     # print(result_2)
 
     #mark8
