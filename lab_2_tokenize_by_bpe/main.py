@@ -6,6 +6,7 @@ BPE and machine translation evaluation
 
 # pylint:disable=unused-argument
 from typing import Sequence
+import json
 
 
 def prepare_word(
@@ -374,7 +375,16 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
 
+    with open(vocab_path, "r", encoding = "utf-8") as text_file:
+        vocabulary = json.load(text_file)
+
+    if not isinstance(vocabulary, dict):
+        return None
+
+    return vocabulary
 
 def encode(
     original_text: str,
