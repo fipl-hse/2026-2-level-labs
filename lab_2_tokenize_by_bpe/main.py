@@ -352,22 +352,22 @@ def tokenize_word(
 
     joined_word = "".join(word)
 
-    vocabulary_lst = [key for key in vocabulary.keys() if key in joined_word]
-    vocabulary_lst = sorted(vocabulary_lst, key = lambda token: (-len(token), token))
+    tokens = [key for key in vocabulary.keys() if key in joined_word]
+    tokens = sorted(tokens, key = lambda token: (-len(token), token))
 
     encoded_word = [joined_word]
-    for token in vocabulary_lst:
+    for token in tokens:
         parts_encoded_word = []
-        for el in encoded_word:
-            if isinstance(el, int) or token not in el:
-                parts_encoded_word.append(el)
+        for element in encoded_word:
+            if isinstance(element, int) or token not in element:
+                parts_encoded_word.append(element)
             else:
-                el = el.split(token)
-                for i, ch in enumerate(el):
+                piece = element.split(token)
+                for i, char in enumerate(piece):
                     if i > 0:
                         parts_encoded_word.append(vocabulary[token])
-                    if ch:
-                        parts_encoded_word.append(ch)
+                    if char:
+                        parts_encoded_word.append(char)
         encoded_word = parts_encoded_word
 
     result = []
