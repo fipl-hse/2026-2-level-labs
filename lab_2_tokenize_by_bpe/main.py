@@ -43,10 +43,7 @@ def prepare_word(
     if end_of_word is not None:
         prepared_word.append(end_of_word)
 
-    prepared_word = tuple(prepared_word)
-
-    return prepared_word
-
+    return tuple(prepared_word)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -114,6 +111,9 @@ def count_tokens_pairs(
     ):
         return None
 
+    if word_frequencies is None:
+        return None
+
     pair_frequencies = {}
     for key, value in word_frequencies.items():
         for i in range(len(key)-1):
@@ -148,6 +148,9 @@ def merge_tokens(
         all(isinstance(word, str) for key in word_frequencies for word in key) and
         all(isinstance(token, str) for token in pair)
     ):
+        return None
+
+    if word_frequencies is None:
         return None
 
     new_word_frequencies = {}

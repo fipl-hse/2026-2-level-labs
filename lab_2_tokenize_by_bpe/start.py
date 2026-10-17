@@ -23,7 +23,10 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with (
+        open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8")
+        as text_file
+    ):
         secret_text = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
         ru_original_text = text_file.read()
@@ -51,10 +54,8 @@ def main() -> None:
     assert encoded_text, "Impossible to encode text"
 
     ru_encoded_text = [int(element) for element in ru_encoded_text.split()]
-    print(list(ru_encoded_text[:20]))
+    assert ru_encoded_text, "Impossible to rncode ru text"
     print(encoded_text[:20] == list(ru_encoded_text[:20]))
-
-    return None
 
 if __name__ == "__main__":
     main()
