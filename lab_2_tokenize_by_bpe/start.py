@@ -42,8 +42,8 @@ def main() -> None:
     vocabulary = get_vocabulary(trained_tokenizator, "<unk>")
     assert vocabulary, "Impossible to git vocabulary"
 
-    secret_text = [int(el) for el in secret_text.split()]
-    result = decode(secret_text, vocabulary, "</s>")
+    secret_text_splited = [int(el) for el in secret_text.split()]
+    result = decode(secret_text_splited, vocabulary, "</s>")
     assert result, "Text can not be decoded"
     print(result)
 
@@ -53,9 +53,9 @@ def main() -> None:
     encoded_text = encode(ru_original_text, vocabulary, "\u2581", None, "<unk>")
     assert encoded_text, "Impossible to encode text"
 
-    ru_encoded_text = [int(element) for element in ru_encoded_text.split()]
+    ru_encoded_text_splited = [int(element) for element in ru_encoded_text.split()]
     assert ru_encoded_text, "Impossible to rncode ru text"
-    print(encoded_text[:20] == list(ru_encoded_text[:20]))
+    print(encoded_text[:20] == list(ru_encoded_text_splited[:20]))
 
 if __name__ == "__main__":
     main()

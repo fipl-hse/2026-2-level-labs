@@ -81,6 +81,8 @@ def collect_frequencies(
     frequencies_dict = {}
     for word in prepared_text:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
+        if prepared_word is None:
+            return None
         if prepared_word and prepared_word not in frequencies_dict:
             frequencies_dict[prepared_word] = 1
         else:
@@ -203,6 +205,9 @@ def train(
         if not pair_frequencies:
             break
 
+        if pair_frequencies is None:
+            return None
+
         max_freq = max(pair_frequencies.values())
         popular_tokens = []
 
@@ -221,10 +226,11 @@ def train(
 
         popular_pair = min(longest)[1]
 
-        if merge_tokens(word_frequencies, popular_pair) is None:
+        word_frequencies = merge_tokens(word_frequencies, popular_pair)
+
+        if word_frequencies is None:
             return None
 
-        word_frequencies = merge_tokens(word_frequencies, popular_pair)
         num_merges -= 1
 
     return word_frequencies
@@ -426,7 +432,7 @@ def encode(
         return None
 
     if not all(
-        isinstance(key, str) and (value, int)
+        isinstance(key, str) and isinstance(value, int)
         for key, value in vocabulary.items()
     ):
         return None
