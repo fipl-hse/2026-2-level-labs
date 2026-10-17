@@ -350,12 +350,12 @@ def tokenize_word(
     ):
         return None
 
-    word = "".join(word)
+    joined_word = "".join(word)
 
-    vocabulary_lst = [key for key in vocabulary.keys() if key in word]
+    vocabulary_lst = [key for key in vocabulary.keys() if key in joined_word]
     vocabulary_lst = sorted(vocabulary_lst, key = lambda token: (-len(token), token))
 
-    encoded_word = [word]
+    encoded_word = [joined_word]
     for token in vocabulary_lst:
         parts_encoded_word = []
         for el in encoded_word:
@@ -449,7 +449,7 @@ def encode(
     encoded_text = []
     for word in prepared_text:
         prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
-        if prepare_word is None:
+        if prepared_word is None:
             return None
 
         encoded_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
