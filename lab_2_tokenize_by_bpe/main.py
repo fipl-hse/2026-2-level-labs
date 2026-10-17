@@ -355,7 +355,7 @@ def tokenize_word(
     tokens = [key for key in vocabulary.keys() if key in joined_word]
     tokens = sorted(tokens, key = lambda token: (-len(token), token))
 
-    encoded_word = [joined_word]
+    encoded_word: list[str | int] = [joined_word]
     for token in tokens:
         parts_encoded_word = []
         for element in encoded_word:
