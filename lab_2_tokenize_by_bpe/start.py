@@ -6,7 +6,9 @@ BPE Tokenizer starter
 from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
+    encode,
     get_vocabulary,
+    load_vocabulary,
     train,
 )
 
@@ -43,6 +45,33 @@ def main() -> None:
     if secret is None:
         return
     # print(secret)
+
+    # "mark 8"
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
+        ru_text = text_file.read()
+
+    ru_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    if ru_vocabulary is None:
+        return
+
+    encoded_ru = encode(
+        ru_text,
+        ru_vocabulary,
+        start_of_word_token="\u2581",
+        end_of_word_token=None,
+        unknown_token="<unk>",
+    )
+    if encoded_ru is None:
+        return
+    # "comparison"
+    with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as encoded_file:
+        ru_to_compare_raw = encoded_file.read()
+
+    ru_to_compare = [int(number) for number in ru_to_compare_raw.split()]
+
+    n = 20
+    print("Encoded: ", encoded_ru[:n])
+    print("To compare: ", ru_to_compare[:n])
 
 
 if __name__ == "__main__":
