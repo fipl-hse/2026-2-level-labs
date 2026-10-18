@@ -175,11 +175,11 @@ def train(
         pairs = count_tokens_pairs(trained_frequencies)
         if not pairs:
             break
-        
         def sort_key(p: tuple[str, str]) -> tuple[int, int, str]:
+            # pylint: disable=cell-var-from-loop
             assert pairs is not None
             return -pairs[p], -len("".join(p)), "".join(p)
-
+        
         best_pair = sorted(pairs.keys(), key=sort_key)[0]
 
         new_frequencies = merge_tokens(trained_frequencies, best_pair)
@@ -297,9 +297,9 @@ def tokenize_word(
             i += 1
 
     return [
-        vocabulary.get(token, vocabulary.get(unknown_token, 0)) 
+        vocabulary.get(token, vocabulary.get(unknown_token, 0))
         for token in result_list
-        ]
+    ]
 
 
 
@@ -352,8 +352,8 @@ def encode(
     None is returned
     """
     if (
-        not isinstance(original_text, str) 
-        or not isinstance(vocabulary, dict) 
+        not isinstance(original_text, str)
+        or not isinstance(vocabulary, dict)
         or not isinstance(unknown_token, str)
     ):
         return None
