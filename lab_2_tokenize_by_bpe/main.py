@@ -175,17 +175,17 @@ def train(
         pairs = count_tokens_pairs(trained_frequencies)
         if not pairs:
             break
-
-        def sort_key(
-            p: tuple[str, ...], current_pairs: dict[tuple[str, ...], int] = pairs
-        ) -> tuple[int, int, str]:
-            return -current_pairs[p], -len("".join(p)), "".join(p)
+        
+        def sort_key(p: tuple[str, str]) -> tuple[int, int, str]:
+            assert pairs is not None
+            return -pairs[p], -len("".join(p)), "".join(p)
 
         best_pair = sorted(pairs.keys(), key=sort_key)[0]
 
-        trained_frequencies = merge_tokens(trained_frequencies, best_pair)
-        if trained_frequencies is None:
+        new_frequencies = merge_tokens(trained_frequencies, best_pair)
+        if new_frequencies is None:
             return None
+        trained_frequencies = new_frequencies
 
     return trained_frequencies
 
