@@ -33,6 +33,7 @@ def main() -> None:
     trained = train(word_frequencies, num_merges=100)
     assert trained is not None, "Ошибка: обучение токенизатора"
     print(f"Токенизатор обучен: {len(trained)} уникальных слов после слияний")
+
     vocabulary = get_vocabulary(trained, unknown_token="<unk>")
     assert vocabulary is not None, "Ошибка: построение словаря"
     print(f"Размер словаря: {len(vocabulary)} токенов")
