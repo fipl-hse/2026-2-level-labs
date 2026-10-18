@@ -310,13 +310,13 @@ class GreedyTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
 
-    def run(self, seq_len: int, prompt: str) -> str | None:
+    def run(self, prompt: str, seq_len: int) -> str | None:
         """
         Generate sequence based on NGram language model and prompt provided.
 
         Args:
-            seq_len (int): Number of tokens to generate
             prompt (str): Beginning of sequence
+            seq_len (int): Number of tokens to generate
 
         Returns:
             str | None: Generated sequence
@@ -522,13 +522,13 @@ class BackOffGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
 
-    def run(self, seq_len: int, prompt: str) -> str | None:
+    def run(self, prompt: str, seq_len: int) -> str | None:
         """
         Generate sequence based on NGram language model and prompt provided.
 
         Args:
-            seq_len (int): Number of tokens to generate
             prompt (str): Beginning of sequence
+            seq_len (int): Number of tokens to generate
 
         Returns:
             str | None: Generated sequence

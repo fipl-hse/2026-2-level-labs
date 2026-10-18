@@ -65,7 +65,7 @@ def test_backoff_generator_run_empty_get_next_token(
         "_get_next_token",
         lambda *args, **kwargs: [],
     )
-    actual = backoff_text_generator.run(50, "The")
+    actual = backoff_text_generator.run("The", 50)
     expected = "The."
     assert expected == actual
 
@@ -163,7 +163,7 @@ def test_backoff_generator_run(backoff_text_generator: BackOffGenerator) -> None
     Args:
         backoff_text_generator (BackOffGenerator): An instance of BackOffGenerator
     """
-    actual = backoff_text_generator.run(50, "The")
+    actual = backoff_text_generator.run("The", 50)
     assert "The the the the the the the the the the the the the t." == actual
 
 
@@ -180,11 +180,11 @@ def test_backoff_generator_run_invalid_input(backoff_text_generator: BackOffGene
     bad_prompt_inputs = [1, [None], {}, None, (), 1.1, True, ""]
     expected = None
     for bad_input in bad_len_inputs:
-        actual = backoff_text_generator.run(bad_input, "The")
+        actual = backoff_text_generator.run("The", bad_input)
         assert expected == actual
 
     for bad_input in bad_prompt_inputs:
-        actual = backoff_text_generator.run(50, bad_input)
+        actual = backoff_text_generator.run(bad_input, 50)
         assert expected == actual
 
 
@@ -205,7 +205,7 @@ def test_backoff_generator_run_none_encode(
         "encode",
         lambda *args, **kwargs: None,
     )
-    actual = backoff_text_generator.run(50, "The")
+    actual = backoff_text_generator.run("The", 50)
     assert actual is None
 
 
@@ -226,5 +226,5 @@ def test_backoff_generator_run_none_get_next_token(
         "_get_next_token",
         lambda *args, **kwargs: None,
     )
-    actual = backoff_text_generator.run(50, "The")
+    actual = backoff_text_generator.run("The", 50)
     assert actual is None

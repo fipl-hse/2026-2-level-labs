@@ -42,7 +42,7 @@ def test_greedy_text_generator_run(greedy_text_generator: GreedyTextGenerator) -
     Args:
         greedy_text_generator (GreedyTextGenerator): An instance of GreedyTextGenerator
     """
-    actual = greedy_text_generator.run(4, "He")
+    actual = greedy_text_generator.run("He", 4)
     assert "He had." == actual
 
 
@@ -65,7 +65,7 @@ def test_greedy_text_generator_run_none_encode(
         "encode",
         lambda *args, **kwargs: None,
     )
-    actual = greedy_text_generator.run(4, "He")
+    actual = greedy_text_generator.run("He", 4)
     expected = None
     assert expected == actual
 
@@ -90,7 +90,7 @@ def test_greedy_text_generator_run_none_generate_next_token(
         "generate_next_token",
         lambda *args, **kwargs: None,
     )
-    actual = greedy_text_generator.run(4, "He")
+    actual = greedy_text_generator.run("He", 4)
     expected = "He."
     assert expected == actual
 
@@ -114,7 +114,7 @@ def test_greedy_text_generator_run_empty_next_candidate(
         "generate_next_token",
         lambda *args, **kwargs: {},
     )
-    actual = greedy_text_generator.run(4, "He")
+    actual = greedy_text_generator.run("He", 4)
     expected = "He."
     assert expected == actual
 
@@ -136,8 +136,8 @@ def test_greedy_text_generator_run_invalid_input(
     seq_len_bad_input = [[None], {}, None, (), 1.1, "string", 0, -1]
     prompt_bad_input = [1, [None], {}, None, (), 1.1, "", 0]
     for bad_input in seq_len_bad_input:
-        actual = greedy_text_generator.run(bad_input, "He")
+        actual = greedy_text_generator.run("He", bad_input)
         assert expected == actual
     for bad_input in prompt_bad_input:
-        actual = greedy_text_generator.run(4, bad_input)
+        actual = greedy_text_generator.run(bad_input, 4)
         assert expected == actual
