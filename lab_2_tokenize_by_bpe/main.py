@@ -332,9 +332,8 @@ def tokenize_word(
     or not all(isinstance(i, str) for i in word)
     or (end_of_word is not None and not isinstance(end_of_word, str))
     or not isinstance(unknown_token, str)
+    or not isinstance(vocabulary, dict)
     ):
-        return None
-    if not isinstance(vocabulary, dict):
         return None
 
     for token, token_id in vocabulary.items():
@@ -348,7 +347,7 @@ def tokenize_word(
     if end_of_word is not None and not text.endswith(end_of_word):
         text += end_of_word
 
-    parts = [None] * len(text)
+    parts: list[str | None] = [None] * len(text)
 
     sorted_tokens = sorted(vocabulary.keys(), key=lambda t: (-len(t), t))
 
@@ -378,9 +377,9 @@ def tokenize_word(
         if part is None:
             encoded_ids.append(unknown_id)
             index += 1
-        else:
-            encoded_ids.append(vocabulary[part])
-            index += len(part)
+            continue
+        encoded_ids.append(vocabulary[part])
+        index += len(part)
 
     return encoded_ids
 
@@ -455,7 +454,7 @@ def encode(
 
         tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if tokenized_word is None:
-                return None
+            return None
         encoded.extend(tokenized_word)
 
     return encoded

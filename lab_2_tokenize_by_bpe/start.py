@@ -17,10 +17,12 @@ def main() -> None:
     """
     Launches an implementation
     """
-    with open("lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8"
+        )as text_file:
         text = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
-        secret3 = text_file.read()
+        secret3_raw = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
@@ -40,7 +42,7 @@ def main() -> None:
     if vocabulary is None:
         return
 
-    secret3 = [int(number) for number in secret3.split()]
+    secret3 = [int(number) for number in secret3_raw.split()]
     secret = decode(secret3, vocabulary, '</s>')
     if secret is None:
         return
