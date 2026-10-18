@@ -118,7 +118,7 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict):
         return None
-    if not isinstance(pair, tuple):
+    if not isinstance(pair, tuple) or len(pair) != 2:
         return None
 
     new_frequencies = {}
@@ -167,12 +167,12 @@ def train(
             break
 
         best_pair = None
-        best_count = 0
+        best_key = None
         for pair in pairs:
-            if pairs[pair] > best_count:
-                best_pair = pair
-                best_count = pairs[pair]
-            elif pairs[pair] == best_count and pair < best_pair:
+            token = pair[0] + pair[1]
+            key = (-pairs[pair], -len(token), token)
+            if best_key is None or key < best_key:
+                best_key = key
                 best_pair = pair
 
         word_frequencies = merge_tokens(word_frequencies, best_pair)
@@ -202,23 +202,23 @@ def get_vocabulary(
     if not isinstance(unknown_token, str):
         return None
 
-    tokens = []
+    tokens = set()
     for word in word_frequencies:
         for token in word:
-            if token not in tokens:
-                tokens.append(token)
+            tokens.add(token)
+            for letter in token:
+                tokens.add(letter)
+    tokens.add(unknown_token)
 
-    if unknown_token not in tokens:
-        tokens.append(unknown_token)
-
+    tokens = list(tokens)
     tokens.sort()
+    tokens.sort(key=len, reverse=True)
 
     vocabulary = {}
-    identifier = 0
+    number = 0
     for token in tokens:
-        vocabulary[token] = identifier
-        identifier += 1
-
+        vocabulary[token] = number
+        number += 1
     return vocabulary
 
 def decode(
