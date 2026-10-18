@@ -311,23 +311,16 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(word, tuple):
-        return None
-    if not all(isinstance(part, str) for part in word):
-        return None
-
-    if not (isinstance(end_of_word, str) or end_of_word is None):
-        return None
-    if not isinstance(unknown_token, str):
+    if (not isinstance(word, tuple)
+        or not all(isinstance(part, str) for part in word)
+        or not (isinstance(end_of_word, str) or end_of_word is None)
+            or not isinstance(unknown_token, str)):
         return None
 
-    if not isinstance(vocabulary, dict):
+    if (not isinstance(vocabulary, dict)
+        or not all(isinstance(token, str) and isinstance(identifier, int)
+                   for token, identifier in vocabulary.items())):
         return None
-    for token, identifier in vocabulary.items():
-        if not isinstance(token, str):
-            return None
-        if not isinstance(identifier, int):
-            return None
 
     raw_text = "".join(word)
 
