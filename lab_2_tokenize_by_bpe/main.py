@@ -332,8 +332,10 @@ def tokenize_word(
     or not all(isinstance(i, str) for i in word)
     or (end_of_word is not None and not isinstance(end_of_word, str))
     or not isinstance(unknown_token, str)
-    or not isinstance(vocabulary, dict)
     ):
+        return None
+
+    if not isinstance(vocabulary, dict):
         return None
 
     for token, token_id in vocabulary.items():
@@ -363,8 +365,8 @@ def tokenize_word(
             ):
                 parts[index:index + token_len] = [token] * token_len
                 index += token_len
-            else:
-                index += 1
+                continue
+            index += 1
 
     unknown_id = vocabulary.get(unknown_token)
     if unknown_id is None:

@@ -21,11 +21,17 @@ def main() -> None:
         "lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8"
         )as text_file:
         text = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/secrets/secret_3.txt", "r", encoding="utf-8"
+        ) as text_file:
         secret3_raw = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8"
+        ) as text_file:
         text_reference_translation = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8"
+        ) as text_file:
         translation_encoded_raw = text_file.read()
 
     result = collect_frequencies(text, None, "</s>")
