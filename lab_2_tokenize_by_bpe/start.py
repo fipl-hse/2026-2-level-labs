@@ -4,6 +4,7 @@ BPE Tokenizer starter
 
 # pylint:disable=too-many-locals, unused-variable
 from lab_2_tokenize_by_bpe.main import (
+    calculate_bleu,
     collect_frequencies,
     decode,
     encode,
@@ -78,9 +79,37 @@ def main() -> None:
     ru_to_compare = [int(number) for number in ru_to_compare_raw.split()]
 
     n = 20
-    print("Encoded: ", encoded_ru[:n])
-    print("To compare: ", ru_to_compare[:n])
+    # print("Encoded: ", encoded_ru[:n])
+    # print("To compare: ", ru_to_compare[:n])
 
+    # "mark 10"
+    translation_encoded = [int(number) for number in translation_encoded_raw.split()]
+
+    en_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    if en_vocabulary is None:
+        return
+
+    translation_decoded = decode(
+        translation_encoded,
+        en_vocabulary,
+        None,
+    )
+    if translation_decoded is None:
+        return
+
+    translation_decoded = translation_decoded.replace("\u2581", " ")
+
+    bleu = calculate_bleu(
+        translation_decoded,
+        text_reference_translation,
+    )
+
+    if bleu is None:
+        return
+
+    print("Predicted translation:", translation_decoded)
+    print("Reference translation:", text_reference_translation)
+    print("BLEU:", bleu)
 
 if __name__ == "__main__":
     main()
