@@ -72,12 +72,8 @@ def collect_frequencies(
         token = prepare_word(word, start_of_word, end_of_word)
         if token is None:
             return None
-        if token in freq_dict:
-            freq_dict[token] +=1
-        else:
-            freq_dict[token] =1
+        freq_dict[token] = freq_dict.get(token,0) +1
     return freq_dict
-
 
 
 def count_tokens_pairs(
@@ -117,7 +113,6 @@ def count_tokens_pairs(
             else:
                 counts[pair] = frequency
     return counts
-
 
 
 def merge_tokens(
@@ -165,13 +160,12 @@ def merge_tokens(
             ):
                 new_words.append(merged_token)
                 i +=2
-            else:
-                new_words.append(word[i])
-                i+=1
+                continue
+            new_words.append(word[i])
+            i+=1
         new_keys = tuple(new_words)
         new_words_frequencies[new_keys] = (new_words_frequencies.get(new_keys, 0) + frequency)
     return new_words_frequencies
-
 
 
 def train(
@@ -219,7 +213,6 @@ def train(
     return new
 
 
-
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
@@ -265,7 +258,6 @@ def get_vocabulary(
     return result
 
 
-
 def decode(
     encoded_text: Sequence[int] | None,
     vocabulary: dict[str, int] | None,
@@ -307,7 +299,6 @@ def decode(
         else:
             res.append(token)
     return ''.join(res)
-
 
 
 def tokenize_word(
