@@ -177,9 +177,9 @@ def train(
             break
 
         best_pair = sorted(
-            pairs.keys(),
-            key=lambda p: (-pairs[p], -len(p[0] + p[1]), p[0] + p[1])
-        )[0]
+        pairs.keys(),
+        key=lambda p, current_pairs=pairs: (-current_pairs[p], -len("".join(p)), "".join(p))
+    )[0]
 
         trained_frequencies = merge_tokens(trained_frequencies, best_pair)
         if trained_frequencies is None:
@@ -246,15 +246,14 @@ def decode(
 
     for token_id in encoded_text:
         token = inverted_vocab.get(token_id)
-        if token is None:
-            continue
-
-        if token == end_of_word_token:
-            decoded_tokens.append(" ")
-        else:
+        if token is not None:
             decoded_tokens.append(token)
 
-    return "".join(decoded_tokens)
+    result_text = "".join(decoded_tokens)
+    if end_of_word_token is not None:
+        result_text = result_text.replace(end_of_word_token, " ")
+
+    return result_text
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str

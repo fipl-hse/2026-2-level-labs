@@ -329,6 +329,9 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
 
 def calculate_rmse(predicted: Sequence[float], actual: Sequence[float]) -> float | None:
+    """
+    Calculates root mean squared error.
+    """
     mse_value = calculate_mse(predicted, actual)
     if mse_value is None:
         return None
