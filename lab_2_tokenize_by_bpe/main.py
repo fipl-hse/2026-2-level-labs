@@ -176,10 +176,12 @@ def train(
         if not pairs:
             break
 
-        best_pair = sorted(
-        pairs.keys(),
-        key=lambda p, current_pairs=pairs: (-current_pairs[p], -len("".join(p)), "".join(p))
-    )[0]
+        def sort_key(
+            p: tuple[str, ...], current_pairs: dict[tuple[str, ...], int] = pairs
+        ) -> tuple[int, int, str]:
+            return -current_pairs[p], -len("".join(p)), "".join(p)
+
+        best_pair = sorted(pairs.keys(), key=sort_key)[0]
 
         trained_frequencies = merge_tokens(trained_frequencies, best_pair)
         if trained_frequencies is None:
@@ -290,11 +292,14 @@ def tokenize_word(
                 if span_str == token:
                     result_list[i:j + 1] = [token]
                     break
-                elif len(span_str) > len(token):
+                if len(span_str) > len(token):
                     break
             i += 1
 
-    return [vocabulary.get(token, vocabulary.get(unknown_token, 0)) for token in result_list]
+    return [
+        vocabulary.get(token, vocabulary.get(unknown_token, 0)) 
+        for token in result_list
+        ]
 
 
 
@@ -346,7 +351,11 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if not isinstance(original_text, str) or not isinstance(vocabulary, dict) or not isinstance(unknown_token, str):
+    if (
+        not isinstance(original_text, str) 
+        or not isinstance(vocabulary, dict) 
+        or not isinstance(unknown_token, str)
+    ):
         return None
     if start_of_word_token is not None and not isinstance(start_of_word_token, str):
         return None
