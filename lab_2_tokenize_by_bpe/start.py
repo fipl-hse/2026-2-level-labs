@@ -21,6 +21,7 @@ def main() -> None:
     """
     Launches an implementation
     """
+    result = None
     assets = "lab_2_tokenize_by_bpe/assets"
 
     with open(os.path.join(assets, "text.txt"), "r", encoding="utf-8") as text_file:
@@ -54,16 +55,16 @@ def main() -> None:
 
     with open(os.path.join(assets, "ru_raw.txt"), "r", encoding="utf-8") as ru_file:
         ru_text = ru_file.read()
-    encoded_ru = encode(ru_text, model_vocab, "\u2581", None, "<unk>")
-    assert encoded_ru is not None, "Ошибка: кодирование текста"
-    print(f"Русский текст закодирован: {len(encoded_ru)} идентификаторов")
+    result = encode(ru_text, model_vocab, "\u2581", None, "<unk>")
+    assert result is not None, "Ошибка: кодирование текста"
+    print(f"Русский текст закодирован: {len(result)} идентификаторов")
 
     ru_encoded_path = os.path.join(assets, "ru_encoded.txt")
     if os.path.exists(ru_encoded_path):
         with open(ru_encoded_path, "r", encoding="utf-8") as ru_enc_file:
             ru_enc_content = ru_enc_file.read().strip().replace("[", "").replace("]", "")
         ru_encoded = [int(x) for x in ru_enc_content.replace(",", " ").split()]
-        status = "совпадает" if encoded_ru == ru_encoded else "НЕ совпадает"
+        status = "совпадает" if result == ru_encoded else "НЕ совпадает"
         print(f"Кодирование {status} с эталоном ru_encoded.txt")
 
     with open(os.path.join(assets, "en_encoded.txt"), "r", encoding="utf-8") as en_enc_file:
@@ -79,7 +80,7 @@ def main() -> None:
     assert bleu_score is not None, "Ошибка: вычисление BLEU"
     print(f"BLEU score: {bleu_score:.2f}")
 
-    assert encoded_ru, "Translation not working"
+    assert result, "Translation not working"
 
 
 if __name__ == "__main__":
