@@ -533,3 +533,46 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
         sum_ln += math.log(p)
 
     return math.exp(sum_ln / max_order)
+
+
+def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
+    """
+    Compare two sequences by virtue of BLEU metric.
+
+    Args:
+        actual (str | None): Predicted sequence
+        reference (str): Expected sequence
+        max_order (int, optional): Max length of n-gram to consider for comparison. Defaults to 3
+
+    Returns:
+        float | None: A value of BLEU metric
+
+    In case of corrupt input arguments or functions used return None,
+    None is returned
+    """
+
+    if (
+        not isinstance(actual, str)
+        or not isinstance(reference, str)
+        or not isinstance(max_order, int)
+        or isinstance(max_order, bool)
+        or max_order <= 0
+    ):
+        return None
+
+    precisions = []
+    for i in range(1, max_order + 1):
+        actual_ngrams = collect_ngrams(actual, i)
+        reference_ngrams = collect_ngrams(reference, i)
+        if actual_ngrams is None or reference_ngrams is None:
+            return None
+        precision = calculate_precision(actual_ngrams, reference_ngrams)
+        if precision is None:
+            return None
+        precisions.append(precision)
+
+    geo_mean = calculate_geo_mean(precisions, max_order)
+    if geo_mean is None:
+        return None
+
+    return geo_mean * 100
