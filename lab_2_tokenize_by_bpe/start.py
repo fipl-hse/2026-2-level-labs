@@ -1,10 +1,10 @@
 """
 BPE Tokenizer starter
 """
-import json
 
 # pylint:disable=too-many-locals, unused-variable
 from lab_2_tokenize_by_bpe.main import encode, load_vocabulary
+
 
 def main() -> None:
     """
