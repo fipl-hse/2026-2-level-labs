@@ -94,10 +94,10 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     if (not all(isinstance(k,  tuple)
-                and (isinstance(v, int) or isinstance(v, bool))
-                and isinstance(token, str)
-                for k, v in word_frequencies.items() for token in k)
-        ):
+                    and (isinstance(v, int) or isinstance(v, bool))
+                    and isinstance(token, str)
+                    for k, v in word_frequencies.items() for token in k)
+            ):
         return None
 
     res = {}
@@ -134,10 +134,10 @@ def merge_tokens(
     ):
         return None
     if (not all(isinstance(k,  tuple)
-                and (isinstance(v, int) or isinstance(v, bool))
-                and isinstance(token, str)
-                for k, v in word_frequencies.items() for token in k)
-        ):
+                    and (isinstance(v, int) or isinstance(v, bool))
+                    and isinstance(token, str)
+                    for k, v in word_frequencies.items() for token in k)
+            ):
         return None
 
     merged = ''.join(pair)
@@ -296,6 +296,36 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+        return None
+
+    if not isinstance(encoded_text, Sequence) or isinstance(encoded_text, str):
+        return None
+    if not encoded_text:
+        return None
+    if not all(isinstance(identifier, int) for identifier in encoded_text):
+        return None
+
+    if not isinstance(vocabulary, dict) or not vocabulary:
+        return None
+    for token, identifier in vocabulary.items():
+        if not isinstance(token, str):
+            return None
+        if not isinstance(identifier, int):
+            return None
+
+    identifier_to_token = {
+        identifier: token for token, identifier in vocabulary.items()
+    }
+
+    decoded_tokens = [identifier_to_token[identifier]
+                      for identifier in encoded_text]
+    sentence = "".join(decoded_tokens)
+
+    if end_of_word_token:
+        sentence = sentence.replace(end_of_word_token, " ")
+
+    return sentence
 
 
 def tokenize_word(
