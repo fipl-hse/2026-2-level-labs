@@ -3,7 +3,7 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-from main import collect_frequencies, decode, get_vocabulary, train
+from main import encode, load_vocabulary
 
 
 def main() -> None:
@@ -16,13 +16,10 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
-        secret_1 = text_file.read()
-    freqs = collect_frequencies(text, None, "</s>")
-    freqs = train(freqs, 1000)          # подставь нужное число merge'ей
-    vocab = get_vocabulary(freqs, "<unk>")
-    encoded_secret = [int(token) for token in secret_1.split()]
-    result = decode(encoded_secret, vocab, "</s>")
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
+        ru_text = text_file.read()
+    vocab = load_vocabulary('lab_2_tokenize_by_bpe/assets/vocab.json')
+    result = encode(ru_text, vocab, "\u2581", None, "<unk>")
     assert result, "Translation not working"
 
 

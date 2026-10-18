@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 """
 
 # pylint:disable=unused-argument
+import json
 from typing import Sequence
 
 
@@ -345,6 +346,54 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word, tuple):
+        return None
+    if not all(isinstance(part, str) for part in word):
+        return None
+
+    if not (isinstance(end_of_word, str) or end_of_word is None):
+        return None
+    if not isinstance(unknown_token, str):
+        return None
+
+    if not isinstance(vocabulary, dict):
+        return None
+    for token, identifier in vocabulary.items():
+        if not isinstance(token, str):
+            return None
+        if not isinstance(identifier, int):
+            return None
+
+    raw_text = "".join(word)
+
+    matching_tokens = [token for token in vocabulary if token in raw_text]
+    matching_tokens.sort(key=lambda token: (-len(token), token))
+
+    pieces: list[str | int] = [raw_text]
+    for token in matching_tokens:
+        updated_pieces: list[str | int] = []
+        for piece in pieces:
+            if isinstance(piece, int) or token not in piece:
+                updated_pieces.append(piece)
+                continue
+
+            fragments = piece.split(token)
+            for position, fragment in enumerate(fragments):
+                if position > 0:
+                    updated_pieces.append(vocabulary[token])
+                if fragment:
+                    updated_pieces.append(fragment)
+        pieces = updated_pieces
+
+    unknown_identifier = vocabulary[unknown_token]
+    encoded: list[int] = []
+    for piece in pieces:
+        if isinstance(piece, int):
+            encoded.append(piece)
+        else:
+            encoded.extend([unknown_identifier] * len(piece))
+
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -359,6 +408,25 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    file_handle = open(vocab_path, "r", encoding="utf-8")
+    try:
+        loaded_data = json.load(file_handle)
+    finally:
+        file_handle.close()
+
+    if not isinstance(loaded_data, dict):
+        return None
+
+    for token, identifier in loaded_data.items():
+        if not isinstance(token, str):
+            return None
+        if not isinstance(identifier, int):
+            return None
+
+    return loaded_data
 
 
 def encode(
@@ -384,6 +452,40 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(original_text, str):
+        return None
+
+    if not (isinstance(start_of_word_token, str) or start_of_word_token is None):
+        return None
+    if not (isinstance(end_of_word_token, str) or end_of_word_token is None):
+        return None
+    if not isinstance(unknown_token, str):
+        return None
+
+    if not isinstance(vocabulary, dict):
+        return None
+    for token, identifier in vocabulary.items():
+        if not isinstance(token, str):
+            return None
+        if not isinstance(identifier, int):
+            return None
+
+    encoded: list[int] = []
+    for raw_word in original_text.split():
+        prepared = prepare_word(
+            raw_word, start_of_word_token, end_of_word_token)
+        if prepared is None:
+            return None
+
+        encoded_word = tokenize_word(
+            prepared, vocabulary, end_of_word_token, unknown_token
+        )
+        if encoded_word is None:
+            return None
+
+        encoded.extend(encoded_word)
+
+    return encoded
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
