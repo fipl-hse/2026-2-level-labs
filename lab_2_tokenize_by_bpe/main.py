@@ -194,18 +194,14 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if not isinstance(word_frequencies, dict):
-        return None
-
-    if not all(
-        isinstance(k, tuple) and isinstance(v, int) and k
-        and all(isinstance(el, str) for el in k)
-        for k, v in word_frequencies.items()
-    ):
-        return None
-
     if (
-        not isinstance(num_merges, int)
+        not isinstance(word_frequencies, dict)
+        or not all(
+            isinstance(k, tuple) and isinstance(v, int) and k
+            and all(isinstance(el, str) for el in k)
+            for k, v in word_frequencies.items()
+        )
+        or not isinstance(num_merges, int)
         or isinstance(num_merges, bool)
         or num_merges < 0
     ):
