@@ -174,40 +174,33 @@ def train(
     None is returned
     """
     if (not isinstance(word_frequencies, dict)
-        or not isinstance(num_merges, int)
-        or not all(isinstance(k, tuple)
-                   and isinstance(v, (int, bool))
-                   and all(isinstance(token, str) for token in k)
-                   for k, v in word_frequencies.items())):
-
+            or not isinstance(num_merges, int)
+            or not all(isinstance(k, tuple)
+                       and isinstance(v, (int, bool))
+                       and all(isinstance(token, str) for token in k)
+                       for k, v in word_frequencies.items())):
         return None
 
     corpus = word_frequencies
-    merges_done = 0
 
-    while merges_done < num_merges:
+    for _ in range(num_merges):
         stats = count_tokens_pairs(corpus)
         if not stats:
-            break
+            return corpus
 
         chosen_pair = min(
             stats.items(),
-            key=lambda item: (
-                -item[1],
-                -len(''.join(item[0])),
-                ''.join(item[0])
-            )
+            key=lambda item: (-item[1], -
+                              len(''.join(item[0])), ''.join(item[0]))
         )[0]
-        new_corpus = merge_tokens(corpus, chosen_pair)
 
+        new_corpus = merge_tokens(corpus, chosen_pair)
         if new_corpus is None:
             return None
-
         if new_corpus == corpus:
-            break
+            return corpus
 
         corpus = new_corpus
-        merges_done += 1
 
     return corpus
 
@@ -278,23 +271,18 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
-    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+    if (not isinstance(encoded_text, Sequence)
+        or isinstance(encoded_text, str)
+        or not encoded_text
+            or not all(isinstance(identifier, int) for identifier in encoded_text)):
         return None
 
-    if not isinstance(encoded_text, Sequence) or isinstance(encoded_text, str):
+    if (end_of_word_token is not None and not isinstance(end_of_word_token, str)
+        or not isinstance(vocabulary, dict)
+        or not vocabulary
+        or not all(isinstance(token, str) and isinstance(identifier, int)
+                   for token, identifier in vocabulary.items())):
         return None
-    if not encoded_text:
-        return None
-    if not all(isinstance(identifier, int) for identifier in encoded_text):
-        return None
-
-    if not isinstance(vocabulary, dict) or not vocabulary:
-        return None
-    for token, identifier in vocabulary.items():
-        if not isinstance(token, str):
-            return None
-        if not isinstance(identifier, int):
-            return None
 
     identifier_to_token = {
         identifier: token for token, identifier in vocabulary.items()
@@ -433,8 +421,10 @@ def encode(
     if (not isinstance(original_text, str)
         or not (isinstance(start_of_word_token, str) or start_of_word_token is None)
         or not (isinstance(end_of_word_token, str) or end_of_word_token is None)
-        or not isinstance(unknown_token, str)
-        or not isinstance(vocabulary, dict)
+            or not isinstance(unknown_token, str)):
+        return None
+
+    if (not isinstance(vocabulary, dict)
         or not all(isinstance(token, str) and isinstance(identifier, int)
                    for token, identifier in vocabulary.items())):
         return None
