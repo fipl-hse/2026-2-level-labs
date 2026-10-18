@@ -375,12 +375,11 @@ def tokenize_word(
     if not all(isinstance(s, str) for s in word):
         return None
 
-    vocab_tokens = sorted(vocabulary, key=lambda x: (-len(x), x))
     word_str = "".join(word)
     matches = []
     selected_matches = []
 
-    for token in vocab_tokens:
+    for token in sorted(vocabulary, key=lambda x: (-len(x), x)):
         if token not in word_str:
             continue
         search_start = 0
@@ -392,9 +391,7 @@ def tokenize_word(
             matches.append((found_index, end_index, vocabulary[token]))
             search_start = end_index
 
-    sorted_all_matches = sorted(matches, key=lambda match: -(match[1] - match[0]))
-
-    for match in sorted_all_matches:
+    for match in sorted(matches, key=lambda match: -(match[1] - match[0])):
         new_start, new_end, _ = match
         overlap = False
         for final_piece in selected_matches:
@@ -416,9 +413,7 @@ def tokenize_word(
         if not is_covered:
             selected_matches.append((i, i + 1, unk_id))
 
-    sorted_pieces = sorted(selected_matches, key=lambda x: x[0])
-
-    return [piece[2] for piece in sorted_pieces]
+    return [piece[2] for piece in sorted(selected_matches, key=lambda x: x[0])]
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
