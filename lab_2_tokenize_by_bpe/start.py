@@ -20,8 +20,7 @@ def main() -> None:
         secret_1 = text_file.read()
     freqs = collect_frequencies(secret_1, None, "</s>")
     vocab = get_vocabulary(freqs, "<unk>")
-    text = decode(secret_1, vocab, "</s>")
-    result = None
+    result = decode(secret_1, vocab, "</s>")
     assert result, "Translation not working"
 
 
