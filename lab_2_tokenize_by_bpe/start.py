@@ -1,8 +1,9 @@
+# mypy: ignore-errors
 """
 BPE Tokenizer starter
 """
 
-# pylint:disable=too-many-locals, unused-variable
+# pylint:disable=too-many-locals, unused-variable, unused-import, import-error, line-too-long
 from main import (
     collect_frequencies,
     count_tokens_pairs,

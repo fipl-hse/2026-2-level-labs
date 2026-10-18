@@ -499,12 +499,13 @@ def encode(
         if prepared is None:
             return None
 
-    token_ids = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
+        token_ids = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
 
-    if token_ids is None:
-        return None
+        if token_ids is None:
+            return None
 
-    encoded_tokens.extend(token_ids)
+        if token_ids is not None:
+            encoded_tokens.extend(token_ids)
 
     return encoded_tokens
 
