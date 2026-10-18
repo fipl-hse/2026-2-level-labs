@@ -175,9 +175,7 @@ def train(
     """
     if (not isinstance(word_frequencies, dict)
             or not isinstance(num_merges, int)
-            or not all(isinstance(k, tuple)
-                       and isinstance(v, (int, bool))
-                       and all(isinstance(token, str) for token in k)
+            or not all(isinstance(k, tuple) and isinstance(v, (int, bool))
                        for k, v in word_frequencies.items())):
         return None
 
@@ -195,10 +193,8 @@ def train(
         )[0]
 
         new_corpus = merge_tokens(corpus, chosen_pair)
-        if new_corpus is None:
-            return None
-        if new_corpus == corpus:
-            return corpus
+        if new_corpus is None or new_corpus == corpus:
+            return None if new_corpus is None else corpus
 
         corpus = new_corpus
 
