@@ -271,7 +271,7 @@ def get_vocabulary(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(word_frequencies, dict):
-            return None
+        return None
 
     for word_key, value in word_frequencies.items():
         if (
