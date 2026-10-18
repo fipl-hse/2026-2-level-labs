@@ -4,7 +4,7 @@ Lab 2.
 BPE and machine translation evaluation
 """
 
-# pylint:disable=unused-argument
+# pylint:disable=unused-argument, too-many-return-statements, too-many-branches, singleton-comparison, line-too-long, bad-indentation, too-many-locals
 import json
 from typing import Sequence
 
@@ -209,11 +209,12 @@ def train(
     if not isinstance(num_merges, int):
         return None
 
-    for i in range(num_merges):
+    for _ in range(num_merges):
         collecting_pairs = count_tokens_pairs(word_frequencies)
         if not collecting_pairs:
             break
-        best_pair = sorted(collecting_pairs.items(), key=lambda pair: (-pair[1], -len(pair[0][0] + pair[0][1]), pair[0]))[0][0]
+        best_pair = sorted(collecting_pairs.items(), key=lambda pair:
+                           (-pair[1], -len(pair[0][0] + pair[0][1]), pair[0]))[0][0]
         word_frequencies = merge_tokens(word_frequencies, best_pair)
         if word_frequencies is None:
             return None
@@ -237,7 +238,7 @@ def get_vocabulary(
     In case of corrupt input arguments, None is returned
     """
     if word_frequencies is None or not isinstance(word_frequencies, dict):
-            return None
+        return None
 
     for key, value in word_frequencies.items():
         if not isinstance(key, tuple):
@@ -390,7 +391,7 @@ def tokenize_word(
             is_overlapping = False
 
             for i in range(idx, idx + len(token)):
-                if letters_used[i] == True:
+                if letters_used[i]:
                     is_overlapping = True
                     break
 
@@ -474,7 +475,7 @@ def encode(
         return None
 
     if vocabulary is None or not isinstance(vocabulary, dict):
-            return None
+        return None
 
     for key, value in vocabulary.items():
         if not isinstance(key, str):
