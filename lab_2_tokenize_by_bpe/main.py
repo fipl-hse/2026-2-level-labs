@@ -95,7 +95,7 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     if (not all(isinstance(k,  tuple)
-                    and (isinstance(v, int) or isinstance(v, bool))
+                    and isinstance(v, (bool, int))
                     and isinstance(token, str)
                     for k, v in word_frequencies.items() for token in k)
             ):
@@ -127,18 +127,14 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
-    if (
-        not isinstance(word_frequencies, dict)
+    if (not isinstance(word_frequencies, dict)
         or not isinstance(pair, tuple)
-        or not all(isinstance(token, str) for token in pair)
         or len(pair) != 2
-    ):
-        return None
-    if (not all(isinstance(k,  tuple)
-                    and (isinstance(v, int) or isinstance(v, bool))
-                    and isinstance(token, str)
-                    for k, v in word_frequencies.items() for token in k)
-            ):
+        or not all(isinstance(token, str) for token in pair)
+        or not all(isinstance(k, tuple)
+                   and isinstance(v, (int, bool))
+                   and isinstance(token, str)
+                   for k, v in word_frequencies.items() for token in k)):
         return None
 
     merged = ''.join(pair)
@@ -177,28 +173,13 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if (
-        not isinstance(word_frequencies, dict)
+    if (not isinstance(word_frequencies, dict)
         or not isinstance(num_merges, int)
-    ):
-        return None
+        or not all(isinstance(k, tuple)
+                   and isinstance(v, (int, bool))
+                   and all(isinstance(token, str) for token in k)
+                   for k, v in word_frequencies.items())):
 
-    if not all(
-        isinstance(k, tuple)
-        and (isinstance(v, int) or isinstance(v, bool))
-        for k, v in word_frequencies.items()
-    ):
-        return None
-
-    if not all(
-        isinstance(token, str)
-        for k in word_frequencies.keys() for token in k
-    ):
-        return None
-
-    pairs_freqs = count_tokens_pairs(word_frequencies)
-
-    if pairs_freqs is None:
         return None
 
     corpus = word_frequencies
@@ -411,11 +392,8 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     if not isinstance(vocab_path, str):
         return None
 
-    file_handle = open(vocab_path, "r", encoding="utf-8")
-    try:
+    with open(vocab_path, "r", encoding="utf-8") as file_handle:
         loaded_data = json.load(file_handle)
-    finally:
-        file_handle.close()
 
     if not isinstance(loaded_data, dict):
         return None
@@ -452,23 +430,14 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if not isinstance(original_text, str):
+    if (not isinstance(original_text, str)
+        or not (isinstance(start_of_word_token, str) or start_of_word_token is None)
+        or not (isinstance(end_of_word_token, str) or end_of_word_token is None)
+        or not isinstance(unknown_token, str)
+        or not isinstance(vocabulary, dict)
+        or not all(isinstance(token, str) and isinstance(identifier, int)
+                   for token, identifier in vocabulary.items())):
         return None
-
-    if not (isinstance(start_of_word_token, str) or start_of_word_token is None):
-        return None
-    if not (isinstance(end_of_word_token, str) or end_of_word_token is None):
-        return None
-    if not isinstance(unknown_token, str):
-        return None
-
-    if not isinstance(vocabulary, dict):
-        return None
-    for token, identifier in vocabulary.items():
-        if not isinstance(token, str):
-            return None
-        if not isinstance(identifier, int):
-            return None
 
     encoded: list[int] = []
     for raw_word in original_text.split():

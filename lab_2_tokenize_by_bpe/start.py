@@ -3,7 +3,7 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-from main import encode, load_vocabulary
+from lab_2_tokenize_by_bpe.main import encode, load_vocabulary
 
 
 def main() -> None:
