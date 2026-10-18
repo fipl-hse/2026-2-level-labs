@@ -16,7 +16,7 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-    with open("lab_2_tokenize_by_bpe/assets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         secret_1 = text_file.read()
     freqs = collect_frequencies(secret_1, None, "</s>")
     vocab = get_vocabulary(freqs, "<unk>")
