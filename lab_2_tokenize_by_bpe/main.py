@@ -179,7 +179,7 @@ def train(
             # pylint: disable=cell-var-from-loop
             assert pairs is not None
             return -pairs[p], -len("".join(p)), "".join(p)
-        
+
         best_pair = sorted(pairs.keys(), key=sort_key)[0]
 
         new_frequencies = merge_tokens(trained_frequencies, best_pair)
@@ -275,8 +275,8 @@ def tokenize_word(
     In case of corrupt input arguments, None is returned
     """
     if (
-        not isinstance(word, tuple) 
-        or not isinstance(vocabulary, dict) 
+        not isinstance(word, tuple)
+        or not isinstance(vocabulary, dict)
         or not isinstance(unknown_token, str)
     ):
         return None
@@ -284,7 +284,7 @@ def tokenize_word(
         return None
 
     sorted_tokens = sorted(
-    vocabulary.keys(), 
+    vocabulary.keys(),
     key=lambda x: (-len(x), x)
     )
     result_list = list(word)
