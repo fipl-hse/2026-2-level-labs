@@ -388,14 +388,14 @@ def tokenize_word(
             pos = word_str.find(token, pos + len(token))
 
     for match in sorted(matches, key=lambda m: m[0] - m[1]):
-        if not any(match[1] > c[0] and c[1] > match[0] for c in selected_matches):
+        if not any(match[1] > chunk[0] and chunk[1] > match[0] for chunk in selected_matches):
             selected_matches.append(match)
 
     unk = vocabulary[unknown_token]
     for i in range(len(word_str)):
-        if not any(c[0] <= i < c[1] for c in selected_matches):
+        if not any(chunk[0] <= i < chunk[1] for chunk in selected_matches):
             selected_matches.append((i, i + 1, unk))
-            
+
     return [piece[2] for piece in sorted(selected_matches, key=lambda x: x[0])]
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
