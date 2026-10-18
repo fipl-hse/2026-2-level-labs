@@ -382,37 +382,20 @@ def tokenize_word(
     for token in sorted(vocabulary, key=lambda x: (-len(x), x)):
         if token not in word_str:
             continue
-        search_start = 0
-        while True:
-            found_index = word_str.find(token, search_start)
-            if found_index == -1:
-                break
-            end_index = found_index + len(token)
-            matches.append((found_index, end_index, vocabulary[token]))
-            search_start = end_index
+        pos = word_str.find(token)
+        while pos != -1:
+            matches.append((pos, pos + len(token), vocabulary[token]))
+            pos = word_str.find(token, pos + len(token))
 
-    for match in sorted(matches, key=lambda match: -(match[1] - match[0])):
-        new_start, new_end, _ = match
-        overlap = False
-        for final_piece in selected_matches:
-            old_start, old_end, _ = final_piece
-            if new_end > old_start and old_end > new_start:
-                overlap = True
-                break
-        if not overlap:
+    for match in sorted(matches, key=lambda m: m[0] - m[1]):
+        if not any(match[1] > c[0] and c[1] > match[0] for c in selected_matches):
             selected_matches.append(match)
 
-    unk_id = vocabulary[unknown_token]
+    unk = vocabulary[unknown_token]
     for i in range(len(word_str)):
-        is_covered = False
-        for pieces in selected_matches:
-            p_start, p_end, _ = pieces
-            if p_start <= i < p_end:
-                is_covered = True
-                break
-        if not is_covered:
-            selected_matches.append((i, i + 1, unk_id))
-
+        if not any(c[0] <= i < c[1] for c in selected_matches):
+            selected_matches.append((i, i + 1, unk))
+            
     return [piece[2] for piece in sorted(selected_matches, key=lambda x: x[0])]
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
