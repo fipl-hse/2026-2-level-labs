@@ -274,12 +274,19 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(word, tuple) or not isinstance(vocabulary, dict) or not isinstance(unknown_token, str):
+    if (
+        not isinstance(word, tuple) 
+        or not isinstance(vocabulary, dict) 
+        or not isinstance(unknown_token, str)
+    ):
         return None
     if end_of_word is not None and not isinstance(end_of_word, str):
         return None
 
-    sorted_tokens = sorted(vocabulary.keys(), key=lambda x: (-len(x), x))
+    sorted_tokens = sorted(
+    vocabulary.keys(), 
+    key=lambda x: (-len(x), x)
+    )
     result_list = list(word)
 
     for token in sorted_tokens:
