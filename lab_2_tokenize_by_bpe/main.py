@@ -3,6 +3,7 @@ Lab 2.
 
 BPE and machine translation evaluation
 """
+import json
 
 # pylint:disable=unused-argument
 from typing import Sequence
@@ -407,7 +408,20 @@ def tokenize_word(
         if not overlap:
             selected_matches.append(match)
 
+    unk_id = vocabulary[unknown_token]
+    for i in range(len(word_str)):
+        is_covered = False
+        for pieces in selected_matches:
+            p_start, p_end, _ = pieces
+            if p_start <= i < p_end:
+                is_covered = True
+                break
+        if not is_covered:
+            selected_matches.append((i, i + 1, unk_id))
 
+    sorted_pieces = sorted(selected_matches, key=lambda x: x[0])
+
+    return [piece[2] for piece in sorted_pieces]
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -421,6 +435,23 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(f"{vocab_path}", "r", encoding="utf-8") as file:
+        vocab = json.load(file)
+
+    if not isinstance(vocab, dict):
+        return None
+
+    for key, value in vocab.items():
+        if not all(
+            [isinstance(key, str),
+            isinstance(value, int)]
+        ):
+            return None
+
+    return vocab
 
 
 def encode(
@@ -446,7 +477,34 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(original_text, str)
+        or not isinstance(vocabulary, dict)
+        or not (isinstance(start_of_word_token, str) or start_of_word_token is None)
+        or not (isinstance(end_of_word_token, str) or end_of_word_token is None)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
 
+    for key, value in vocabulary.items():
+        if not isinstance(key, str):
+            return None
+        if not isinstance(value, int):
+            return None
+
+    cleaned_text = original_text.strip().split()
+    text_tokens = []
+
+    for word in cleaned_text:
+        prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if prepare_word is None:
+            return None
+        tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if tokenized_word is None:
+            return None
+        text_tokens.extend(tokenized_word)
+
+    return text_tokens
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
