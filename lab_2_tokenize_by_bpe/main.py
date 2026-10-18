@@ -32,12 +32,12 @@ def prepare_word(
     prepared_words = []
 
     if start_of_word is not None:
-        prepared_words += [start_of_word]
+        prepared_words.append(start_of_word)
 
-    prepared_words.extend(list(raw_word))
+    prepared_words.extend(raw_word)
 
     if end_of_word is not None:
-        prepared_words += [end_of_word]
+        prepared_words.append(end_of_word)
 
         return tuple(prepared_words)
         
@@ -67,16 +67,12 @@ def collect_frequencies(
 
     word_frequencies = {}
 
-    for line in text.split('\n'):
-        for word in line.split():
-            prepared_word = prepare_word(word, start_of_word, end_of_word)
-            if prepared_word is None:
+    for word in text.split():
+        prepared_word = prepare_word(word, start_of_word, end_of_word)
+        if prepared_word is None:
                 return None
-
-            if prepared_word not in word_frequencies:
-                word_frequencies[prepared_word] = 0
-            word_frequencies[prepared_word] += 1
-
+        
+        word_frequencies[prepared_word] = word_frequencies.get(prepared_word, 0) + 1
     return word_frequencies
 
 
