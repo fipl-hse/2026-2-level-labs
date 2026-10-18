@@ -197,24 +197,18 @@ def train(
     if not isinstance(word_frequencies, dict):
         return None
 
-    for key, value in word_frequencies.items():
-        if (
-            not isinstance(key, tuple)
-            or not isinstance(value, int)
-            ):
-            return None
-
-        if (
-            not key
-            or not all(isinstance(el, str) for el in key)
-            ):
-            return None
+    if not all(
+        isinstance(k, tuple) and isinstance(v, int) and k
+        and all(isinstance(el, str) for el in k)
+        for k, v in word_frequencies.items()
+    ):
+        return None
 
     if (
         not isinstance(num_merges, int)
         or isinstance(num_merges, bool)
         or num_merges < 0
-        ):
+    ):
         return None
 
     for _ in range(num_merges):
