@@ -242,7 +242,14 @@ def train(
             if word[0] + word[1] == lexical_longest:
                 best_word = word
 
-        word_frequencies = merge_tokens(word_frequencies, best_word)
+        if best_word is None:
+            return None
+
+        merged = merge_tokens(word_frequencies, best_word)
+        if merged is None:
+            return None
+
+        word_frequencies = merged
 
     return word_frequencies
 
@@ -266,16 +273,16 @@ def get_vocabulary(
     if not isinstance(word_frequencies, dict):
             return None
 
-    for key, value in word_frequencies.items():
+    for word_key, value in word_frequencies.items():
         if (
-            not isinstance(key, tuple)
+            not isinstance(word_key, tuple)
             or not isinstance(value, int)
         ):
             return None
 
         if (
-            not key
-            or not all(isinstance(el, str) for el in key)
+            not word_key
+            or not all(isinstance(el, str) for el in word_key)
         ):
             return None
 
@@ -293,8 +300,8 @@ def get_vocabulary(
     sorted_word_freq = sorted(unique_tokens, key=lambda x: (-len(x), x))
 
     dict_sorted = {}
-    for i, key in enumerate(sorted_word_freq):
-        dict_sorted[key] = i
+    for i, token in enumerate(sorted_word_freq):
+        dict_sorted[token] = i
 
     return dict_sorted
 
@@ -497,7 +504,7 @@ def encode(
 
     for word in cleaned_text:
         prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
-        if prepare_word is None:
+        if prepared_word is None:
             return None
         tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if tokenized_word is None:
