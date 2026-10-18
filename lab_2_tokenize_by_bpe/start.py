@@ -38,6 +38,8 @@ def main() -> None:
 
     result = train(freq_dict, 100)
     print(f"Demonstration of trained tokenizer: {result}")
+    if result is None:
+        return None
 
     ru_vocab = get_vocabulary(result, "<unk>")
     if ru_vocab is None:
