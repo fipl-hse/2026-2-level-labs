@@ -191,13 +191,6 @@ print("*" * 15 + " TASKS " + "*" * 15)
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
 # deadline = Deadline()
 
-class Deadline:
-    def __init__(self) -> None:
-        print("Oh, no! It is another deadline!")
-
-
-deadline = Deadline()
-
 
 #  Task 2
 # easy level
@@ -209,21 +202,6 @@ deadline = Deadline()
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
 # student2 = Student('Nastya', 2)  # Hello! My name is Nastya, I'm in year 2
-
-class Student:
-    def __init__(self, name: str, year: int) -> None:
-        self.name = name
-        self.year = year
-
-    def introduce(self) -> None:
-        print(f"Hello! My name is {self.name}, I'm in year {self.year}")
-
-
-student1 = Student("Marina", 1)
-student1.introduce()
-
-student2 = Student("Nastya", 2)
-student2.introduce()
 
 
 # Task 3
@@ -241,22 +219,6 @@ student2.introduce()
 #
 # spider = Insect('Spider', 8)
 # spider.introduce()  # Hi! My name is Spider and I have 8 legs
-
-
-class Insect:
-    def __init__(self, name: str, legs: int) -> None:
-        self.name = name
-        self.legs = legs
-
-    def introduce(self) -> None:
-        print(f"Hi! My name is {self.name} and I have {self.legs} legs")
-
-
-bee = Insect("Bee", 6)
-bee.introduce()
-
-spider = Insect("Spider", 8)
-spider.introduce()
 
 
 # Task 4
@@ -277,28 +239,6 @@ spider.introduce()
 # student.deadlines = 1000
 # print(student.mood())  # Bad
 
-class Student:
-    def __init__(self, deadlines: int) -> None:
-        self.deadlines = deadlines
-
-    def mood(self) -> str:
-        if self.deadlines < 3:
-            return "Good"
-        elif self.deadlines <= 5:
-            return "So-so"
-        else:
-            return "Bad"
-
-
-student = Student(2)
-print(student.mood())
-
-student.deadlines = 4
-print(student.mood())
-
-student.deadlines = 1000
-print(student.mood())
-
 # Task 5
 # medium level
 # class Square:
@@ -317,22 +257,6 @@ print(student.mood())
 #
 # square2 = Square(side_length=5.12)
 # print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
-class Square:
-    def __init__(self, side_length: float) -> None:
-        self.side_length = side_length
-
-    def get_area(self) -> float:
-        return self.side_length ** 2
-
-    def get_perimeter(self) -> float:
-        return self.side_length * 4
-
-
-square1 = Square(side_length=2)
-print(square1.get_area(), square1.get_perimeter())  # 4 8
-
-square2 = Square(side_length=5.12)
-print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 
 
 # Task 6
@@ -342,65 +266,6 @@ print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 # Number of credits? Number of learning hours? Tasks?
 # What methods should be present? What attributes should be added?
 # Create such a class and demonstrate its instantiating for at least two different subjects.
-
-class LearningDiscipline:
-    """
-    A class to represent a learning discipline studied in HSE.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        teacher: str,
-        credits: int,
-        hours: int,
-        tasks: list[str]
-    ) -> None:
-        self.name = name
-        self.teacher = teacher
-        self.credits = credits
-        self.hours = hours
-        self.tasks = tasks
-
-    def introduce(self) -> None:
-        print(f"Subject: {self.name}")
-        print(f"Teacher: {self.teacher}")
-        print(f"Credits: {self.credits}")
-        print(f"Hours: {self.hours}")
-        print(f"Tasks: {', '.join(self.tasks)}")
-
-    def add_task(self, task: str) -> None:
-        self.tasks.append(task)
-
-    def show_tasks(self) -> None:
-        print(f"Tasks for {self.name}:")
-        for task in self.tasks:
-            print(f"- {task}")
-
-
-programming = LearningDiscipline(
-    name="Programming",
-    teacher="Ivan Petrov",
-    credits=4,
-    hours=72,
-    tasks=["Seminar 9", "Seminar 15"]
-)
-
-linguistics = LearningDiscipline(
-    name="Linguistics",
-    teacher="Anna Ivanova",
-    credits=3,
-    hours=54,
-    tasks=["Seminar report", "Presentation"]
-)
-
-programming.introduce()
-print()
-
-linguistics.introduce()
-
-programming.add_task("Final project")
-programming.show_tasks()
 
 # class ???:
 #     """
