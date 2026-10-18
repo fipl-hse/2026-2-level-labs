@@ -284,12 +284,15 @@ def tokenize_word(
         return None
 
     sorted_tokens = sorted(
-    vocabulary.keys(),
-    key=lambda x: (-len(x), x)
+        vocabulary.keys(),
+        key=lambda x: (-len(x), x)
     )
     result_list = list(word)
+    word_str = "".join(word)
 
     for token in sorted_tokens:
+        if token not in word_str:
+            continue
         i = 0
         while i < len(result_list):
             span_str = ""
