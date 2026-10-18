@@ -3,7 +3,7 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-from main import collect_frequencies, get_vocabulary, decode
+from main import collect_frequencies, get_vocabulary, train, decode
 
 
 def main() -> None:
@@ -18,7 +18,8 @@ def main() -> None:
         translation_encoded_raw = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         secret_1 = text_file.read()
-    freqs = collect_frequencies(secret_1, None, "</s>")
+    freqs = collect_frequencies(text, None, "</s>")
+    freqs = train(freqs, 1000)          # подставь нужное число merge'ей
     vocab = get_vocabulary(freqs, "<unk>")
     encoded_secret = [int(token) for token in secret_1.split()]
     result = decode(encoded_secret, vocab, "</s>")
