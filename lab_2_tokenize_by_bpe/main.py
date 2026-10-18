@@ -94,15 +94,15 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     if (not all(isinstance(k,  tuple)
-                    and (isinstance(v, int) or isinstance(v, bool))
-                    and isinstance(token, str)
-                    for k, v in word_frequencies.items() for token in k)
-            ):
+                and (isinstance(v, int) or isinstance(v, bool))
+                and isinstance(token, str)
+                for k, v in word_frequencies.items() for token in k)
+        ):
         return None
 
     res = {}
-    for word, freq in word_frequencies.items():
-        for pos, _ in enumerate(word[1:], 1):
+    for word, freq in reversed(list(word_frequencies.items())):
+        for pos in range(len(word) - 1, 0, -1):
             pair = (word[pos - 1], word[pos])
             res[pair] = res.get(pair, 0) + freq
 
@@ -134,21 +134,26 @@ def merge_tokens(
     ):
         return None
     if (not all(isinstance(k,  tuple)
-                    and (isinstance(v, int) or isinstance(v, bool))
-                    and isinstance(token, str)
-                    for k, v in word_frequencies.items() for token in k)
-            ):
+                and (isinstance(v, int) or isinstance(v, bool))
+                and isinstance(token, str)
+                for k, v in word_frequencies.items() for token in k)
+        ):
         return None
 
-    pair_conv_to_str = pair[0] + pair[1]
+    merged = ''.join(pair)
     res = {}
 
     for word, freq in word_frequencies.items():
-        joined_word = " ".join(word)
-        replaced_word = joined_word.replace(
-            pair[0] + " " + pair[1], pair_conv_to_str
-        )
-        res[tuple(replaced_word.split())] = freq
+        new_word = []
+        i = 0
+        while i < len(word):
+            if i < len(word) - 1 and word[i] == pair[0] and word[i + 1] == pair[1]:
+                new_word.append(merged)
+                i += 2
+            else:
+                new_word.append(word[i])
+                i += 1
+        res[tuple(new_word)] = freq
 
     return res
 
@@ -171,6 +176,58 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(word_frequencies, dict)
+        or not isinstance(num_merges, int)
+    ):
+        return None
+
+    if not all(
+        isinstance(k, tuple)
+        and (isinstance(v, int) or isinstance(v, bool))
+        for k, v in word_frequencies.items()
+    ):
+        return None
+
+    if not all(
+        isinstance(token, str)
+        for k in word_frequencies.keys() for token in k
+    ):
+        return None
+
+    pairs_freqs = count_tokens_pairs(word_frequencies)
+
+    if pairs_freqs is None:
+        return None
+
+    corpus = word_frequencies
+    merges_done = 0
+
+    while merges_done < num_merges:
+        stats = count_tokens_pairs(corpus)
+        if not stats:
+            break
+
+        chosen_pair = min(
+            stats.items(),
+            key=lambda item: (
+                -item[1],
+                -len(''.join(item[0])),
+                ''.join(item[0])
+            )
+        )[0]
+        new_corpus = merge_tokens(corpus, chosen_pair)
+
+        if new_corpus is None:
+            return None
+
+        if new_corpus == corpus:
+            break
+
+        corpus = new_corpus
+        merges_done += 1
+
+    return corpus
 
 
 def get_vocabulary(
@@ -189,6 +246,35 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word_frequencies, dict)
+        or not isinstance(unknown_token, str)
+    ):
+        return None
+
+    if not all(
+        isinstance(k, tuple) and isinstance(v, int)
+        for k, v in word_frequencies.items()
+    ):
+        return None
+
+    candidates: list[str] = []
+    for word in word_frequencies:
+        for token in word:
+            candidates.append(token)
+            candidates.extend(token)
+
+    candidates.append(unknown_token)
+
+    unique_tokens: list[str] = []
+    for candidate in candidates:
+        if candidate not in unique_tokens:
+            unique_tokens.append(candidate)
+
+    ordered_tokens = sorted(
+        unique_tokens, key=lambda token: (-len(token), token))
+
+    return {token: identifier for identifier, token in enumerate(ordered_tokens)}
 
 
 def decode(
