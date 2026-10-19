@@ -31,8 +31,20 @@ def main() -> None:
         stopwords = file.read().splitlines()
 
     tokens = tokenize(en_text)
+    if tokens is None:
+        print("Ошибка токенизации")
+        return
+
     filtered_tokens = remove_stop_words(tokens, stopwords)
+    if filtered_tokens is None:
+        print("Ошибка удаления стоп-слов")
+        return
+
     freq_dict = calculate_frequencies(filtered_tokens)
+    if freq_dict is None:
+        print("Ошибка подсчета частот")
+        return
+
     top_7 = get_top_n_words(freq_dict, 7)
 
     print("Токены (первые 20):", tokens[:20])
