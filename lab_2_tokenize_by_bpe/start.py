@@ -2,26 +2,26 @@
 BPE Tokenizer starter
 """
 
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))
+
+if __name__ == "__main__":
+    _main_module = __import__("main")
+else:
+    _main_module = __import__("lab_2_tokenize_by_bpe.main", fromlist=[""])
+
+collect_frequencies = _main_module.collect_frequencies
+decode = _main_module.decode
+encode = _main_module.encode
+get_vocabulary = _main_module.get_vocabulary
+load_vocabulary = _main_module.load_vocabulary
+train = _main_module.train
+
 # pylint:disable=too-many-locals, unused-variable
 
-try:
-    from .main import (
-        collect_frequencies,
-        decode,
-        encode,
-        get_vocabulary,
-        load_vocabulary,
-        train,
-    )
-except ImportError:
-    from main import (
-        collect_frequencies,
-        decode,
-        encode,
-        get_vocabulary,
-        load_vocabulary,
-        train,
-    )
 
 def mark_6(frequencies: dict | None, num_merges: int) -> str | None:
     """
@@ -47,7 +47,7 @@ def mark_6(frequencies: dict | None, num_merges: int) -> str | None:
         decoded_secret = decode(encoded_secret, vocabulary, "</s>")
         print(f"Секретное содержимое файла secret_1 (токенов: {num_merges}):", decoded_secret)
 
-        return decoded_secret
+        return str(decoded_secret)
 
     return None
 
