@@ -187,7 +187,11 @@ print("*" * 15 + " TASKS " + "*" * 15)
 #
 #     def __init__(...):
 #         ...
+class Deadline:
+    def __init__(self):
+        print("Oh, no! It is another deadline!")
 
+deadline = Deadline()
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
 # deadline = Deadline()
 
@@ -198,6 +202,10 @@ print("*" * 15 + " TASKS " + "*" * 15)
 #
 #     def ...:
 #         ...
+
+class Student:
+    def __init__(self, name, year):
+        print(f"Hello! My name is {name}, I'm in year {year}")
 
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
@@ -213,6 +221,13 @@ print("*" * 15 + " TASKS " + "*" * 15)
 #
 #     def introduce(self):
 #         print(f'Hi! My name is {self.name} and I have {self.legs} legs')
+class Insect:
+    def __init__(self, name, legs):
+        self.name = name
+        self.legs = legs
+
+    def introduce(self):
+        print(f"Hi! my name is {self.name} and i have {self.legs} legs")
 
 # bee = Insect('Bee', 6)
 # bee.introduce()  # Hi! My name is Bee and I have 6 legs
