@@ -218,9 +218,6 @@ def check_profile(profile: ProfileType) -> bool:
     if not isinstance(n_words, int) or isinstance(n_words, bool):
         return False
 
-    if n_words != len(freq_dict):
-        return False
-
     return True
 
 def compare_profiles_by_top_n(
