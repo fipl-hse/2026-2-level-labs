@@ -38,22 +38,23 @@ def main() -> None:
     result = collect_frequencies(text, None, "</s>")
 
     assert result, "Frequency dictionary is None"
-    # print(result)
+    print(result)
 
     bpe_train = train(result, 100)
     if bpe_train is None:
         return
-    # print(bpe_train)
+    print(bpe_train)
 
     vocabulary = get_vocabulary(bpe_train,'<unk>')
     if vocabulary is None:
         return
 
+    # "secret"
     secret3 = [int(number) for number in secret3_raw.split()]
     secret = decode(secret3, vocabulary, '</s>')
     if secret is None:
         return
-    # print(secret)
+    print(secret)
 
     # "mark 8"
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
@@ -94,8 +95,7 @@ def main() -> None:
         en_vocabulary,
         None,
     )
-    if translation_decoded is None:
-        return
+    assert translation_decoded, "Decoded translation is None"
 
     translation_decoded = translation_decoded.replace("\u2581", " ")
 
@@ -104,8 +104,7 @@ def main() -> None:
         text_reference_translation,
     )
 
-    if bleu is None:
-        return
+    assert bleu, "BLEU is None"
 
     print("Predicted translation:", translation_decoded)
     print("Reference translation:", text_reference_translation)
