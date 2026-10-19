@@ -2,27 +2,32 @@
 BPE Tokenizer starter
 """
 
-# pylint:disable=too-many-locals, unused-variable, unused-import
+# pylint:disable=too-many-locals, unused-variable
 
 
 from .main import (
     collect_frequencies,
-    count_tokens_pairs,
     decode,
     encode,
     get_vocabulary,
     load_vocabulary,
-    merge_tokens,
-    prepare_word,
-    tokenize_word,
     train,
 )
 
-def mark_6(frequencies: dict, num_merges: int) -> str | None:
+
+def mark_6(frequencies: dict | None, num_merges: int) -> str | None:
     """
     Обучает токенизатор и декодирует секретный файл.
     """
+
+    if frequencies is None:
+        return None
+
     train_tokenizer = train(frequencies, num_merges)
+
+    if train_tokenizer is None:
+        return None
+
     vocabulary = get_vocabulary(train_tokenizer, "<unk>")
 
     if vocabulary is not None:
@@ -54,6 +59,7 @@ def main() -> None:
     # Mark 4
     frequencies = collect_frequencies(text, None, "</s>")
     # print(frequencies)
+    assert frequencies is not None, "Frequencies is None"
 
     # Mark 6
     mark_6(frequencies, 2000)
