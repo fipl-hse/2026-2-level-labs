@@ -66,7 +66,7 @@ def collect_frequencies(
     frequencies = {}
     for raw_word in text.split():
         word = prepare_word(raw_word, start_of_word, end_of_word)
-        if word is None:
+        if word is None:     #страховк на случай если prepare_word вернула none
             return None
         frequencies[word] = frequencies.get(word, 0) + 1
     return frequencies
@@ -159,26 +159,50 @@ def train(
     if not isinstance(num_merges, int):
         return None
 
-    for _ in range(num_merges):
-        pairs = count_tokens_pairs(word_frequencies)
-        if pairs is None:
-            return None
-        if len(pairs) == 0:
-            break
+    print("Начальный словарь:", word_frequencies)
 
-        best_pair = None
-        best_key = None
-        for pair in pairs:
-            token = pair[0] + pair[1]
-            key = (-pairs[pair], -len(token), token)
-            if best_key is None or key < best_key:
-                best_key = key
-                best_pair = pair
+    for step in range(1, num_merges + 1):
+    pairs = count_tokens_pairs(word_frequencies)
 
-        word_frequencies = merge_tokens(word_frequencies, best_pair)
-        if word_frequencies is None:
-            return None
+    if pairs is None:
+        return None
 
+    if len(pairs) == 0:
+        print("Больше нет пар для слияния.")
+        break
+
+    best_pair = None
+    best_key = None
+
+    for pair in pairs:
+        token = pair[0] + pair[1]
+        key = (-pairs[pair], -len(token), token)
+
+        if best_key is None or key < best_key:
+            best_key = key
+            best_pair = pair
+
+    # Показываем выбранную пару
+    print(f"\nСлияние №{step}")
+    print(f"Выбранная пара: {best_pair}")
+    print(f"Частота пары: {pairs[best_pair]}")
+    print(
+        f"Новый токен: {best_pair[0]} + "
+        f"{best_pair[1]} -> {best_pair[0] + best_pair[1]}"
+    )
+
+    # Выполняем слияние
+    word_frequencies = merge_tokens(
+        word_frequencies, best_pair
+    )
+
+    if word_frequencies is None:
+        return None
+
+    # отображение результата
+    print("Словарь после слияния:", word_frequencies)
+
+    print("\nИтоговый словарь:", word_frequencies)
     return word_frequencies
 
 def get_vocabulary(
