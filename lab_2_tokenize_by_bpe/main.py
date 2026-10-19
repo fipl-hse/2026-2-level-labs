@@ -4,7 +4,7 @@ Lab 2.
 BPE and machine translation evaluation
 """
 
-# pylint:disable=unused-argument, too-many-return-statements, too-many-branches, singleton-comparison, line-too-long, bad-indentation, too-many-locals
+# pylint:disable=unused-argument
 import json
 from typing import Sequence
 

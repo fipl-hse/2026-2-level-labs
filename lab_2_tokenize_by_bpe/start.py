@@ -3,7 +3,7 @@
 BPE Tokenizer starter
 """
 
-# pylint:disable=too-many-locals, unused-variable, unused-import, import-error, line-too-long
+# pylint:disable=too-many-locals, unused-variable, unused-import
 from main import (
     collect_frequencies,
     count_tokens_pairs,
@@ -41,6 +41,55 @@ def main() -> None:
 
     # Mark 6
 
+    train_tokenizer = train(frequencies, 100)
+    vocabulary = get_vocabulary(train_tokenizer, "<unk>")
+
+    if vocabulary is not None:
+        with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+            secret_content = secret_file.read()
+
+        encoded_secret = [int(num) for num in secret_content.split()]
+        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+        result6 = decoded_secret
+        print("Секретное содержимое файла secret_1 на основе 100 токенов:", result6)
+
+    train_tokenizer = train(frequencies, 200)
+    vocabulary = get_vocabulary(train_tokenizer, "<unk>")
+
+    if vocabulary is not None:
+        with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+            secret_content = secret_file.read()
+
+        encoded_secret = [int(num) for num in secret_content.split()]
+        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+        result6 = decoded_secret
+        print("Секретное содержимое файла secret_1 на основе 200 токенов:", result6)
+
+
+    train_tokenizer = train(frequencies, 500)
+    vocabulary = get_vocabulary(train_tokenizer, "<unk>")
+
+    if vocabulary is not None:
+        with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+            secret_content = secret_file.read()
+
+        encoded_secret = [int(num) for num in secret_content.split()]
+        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+        result6 = decoded_secret
+        print("Секретное содержимое файла secret_1 на основе 500 токенов:", result6)
+
+    train_tokenizer = train(frequencies, 1000)
+
+    vocabulary = get_vocabulary(train_tokenizer, "<unk>")
+    if vocabulary is not None:
+        with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+            secret_content = secret_file.read()
+
+        encoded_secret = [int(num) for num in secret_content.split()]
+        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+        result6 = decoded_secret
+        print("Секретное содержимое файла secret_1 на основе 1000 токенов:", result6)
+
     train_tokenizer = train(frequencies, 2000)
     vocabulary = get_vocabulary(train_tokenizer, "<unk>")
 
@@ -51,7 +100,20 @@ def main() -> None:
         encoded_secret = [int(num) for num in secret_content.split()]
         decoded_secret = decode(encoded_secret, vocabulary, "</s>")
         result6 = decoded_secret
-        print("Секретное содержимое файла secret_1:", result6)
+        print("Секретное содержимое файла secret_1 на основе 2000 токенов:", result6)
+
+    train_tokenizer = train(frequencies, 5000)
+    vocabulary = get_vocabulary(train_tokenizer, "<unk>")
+
+    if vocabulary is not None:
+        with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as secret_file:
+            secret_content = secret_file.read()
+
+        encoded_secret = [int(num) for num in secret_content.split()]
+        decoded_secret = decode(encoded_secret, vocabulary, "</s>")
+        result6 = decoded_secret
+        print("Секретное содержимое файла secret_1 на основе 5000 токенов:", result6)
+
 
     # Mark 8
 
