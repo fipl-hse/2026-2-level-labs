@@ -25,6 +25,7 @@ def main() -> None:
     merged_frequencies = train(word_frequencies, 100)
     vocabulary = get_vocabulary(merged_frequencies, "<unk>")
     result = vocabulary
+    print(vocabulary)
     assert result, "Translation not working"
 
 
