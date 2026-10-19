@@ -321,33 +321,31 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         Returns None in case of incorrect input types or mismatched length.
         In case of empty inputs, returns 0.0.
     """
-    if not all([isinstance(predicted, (tuple, list)),
-                    isinstance(actual, (list, tuple))]):
+
+    if not isinstance(predicted, (list, tuple)) or not isinstance(actual, (list, tuple)):
         return None
 
     if len(predicted) != len(actual):
         return None
 
-    if not (predicted
-            and actual):
+    if len(predicted) == 0:
         return 0.0
 
-    for element in predicted:
-        if not isinstance(element, float):
+    for val in predicted:
+        if not isinstance(val, (int, float)) or isinstance(val, bool):
             return None
 
-    for el in actual:
-        if not isinstance(el, float):
+    for val in actual:
+        if not isinstance(val, (int, float)) or isinstance(val, bool):
             return None
 
-    list_of_values = zip(actual, predicted)
-    diffs = []
+    mse_sum = 0.0
+    for i in range(len(predicted)):
+        # Разница возводится в квадрат, поэтому порядок (predicted - actual)
+        # или (actual - predicted) не имеет значения
+        mse_sum += (predicted[i] - actual[i]) ** 2
 
-    for elem in list_of_values:
-        diff = (elem[0] - elem[1])**2
-        diffs.append(diff)
-
-    return sum(diffs) / len(actual)
+    return mse_sum / len(predicted)
 
 
 def compare_profiles_by_mse(
@@ -365,38 +363,22 @@ def compare_profiles_by_mse(
         float | None: The distance between the profiles.
         In case of corrupt input arguments or invalid profile structure, None is returned.
     """
-    if not all([check_profile(unknown_profile),
-              check_profile (profile_to_compare)]):
+    if not check_profile(unknown_profile) or not check_profile(profile_to_compare):
         return None
 
-    list_of_unk = []
-    list_of_second = []
-    list_of_tokens = []
+    freq_unknown = unknown_profile[1]
+    freq_compare = profile_to_compare[1]
 
-    for element in unknown_profile[1]:
-        list_of_tokens.append(element)
-        list_of_unk.append(element)
+    all_tokens = set(freq_unknown.keys()).union(set(freq_compare.keys()))
 
-    for el in profile_to_compare[1]:
-        list_of_second.append(el)
-        if el not in list_of_tokens:
-            list_of_tokens.append(el)
+    actual_values = []
+    predicted_values = []
 
-    list_of_mse_unk = [
-        unknown_profile[1][i]
-        if i in list_of_unk
-        else 0.0
-        for i in list_of_tokens
-        ]
+    for token in all_tokens:
+        actual_values.append(freq_unknown.get(token, 0.0))
+        predicted_values.append(freq_compare.get(token, 0.0))
 
-    list_of_mse_sec = [
-        profile_to_compare[1][i]
-        if i in list_of_second
-        else 0.0
-        for i in list_of_tokens
-        ]
-
-    return calculate_mse(list_of_mse_unk, list_of_mse_sec)
+    return calculate_mse(predicted_values, actual_values)
 
 
 def detect_language_by_mse(
@@ -415,28 +397,24 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not all([check_profile(unknown_profile),
-                check_profile(profile_1),
-                check_profile(profile_2)]):
+    if not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
         return None
 
-    compared_1 = compare_profiles_by_mse(unknown_profile, profile_1)
-    compared_2 = compare_profiles_by_mse(unknown_profile, profile_2)
+    mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
+    mse_2 = compare_profiles_by_mse(unknown_profile, profile_2)
 
-    if (compared_1 is None
-        or compared_2 is None):
+    if mse_1 is None or mse_2 is None:
         return None
 
-    if compared_1 > compared_2:
-        return profile_2[0]
+    name_1 = profile_1[0]
+    name_2 = profile_2[0]
 
-    if compared_1 < compared_2:
-        return profile_1[0]
+    if mse_1 < mse_2:
+        return name_1
+    if mse_2 < mse_1:
+        return name_2
 
-    list_of_langs = [profile_1[0], profile_2[0]]
-    sorted_list = sorted(list_of_langs)
-
-    return sorted_list[0]
+    return min(name_1, name_2)
 
 # Mark 10
 

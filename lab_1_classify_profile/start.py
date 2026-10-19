@@ -11,6 +11,7 @@ from lab_1_classify_profile.main import (
     create_language_profile,
     detect_language_by_top_n,
     get_top_n_words,
+    detect_language_by_mse,
     remove_stop_words,
     tokenize,
 )
@@ -57,6 +58,11 @@ def main() -> None:
 
     assert result is not None, "Detection result is None"
     print("Определённый язык:", result)
+
+    result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
+
+    assert result_mse is not None, "Detection result by MSE is None"
+    print("Определённый язык (MSE):", result_mse)
 
 if __name__ == "__main__":
     main()
