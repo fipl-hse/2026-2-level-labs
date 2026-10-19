@@ -377,7 +377,7 @@ def tokenize_word(
     while position < len(text):
         token = token_starting_at[position]
 
-        if token is None:
+        if not token:
             result.append(vocabulary[unknown_token])
             position += 1
         else:
