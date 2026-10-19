@@ -32,15 +32,6 @@ def tokenize(text: str) -> Sequence[str] | None:
         return None
 
     text = text.lower()
-    text = re.sub(r"[^\w\s]|\d", "", text)
-    tokens = list(text.split())
-
-    return tokens
-
-    if not isinstance(text, str):
-        return None
-
-    text = text.lower()
 
     tokens = []
     for raw_word in text.split():
@@ -64,19 +55,6 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
         Sequence[str] | None: Sequence of tokens without stop words.
         Returns None in case of incorrect input types.
     """
-    if not all([isinstance(tokens, (list, tuple)),
-                isinstance(stop_words, (list, tuple))]):
-        return None
-
-    if not all(isinstance(i, str) for i in tokens):
-        return None
-
-    if not all(isinstance(i, str) for i in stop_words):
-        return None
-
-    cleaned_text = [word for word in tokens if word not in stop_words]
-
-    return cleaned_text
 
     if not isinstance(tokens, (list, tuple)):
         return None
@@ -106,19 +84,6 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
         dict[str, float] | None: Dictionary with frequencies.
         Returns None in case of incorrect input types.
     """
-    if not isinstance(tokens, (list, tuple)):
-        return None
-
-    for element in tokens:
-        if not isinstance(element, str):
-            return None
-
-    frequency = {}
-    overall_words = len(tokens)
-    for element in tokens:
-        frequency[element] = frequency.get(element, 0.0) + 1.0 / overall_words
-
-    return frequency
 
     if not isinstance(tokens, (list, tuple)):
         return None
