@@ -5,13 +5,13 @@ BPE Tokenizer starter
 # pylint:disable=too-many-locals, unused-variable
 
 from main import (
-    prepare_word,
-    collect_frequencies,
+        collect_frequencies,
     count_tokens_pairs,
-    merge_tokens,
-    train,
-    get_vocabulary,
     decode,
+    get_vocabulary,
+    merge_tokens,
+    prepare_word,
+    train,
 )
 
 
