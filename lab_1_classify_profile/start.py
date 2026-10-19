@@ -9,9 +9,9 @@ from lab_1_classify_profile.main import (
     check_profile,
     compare_profiles_by_top_n,
     create_language_profile,
+    detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
-    detect_language_by_mse,
     remove_stop_words,
     tokenize,
 )

@@ -4,9 +4,7 @@ Lab 1.
 Language detection
 """
 
-# pylint:disable=unused-argument
-import json
-import re
+# pylint:disable=unused-argument, too-many-return-statements
 from typing import Sequence
 
 FreqDictType = dict[str, float]
@@ -341,8 +339,6 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
 
     mse_sum = 0.0
     for i in range(len(predicted)):
-        # Разница возводится в квадрат, поэтому порядок (predicted - actual)
-        # или (actual - predicted) не имеет значения
         mse_sum += (predicted[i] - actual[i]) ** 2
 
     return mse_sum / len(predicted)
@@ -397,7 +393,9 @@ def detect_language_by_mse(
         str | None: Unknown profile language.
         Returns None in case of incorrect input types.
     """
-    if not check_profile(unknown_profile) or not check_profile(profile_1) or not check_profile(profile_2):
+    if (not check_profile(unknown_profile)
+        or not check_profile(profile_1)
+        or not check_profile(profile_2)):
         return None
 
     mse_1 = compare_profiles_by_mse(unknown_profile, profile_1)
