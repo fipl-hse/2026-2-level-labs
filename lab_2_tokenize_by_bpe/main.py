@@ -368,11 +368,7 @@ def tokenize_word(
         else:
             result.append(vocabulary[unknown_token])
 
-
     return result
-
-
-
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
