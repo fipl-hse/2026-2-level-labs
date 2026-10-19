@@ -6,8 +6,8 @@ BPE and machine translation evaluation
 
 # pylint:disable=unused-argument
 import json
-from typing import Sequence
 from math import exp, log
+from typing import Sequence
 
 
 def prepare_word(
@@ -557,7 +557,7 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
     ):
         return None
 
-    log_sum = 0
+    log_sum = 0.0
 
     if any(p <= 0 for p in precisions):
         return 0.0
@@ -596,10 +596,16 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
         actual_ngrams = collect_ngrams(actual, order)
         reference_ngrams = collect_ngrams(reference, order)
 
+        if actual_ngrams is None or reference_ngrams is None:
+            return None
+
         precision = calculate_precision(
             actual_ngrams,
             reference_ngrams
         )
+
+        if precision is None:
+            return None
 
         precisions.append(precision)
 
