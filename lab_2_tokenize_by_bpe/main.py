@@ -507,13 +507,13 @@ def calculate_precision(
     In case of corrupt input arguments, None is returned.
     """
     if (
-    not isinstance(actual, list)
+    not isinstance(actual, (list, tuple))
     or not all(
         isinstance(i, tuple)
         and all(isinstance(token, str) for token in i)
         for i in actual
     )
-    or not isinstance(reference, list)
+    or not isinstance(reference, (list, tuple))
     or not all(
         isinstance(j, tuple)
         and all(isinstance(token, str) for token in j)
@@ -550,7 +550,7 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
     ):
         return None
 
-    log_sum = 0
+    log_sum = 0.0
 
     for precision in precisions:
         if not isinstance(precision, (int, float)):
@@ -577,7 +577,7 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     None is returned
     """
     if (
-    not isinstance(actual, str | None)
+    not isinstance(actual, str)
     or not isinstance(reference, str)
     or not isinstance(max_order, int)
     or max_order <= 0
