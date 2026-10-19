@@ -5,6 +5,7 @@ Language detection
 """
 
 # pylint:disable=unused-argument, too-many-return-statements
+import json
 from typing import Sequence
 
 FreqDictType = dict[str, float]
@@ -338,8 +339,9 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
             return None
 
     mse_sum = 0.0
-    for i in range(len(predicted)):
-        mse_sum += (predicted[i] - actual[i]) ** 2
+
+    for pred, act in zip(predicted, actual):
+        mse_sum += (pred - act) ** 2
 
     return mse_sum / len(predicted)
 

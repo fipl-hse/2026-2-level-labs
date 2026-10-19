@@ -2,7 +2,7 @@
 Language detection starter.
 """
 
-# pylint: disable=unused-variable, duplicate-code, too-many-return-statements
+# pylint: disable=unused-variable, duplicate-code, too-many-return-statements, too-many-locals
 
 from lab_1_classify_profile.main import (
     calculate_frequencies,
