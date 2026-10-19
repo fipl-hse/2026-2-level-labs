@@ -4,16 +4,24 @@ BPE Tokenizer starter
 
 # pylint:disable=too-many-locals, unused-variable
 
-
-from .main import (
-    collect_frequencies,
-    decode,
-    encode,
-    get_vocabulary,
-    load_vocabulary,
-    train,
-)
-
+try:
+    from .main import (
+        collect_frequencies,
+        decode,
+        encode,
+        get_vocabulary,
+        load_vocabulary,
+        train,
+    )
+except ImportError:
+    from main import (
+        collect_frequencies,
+        decode,
+        encode,
+        get_vocabulary,
+        load_vocabulary,
+        train,
+    )
 
 def mark_6(frequencies: dict | None, num_merges: int) -> str | None:
     """
