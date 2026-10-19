@@ -140,21 +140,20 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict):
         return None
 
-    for key, value in word_frequencies.items():
-        if not isinstance(key, tuple):
-            return None
-        if not all(isinstance(token, str) for token in key):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
-            return None
-
-    if not isinstance(pair, tuple):
+    if not all(
+        isinstance(key, tuple)
+        and all(isinstance(token, str) for token in key)
+        and isinstance(value, int)
+        and not isinstance(value, bool)
+        for key, value in word_frequencies.items()
+    ):
         return None
 
-    if not all(isinstance(item, str) for item in pair):
-        return None
-
-    if len(pair) != 2:
+    if (
+        not isinstance(pair, tuple)
+        or len(pair) != 2
+        or not all(isinstance(item, str) for item in pair)
+    ):
         return None
 
     new_word_frequencies = {}
@@ -195,18 +194,16 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if word_frequencies is None or not isinstance(word_frequencies, dict):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
 
-    for key, value in word_frequencies.items():
-        if not isinstance(key, tuple):
-            return None
-        if not all(isinstance(token, str) for token in key):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
-            return None
-
-    if not isinstance(num_merges, int):
+    if not all(
+        isinstance(key, tuple)
+        and all(isinstance(token, str) for token in key)
+        and isinstance(value, int)
+        and not isinstance(value, bool)
+        for key, value in word_frequencies.items()
+    ):
         return None
 
     for _ in range(num_merges):
@@ -287,24 +284,25 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
-    if encoded_text is None or not isinstance(encoded_text, Sequence) or isinstance(encoded_text, str):
+    if (
+    encoded_text is None
+    or not isinstance(encoded_text, Sequence)
+    or isinstance(encoded_text, str)
+    or len(encoded_text) == 0
+    ):
         return None
 
-    if len(encoded_text) == 0:
+    if not all(isinstance(item, int) and not isinstance(item, bool) for item in encoded_text):
         return None
-
-    for item in encoded_text:
-        if not isinstance(item, int) or isinstance(item, bool):
-            return None
 
     if vocabulary is None or not isinstance(vocabulary, dict):
         return None
 
-    for key, value in vocabulary.items():
-        if not isinstance(key, str):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
-            return None
+    if not all(
+        isinstance(key, str) and isinstance(value, int) and not isinstance(value, bool)
+        for key, value in vocabulary.items()
+    ):
+        return None
 
     if end_of_word_token is not None and not isinstance(end_of_word_token, str):
         return None
@@ -347,32 +345,26 @@ def tokenize_word(
     if not isinstance(word, tuple) or not all(isinstance(t, str) for t in word):
         return None
 
-    if not isinstance(vocabulary, dict):
-        return None
-
-    for key, value in vocabulary.items():
-        if not isinstance(key, str):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
-            return None
-
-    if end_of_word is not None and not isinstance(end_of_word, str):
-        return None
-
-    if not isinstance(unknown_token, str):
-        return None
-
-    if unknown_token not in vocabulary:
-        return None
-
-    if len(word) == 0:
+    if not word:
         return []
 
-    word_string = "".join(word)
-    letters_used = []
+    if not isinstance(vocabulary, dict):
+        return None
+    if not all(
+        isinstance(k, str) and isinstance(v, int) and not isinstance(v, bool)
+        for k, v in vocabulary.items()
+    ):
+        return None
 
-    for i in range(len(word_string)):
-        letters_used.append(False)
+    if (
+        (end_of_word is not None and not isinstance(end_of_word, str))
+        or not isinstance(unknown_token, str)
+        or unknown_token not in vocabulary
+    ):
+        return None
+
+    word_string = "".join(word)
+    letters_used = [False] * len(word_string)
 
     found_tokens = {}
     sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
@@ -382,37 +374,25 @@ def tokenize_word(
             continue
 
         start = 0
-        while True:
-            idx = word_string.find(token, start)
+        idx = word_string.find(token, start)
 
-            if idx == -1:
-                break
-
-            is_overlapping = False
-
-            for i in range(idx, idx + len(token)):
-                if letters_used[i]:
-                    is_overlapping = True
-                    break
-
-            if not is_overlapping:
+        while idx != -1:
+            if not any(letters_used[i] for i in range(idx, idx + len(token))):
                 found_tokens[idx] = (vocabulary[token], len(token))
                 for i in range(idx, idx + len(token)):
                     letters_used[i] = True
 
             start = idx + 1
+            idx = word_string.find(token, start)
 
     result = []
     i = 0
 
     while i < len(word_string):
-        if i in found_tokens:
-            token_id, token_length = found_tokens[i]
-            result.append(token_id)
-            i += token_length
-        else:
-            result.append(vocabulary[unknown_token])
-            i += 1
+        token_info = found_tokens.get(i)
+        token_to_add = token_info or (vocabulary[unknown_token], 1)
+        result.append(token_to_add[0])
+        i += token_to_add[1]
 
     return result
 
@@ -471,25 +451,20 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if not isinstance(original_text, str):
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict):
         return None
 
-    if vocabulary is None or not isinstance(vocabulary, dict):
+    if not all(
+        isinstance(key, str) and isinstance(value, int) and not isinstance(value, bool)
+        for key, value in vocabulary.items()
+    ):
         return None
 
-    for key, value in vocabulary.items():
-        if not isinstance(key, str):
-            return None
-        if not isinstance(value, int) or isinstance(value, bool):
-            return None
-
-    if start_of_word_token is not None and not isinstance(start_of_word_token, str):
-        return None
-
-    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
-        return None
-
-    if not isinstance(unknown_token, str):
+    if (
+        (start_of_word_token is not None and not isinstance(start_of_word_token, str))
+        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
+        or not isinstance(unknown_token, str)
+    ):
         return None
 
     words = original_text.split()
