@@ -63,15 +63,14 @@ def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Seque
             return None
 
     if not isinstance(stop_words, (list, tuple)):
-        stop_words = []
-    else:
-        for word in stop_words:
-            if not isinstance(word, str):
-                stop_words = []
-                break
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
 
     result = [token for token in tokens if token not in stop_words]
     return result
+
 
 
 def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:

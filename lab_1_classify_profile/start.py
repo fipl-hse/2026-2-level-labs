@@ -53,14 +53,10 @@ def main() -> None:
     print("Доля пересечения с en:", en_score)
     print("Доля пересечения с de:", de_score)
 
-    detected = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
 
-    if detected is None:
-        print("Не удалось определить язык")
-        return
-
-    print("Определённый язык:", detected)
-
+    assert result is not None, "Detection result is None"
+    print("Определённый язык:", result)
 
 if __name__ == "__main__":
     main()
