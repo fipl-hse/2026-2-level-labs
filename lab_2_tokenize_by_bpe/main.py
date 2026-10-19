@@ -346,34 +346,30 @@ def tokenize_word(
             return None
 
     sorted_tokens = sorted(vocabulary.keys(), key=lambda token: (-len(token), token))
-    s_word = ''.join(word)
-    covered = [False] * len(s_word)
-    t_segments = []
+    tokens = list(word)
 
     for token in sorted_tokens:
-        searh_start_idx = 0
-
-        while True:
-            t_start_idx = s_word.find(token, searh_start_idx)
-            if t_start_idx == -1:
-                break
-            t_end_idx = t_start_idx + len(token)
-
-            if not any(covered[t_start_idx:t_end_idx]):
-                for i in range(t_start_idx, t_end_idx):
-                    covered[i] = True
-                t_segments.append((t_start_idx, t_end_idx, vocabulary[token]))
-                searh_start_idx = t_end_idx
+        search_start_idx = 0
+        new_tokens = []
+        while search_start_idx < len(tokens):
+            if ''.join(tokens[search_start_idx:search_start_idx+len(token)]) == token:
+                new_tokens.append(token)
+                search_start_idx += len(token)
             else:
-                searh_start_idx = t_start_idx + 1
+                new_tokens.append(tokens[search_start_idx])
+                search_start_idx += 1
 
-    for i, is_covered in enumerate(covered):
-        if not is_covered:
-            t_segments.append((i, i + 1, vocabulary[unknown_token]))
+        tokens = new_tokens
 
-    t_segments.sort(key=lambda x: x[0])
+    result = []
+    for token in tokens:
+        if token in vocabulary:
+            result.append(vocabulary[token])
+        else:
+            result.append(vocabulary[unknown_token])
 
-    return [token_id for _, _, token_id in t_segments]
+
+    return result
 
 
 
