@@ -7,6 +7,7 @@ BPE and machine translation evaluation
 # pylint:disable=unused-argument
 import json
 from typing import Sequence
+from math import exp, log
 
 
 def prepare_word(
@@ -476,6 +477,16 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance (text, str) or not isinstance (order, int):
+        return None
+
+    n_grams = []
+
+    for i in range(len(text) - order + 1):
+        n_gram = tuple(text[i:i + order])
+        n_grams.append(n_gram)
+
+    return n_grams
 
 
 def calculate_precision(
@@ -493,6 +504,36 @@ def calculate_precision(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(actual, Sequence) or not isinstance(reference, Sequence):
+        return None
+
+    if not all(
+        isinstance(n_gram, tuple)
+        and all(isinstance(symbol, str) for symbol in n_gram)
+        for n_gram in actual
+    ):
+        return None
+
+    if not all(
+        isinstance(n_gram, tuple)
+        and all(isinstance(symbol, str) for symbol in n_gram)
+        for n_gram in reference
+    ):
+        return None
+
+    if len(actual) == 0:
+        return 0.0
+
+    if len(reference) == 0:
+        return 0.0
+
+    matches = 0
+    for n_gram in actual:
+        if n_gram in reference:
+            matches += 1
+    matches = len(set(actual) & (set(reference)))
+
+    return matches / len(set(actual))
 
 
 def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | None:
@@ -508,6 +549,23 @@ def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | N
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(precisions, Sequence)
+        or len(precisions) == 0
+        or not all(isinstance(p, (int, float)) for p in precisions)
+        or not isinstance(max_order, int)
+    ):
+        return None
+
+    log_sum = 0
+
+    if any(p <= 0 for p in precisions):
+        return 0.0
+
+    for precision in precisions:
+        log_sum += log(precision)
+
+    return exp(log_sum / max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -525,3 +583,29 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(actual, str)
+        or not isinstance(reference, str)
+        or not isinstance(max_order, int)
+    ):
+        return None
+
+    precisions = []
+
+    for order in range(1, max_order + 1):
+        actual_ngrams = collect_ngrams(actual, order)
+        reference_ngrams = collect_ngrams(reference, order)
+
+        precision = calculate_precision(
+            actual_ngrams,
+            reference_ngrams
+        )
+
+        precisions.append(precision)
+
+    geo_mean = calculate_geo_mean(precisions, max_order)
+
+    if geo_mean is None:
+        return None
+
+    return geo_mean * 100
