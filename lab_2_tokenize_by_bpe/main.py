@@ -133,7 +133,7 @@ def merge_tokens(
         if not isinstance(item, str):
             return None
 
-    merged_token = pair[0] + pair[1]
+    merged_token = "".join(pair)
     new_frequencies = {}
 
     for word, freq in word_frequencies.items():
@@ -143,7 +143,7 @@ def merge_tokens(
         new_word = []
         i = 0
         while i < len(word):
-            if i < len(word) - 1 and word[i] == pair[0] and word[i + 1] == pair[1]:
+            if i < len(word) - 1 and (word[i], word[i + 1]) == pair:
                 new_word.append(merged_token)
                 i += 2
             else:
@@ -182,36 +182,9 @@ def train(
         if not token_pairs:
             break
 
-        best_pair = None
-        max_freq = -1
-        max_len = -1
+        sorted_pairs = sorted(token_pairs.items(), key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]),),)
 
-        for pair, freq in token_pairs.items():
-            merged_len = len(pair[0] + pair[1])
-            merged_str = pair[0] + pair[1]
-
-            if best_pair is None:
-                best_pair = pair
-                max_freq = freq
-                max_len = merged_len
-            else:
-                best_best_str = best_pair[0] + best_pair[1]
-                best_best_len = len(best_best_str)
-
-                if freq > max_freq:
-                    best_pair = pair
-                    max_freq = freq
-                    max_len = merged_len
-                elif freq == max_freq:
-                    if merged_len > max_len:
-                        best_pair = pair
-                        max_len = merged_len
-                    elif merged_len == max_len:
-                        if merged_str < best_best_str:
-                            best_pair = pair
-
-        if best_pair is None:
-            break
+        best_pair = sorted_pairs[0][0]
 
         updated_frequencies = merge_tokens(current_frequencies, best_pair)
         if updated_frequencies is None:
@@ -259,8 +232,7 @@ def get_vocabulary(
 
     sorted_tokens = sorted(list(all_tokens), key=lambda x: (-len(x), x))
 
-    vocabulary = {token: idx for idx, token in enumerate(sorted_tokens)}
-    return vocabulary
+    return {token: idx for idx, token in enumerate(sorted_tokens)}
 
 
 def decode(
@@ -284,26 +256,19 @@ def decode(
     """
     if not isinstance(encoded_text, (list, tuple)) or not isinstance(vocabulary, dict):
         return None
-    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
-        return None
 
-    # Строим обратный словарь: ID -> токен
     id_to_token = {idx: token for token, idx in vocabulary.items()}
-    decoded_parts = []
 
     for token_id in encoded_text:
         if not isinstance(token_id, int) or token_id not in id_to_token:
             return None
 
-        token = id_to_token[token_id]
+    decoded_text = "".join(id_to_token[token_id] for token_id in encoded_text)
 
-        # Заменяем токен конца слова на пробел
-        if end_of_word_token is not None and token == end_of_word_token:
-            decoded_parts.append(" ")
-        else:
-            decoded_parts.append(token)
+    if end_of_word_token is not None:
+        decoded_text = decoded_text.replace(end_of_word_token, " ")
 
-    return "".join(decoded_parts)
+    return decoded_text
 
 
 def tokenize_word(
