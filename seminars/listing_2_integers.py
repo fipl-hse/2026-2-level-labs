@@ -213,6 +213,7 @@ def is_prime(n: int) -> bool:
     """
     Check if a number is prime.
 
+
     Args:
         n (int): Integer greater than or equal to 2
 
