@@ -23,7 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-
+        self._end_of_word_token = end_of_word_token
+        self._storage: dict[str, int] = {end_of_word_token: 0}
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
         Tokenize text into unigrams, separating words with special token.
@@ -41,6 +42,25 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+
+        words = text.split()
+        if not words:
+            return ()
+
+        tokens = []
+        for index, word in enumerate(words):
+            # Очищаем слово: приводим к нижнему регистру, оставляем только буквы
+            cleaned_chars = [char.lower() for char in word if char.isalpha()]
+            if cleaned_chars:
+                tokens.extend(cleaned_chars)
+                # Добавляем маркер конца слова, если это не последнее слово
+                # или если исходный текст заканчивался пробелом/знаком препинания
+                if index < len(words) - 1 or text.endswith((' ', '.', '!', '?', ',', ';', ':')):
+                    tokens.append(self._end_of_word_token)
+
+        return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
         """
