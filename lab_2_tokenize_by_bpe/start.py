@@ -21,9 +21,9 @@ def main() -> None:
     result = None
     if vocabulary:
         result = encode(text, vocabulary, '\u2581', None, '<unk>')
-
+        print("Результат кодирования:", result)
     assert result, "Translation not working"
-
+gi
 
 if __name__ == "__main__":
     main()
