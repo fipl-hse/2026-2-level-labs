@@ -217,6 +217,12 @@ def train(
 
         word_frequencies = merge_tokens(word_frequencies, sorted_pair_frequencies[0][0])
 
+        print('Updated word frequencies dictionary')
+        for index, (word, freq) in enumerate(word_frequencies.items()):
+            if index == 10:
+                break
+            print(f'{word}: {freq}')
+
         if word_frequencies is None:
             return None
 
