@@ -223,26 +223,6 @@ def train(
     return word_frequencies
 
 
-        if not unsorted_pairs:
-            break
-
-        if unsorted_pairs is None:
-            return None
-
-        sorted_pairs = sorted(
-            unsorted_pairs.items(),
-            key=lambda x: (
-                -x[1],
-                -len(x[0][0] +x[0][1]),
-                x[0][0] +x[0][1]
-            )
-        )
-        new_frequencies = merge_tokens(word_frequencies, sorted_pairs[0][0])
-        if new_frequencies is None:
-            return None
-
-        word_frequencies = new_frequencies
-    return new_frequencies
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
