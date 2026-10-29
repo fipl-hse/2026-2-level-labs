@@ -13,18 +13,6 @@ from lab_2_tokenize_by_bpe.main import (
     train,
 )
 
-import os
-
-from lab_2_tokenize_by_bpe.main import (
-    calculate_bleu,
-    collect_frequencies,
-    decode,
-    encode,
-    get_vocabulary,
-    load_vocabulary,
-    train,
-)
-
 
 def main() -> None:
     """
