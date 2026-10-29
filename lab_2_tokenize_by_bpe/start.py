@@ -3,6 +3,15 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
+from lab_2_tokenize_by_bpe.main import (
+    calculate_bleu,
+    collect_frequencies,
+    decode,
+    encode,
+    get_vocabulary,
+    load_vocabulary,
+    train,
+)
 
 import os
 
@@ -21,67 +30,97 @@ def main() -> None:
     """
     Launches an implementation
     """
-    result = None
-    assets = "lab_2_tokenize_by_bpe/assets"
-
-    with open(os.path.join(assets, "text.txt"), "r", encoding="utf-8") as text_file:
+    with open(
+        "lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8"
+        )as text_file:
         text = text_file.read()
+    with open(
+        "lab_2_tokenize_by_bpe/assets/secrets/secret_3.txt", "r", encoding="utf-8"
+        ) as text_file:
+        secret3_raw = text_file.read()
+    with open(
+        "lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8"
+        ) as text_file:
+        text_reference_translation = text_file.read()
+    with open(
+        "lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8"
+        ) as text_file:
+        translation_encoded_raw = text_file.read()
 
-    word_frequencies = collect_frequencies(text, start_of_word=None, end_of_word="</s>")
-    assert word_frequencies is not None, "Ошибка: частотный словарь"
-    print(f"Частотный словарь собран: {len(word_frequencies)} уникальных слов")
+    result = collect_frequencies(text, None, "</s>")
 
-    trained = train(word_frequencies, num_merges=100)
-    assert trained is not None, "Ошибка: обучение токенизатора"
-    print(f"Токенизатор обучен: {len(trained)} уникальных слов после слияний")
+    assert result, "Frequency dictionary is None"
+    print(result)
 
-    vocabulary = get_vocabulary(trained, unknown_token="<unk>")
-    assert vocabulary is not None, "Ошибка: построение словаря"
-    print(f"Размер словаря: {len(vocabulary)} токенов")
+    bpe_train = train(result, 100)
+    if bpe_train is None:
+        return
+    print(bpe_train)
 
-    secrets_dir = os.path.join(assets, "secrets")
-    secret_files = os.listdir(secrets_dir) if os.path.exists(secrets_dir) else []
-    if secret_files:
-        secret_path = os.path.join(secrets_dir, secret_files[0])
-        with open(secret_path, "r", encoding="utf-8") as secret_file:
-            content = secret_file.read().strip().replace("[", "").replace("]", "")
-        secret_encoded = [int(x) for x in content.replace(",", " ").split()]
-        secret_decoded = decode(secret_encoded, vocabulary, end_of_word_token="</s>")
-        print(f"Секретное сообщение: {secret_decoded}")
+    vocabulary = get_vocabulary(bpe_train,'<unk>')
+    if vocabulary is None:
+        return
 
-    model_vocab = load_vocabulary(os.path.join(assets, "vocab.json"))
-    assert model_vocab is not None, "Ошибка: загрузка vocab.json"
-    print(f"Загружен словарь модели: {len(model_vocab)} токенов")
+    # "secret"
+    secret3 = [int(number) for number in secret3_raw.split()]
+    secret = decode(secret3, vocabulary, '</s>')
+    if secret is None:
+        return
+    print(secret)
 
-    with open(os.path.join(assets, "ru_raw.txt"), "r", encoding="utf-8") as ru_file:
-        ru_text = ru_file.read()
-    result = encode(ru_text, model_vocab, "\u2581", None, "<unk>")
-    assert result is not None, "Ошибка: кодирование текста"
-    print(f"Русский текст закодирован: {len(result)} идентификаторов")
+    # "mark 8"
+    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
+        ru_text = text_file.read()
 
-    ru_encoded_path = os.path.join(assets, "ru_encoded.txt")
-    if os.path.exists(ru_encoded_path):
-        with open(ru_encoded_path, "r", encoding="utf-8") as ru_enc_file:
-            ru_enc_content = ru_enc_file.read().strip().replace("[", "").replace("]", "")
-        ru_encoded = [int(x) for x in ru_enc_content.replace(",", " ").split()]
-        status = "совпадает" if result == ru_encoded else "НЕ совпадает"
-        print(f"Кодирование {status} с эталоном ru_encoded.txt")
+    ru_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    if ru_vocabulary is None:
+        return
 
-    with open(os.path.join(assets, "en_encoded.txt"), "r", encoding="utf-8") as en_enc_file:
-        en_content = en_enc_file.read().strip().replace("[", "").replace("]", "")
-    en_encoded = [int(x) for x in en_content.replace(",", " ").split()]
-    en_decoded = decode(en_encoded, model_vocab, end_of_word_token=None)
-    assert en_decoded is not None, "Ошибка: декодирование предсказаний"
-    en_decoded_clean = en_decoded.replace("\u2581", " ").strip()
+    encoded_ru = encode(
+        ru_text,
+        ru_vocabulary,
+        start_of_word_token="\u2581",
+        end_of_word_token=None,
+        unknown_token="<unk>",
+    )
+    if encoded_ru is None:
+        return
+    # "comparison"
+    with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as encoded_file:
+        ru_to_compare_raw = encoded_file.read()
 
-    with open(os.path.join(assets, "en_raw.txt"), "r", encoding="utf-8") as en_raw_file:
-        en_raw = en_raw_file.read()
-    bleu_score = calculate_bleu(en_decoded_clean, en_raw, max_order=3)
-    assert bleu_score is not None, "Ошибка: вычисление BLEU"
-    print(f"BLEU score: {bleu_score:.2f}")
+    ru_to_compare = [int(number) for number in ru_to_compare_raw.split()]
 
-    assert result, "Translation not working"
+    n = 20
+    # print("Encoded: ", encoded_ru[:n])
+    # print("To compare: ", ru_to_compare[:n])
 
+    # "mark 10"
+    translation_encoded = [int(number) for number in translation_encoded_raw.split()]
+
+    en_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    if en_vocabulary is None:
+        return
+
+    translation_decoded = decode(
+        translation_encoded,
+        en_vocabulary,
+        None,
+    )
+    assert translation_decoded, "Decoded translation is None"
+
+    translation_decoded = translation_decoded.replace("\u2581", " ")
+
+    bleu = calculate_bleu(
+        translation_decoded,
+        text_reference_translation,
+    )
+
+    assert bleu, "BLEU is None"
+
+    print("Predicted translation:", translation_decoded)
+    print("Reference translation:", text_reference_translation)
+    print("BLEU:", bleu)
 
 if __name__ == "__main__":
     main()
