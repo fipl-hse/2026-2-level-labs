@@ -223,23 +223,6 @@ def train(
     return word_frequencies
 
 
-    for _ in range(num_merges):
-        pairs = count_tokens_pairs(trained_frequencies)
-        if not pairs:
-            break
-        def sort_key(p: tuple[str, str]) -> tuple[int, int, str]:
-            # pylint: disable=cell-var-from-loop
-            assert pairs is not None
-            return -pairs[p], -len("".join(p)), "".join(p)
-
-        best_pair = sorted(pairs.keys(), key=sort_key)[0]
-
-        new_frequencies = merge_tokens(trained_frequencies, best_pair)
-        if new_frequencies is None:
-            return None
-        trained_frequencies = new_frequencies
-
-    return trained_frequencies
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
@@ -327,16 +310,6 @@ def decode(
 
     return "".join(decoded_symbols)
 
-    for token_id in encoded_text:
-        token = inverted_vocab.get(token_id)
-        if token is not None:
-            decoded_tokens.append(token)
-
-    result_text = "".join(decoded_tokens)
-    if end_of_word_token is not None:
-        result_text = result_text.replace(end_of_word_token, " ")
-
-    return result_text
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
