@@ -190,6 +190,17 @@ print("*" * 15 + " TASKS " + "*" * 15)
 
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
 # deadline = Deadline()
+class Deadline:
+    def __init__(self, date):
+        self.date = date
+
+    def info(self):
+        if self.date != "Oct 19":
+            print("Oh, no! It is another deadline!")
+
+
+deadline = Deadline("Oct 17")
+deadline.info()
 
 
 #  Task 2
