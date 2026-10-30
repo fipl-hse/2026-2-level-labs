@@ -355,7 +355,10 @@ def tokenize_word(
     tokens = [key for key in vocabulary.keys() if key in joined_word]
     tokens = sorted(tokens, key = lambda token: (-len(token), token))
 
+    number_of_cut = 0
+
     encoded_word: list[str | int] = [joined_word]
+    tokens_in_word = []
     for token in tokens:
         parts_encoded_word = []
         for element in encoded_word:
@@ -363,6 +366,8 @@ def tokenize_word(
                 parts_encoded_word.append(element)
             else:
                 piece = element.split(token)
+                number_of_cut += 1
+                tokens_in_word.append(token)
                 for i, char in enumerate(piece):
                     if i > 0:
                         parts_encoded_word.append(vocabulary[token])
@@ -377,7 +382,7 @@ def tokenize_word(
         else:
             result.extend([vocabulary[unknown_token]]*len(element))
 
-    return result
+    return result, number_of_cut, tokens_in_word
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -446,19 +451,29 @@ def encode(
 
     prepared_text = original_text.split()
 
+    freq_of_cut = {}
     encoded_text = []
     for word in prepared_text:
         prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
         if prepared_word is None:
             return None
 
-        encoded_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        encoded_word, number_of_cut, tokens_in_most_cut_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        freq_of_cut[word] = number_of_cut
         if encoded_word is None:
             return None
 
         encoded_text.extend(encoded_word)
 
-    return encoded_text
+    cut_values = list(freq_of_cut.values())
+    cut_max_ind = cut_values.index(max(cut_values))
+    most_cut_word = list(freq_of_cut.keys())[cut_max_ind]
+    _, _, tokens_in_most_cut_word = tokenize_word (prepare_word(most_cut_word, start_of_word_token, end_of_word_token), vocabulary, end_of_word_token, unknown_token)
+
+    sorted_most_cut = dict(sorted(freq_of_cut.items(), key=lambda item: item[1], reverse = True))
+
+
+    return encoded_text, most_cut_word, list(sorted_most_cut.keys())[:4], tokens_in_most_cut_word
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """

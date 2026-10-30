@@ -33,6 +33,8 @@ def main() -> None:
     with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as text_file:
         ru_encoded_text = text_file.read()
 
+    print("Оригинальный текст: ", ru_original_text)
+
     word_frequencies = collect_frequencies(text, None, "</s>")
     assert word_frequencies, "Impossible to collect frequencies of words"
 
@@ -45,17 +47,28 @@ def main() -> None:
     secret_text_splited = [int(el) for el in secret_text.split()]
     result = decode(secret_text_splited, vocabulary, "</s>")
     assert result, "Text can not be decoded"
-    print(result)
+    #print(result)
 
     vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
     assert vocabulary, "There is no vocabulary"
 
-    encoded_text = encode(ru_original_text, vocabulary, "\u2581", None, "<unk>")
+    encoded_text, most_cut_word, top_cut, tokens_in_most_cut_word = encode(ru_original_text, vocabulary, "\u2581", None, "<unk>")
     assert encoded_text, "Impossible to encode text"
 
     ru_encoded_text_splited = [int(element) for element in ru_encoded_text.split()]
-    assert ru_encoded_text, "Impossible to rncode ru text"
-    print(encoded_text[:20] == list(ru_encoded_text_splited[:20]))
+    assert ru_encoded_text, "Impossible to encode ru text"
+    print("Закодированный текст: \n", encoded_text)
+
+    print("Больше всего разделений: \n ", most_cut_word)
+
+    print(tokens_in_most_cut_word)
+
+    print("Топ слов по разделениям: \n ", top_cut)
+
+    print("Проверка, что кодирование верное: \n ", encoded_text[:20] == list(ru_encoded_text_splited[:20]))
+
+    decoded_again = decode(encoded_text, vocabulary, "\u2581")
+    print("Снова декодируем: \n", decoded_again.strip())
 
 if __name__ == "__main__":
     main()
