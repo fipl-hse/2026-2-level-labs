@@ -2,7 +2,7 @@
 Generation by NGrams starter
 """
 
-# pylint:disable=too-many-locals, unused-import, unused-variable
+from main import NGramLanguageModel, TextProcessor
 
 
 def main() -> None:
@@ -16,6 +16,11 @@ def main() -> None:
     ) as text_file:
         text = text_file.read()
     result = None
+    text_processor = TextProcessor('_')
+    encoded_corpus = text_processor.encode(text)
+    n_gram_language_model = NGramLanguageModel(encoded_corpus, n_gram_size=3)
+    result = n_gram_language_model.build()
+    print(result)
     assert result
 
 
