@@ -87,6 +87,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> str | None:
         """
@@ -103,10 +104,9 @@ class TextProcessor:
         if not isinstance(element_id, int):
             return None
 
-        id_of_tokens = list(self._storage.values())
-        if element_id in id_of_tokens:
-            ind_of_token = id_of_tokens.index(element_id)
-            return list(self._storage.keys())[ind_of_token]
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
 
         return None
 
@@ -179,6 +179,11 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
+        decoded_text = self._decode(encoded_corpus)
+        result_text = self._postprocess_decoded_text(decoded_text)
+
+        return result_text
+
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -200,6 +205,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(corpus, tuple) and corpus
+        and all(isinstance(element_id, int) for element_id in corpus)
+        ):
+            return None
+
+        decoded_text = []
+
+        for element_id in corpus:
+            found_token = self.get_token(element_id)
+            if found_token is not None:
+                decoded_text.append(found_token)
+            else:
+                return None
+
+        return tuple(decoded_text)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -216,7 +236,17 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus
+        and all(isinstance(token, str) for token in decoded_corpus)
+        ):
+            return None
 
+        lst_decoded_corpus = list(decoded_corpus)
+        lst_decoded_corpus[0] = lst_decoded_corpus[0].upper()
+        result_text = "".join(lst_decoded_corpus).replace(self._end_of_word_token, " ").strip()
+        result_text += "."
+
+        return result_text
 
 class WordProcessor(TextProcessor):
     """
