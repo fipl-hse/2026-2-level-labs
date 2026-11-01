@@ -5,6 +5,7 @@ Generation by NGrams starter
 # pylint:disable=too-many-locals, unused-import, unused-variable
 from main import TextProcessor
 
+
 def main() -> None:
     """
     Launches an implementation.
