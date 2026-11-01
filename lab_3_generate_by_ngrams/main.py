@@ -73,7 +73,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if isinstance(element, str) or len(element) != 1):
+        if not isinstance(element, str) or len(element) != 1:
             return None
 
         if element not in self._storage:
