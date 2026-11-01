@@ -5,7 +5,7 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-
+import re
 
 class TextProcessor:
     """
@@ -23,6 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
@@ -41,6 +43,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+        text = text.lower()
+        cleaned = re.sub(r"[^a-zа-яё\s]"," ",text)
+        words = cleaned.split()
+        tokens = []
+        ends_with_separator = bool(re.search(r"[\s\d\W]$", text)) if text else False
+        for i, word in enumerate(words):
+            for symb in word:
+                tokens.append(symb)
+            is_last = (i == len(words) - 1)
+            if not is_last or ends_with_separator:
+                tokens.append(self._end_of_word_token)
+        return tuple(tokens)
+
 
     def get_id(self, element: str) -> int | None:
         """
