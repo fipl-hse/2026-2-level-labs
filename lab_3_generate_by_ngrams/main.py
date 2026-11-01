@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-import re
 
 class TextProcessor:
     """
@@ -97,6 +96,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> str | None:
         """
@@ -134,7 +134,7 @@ class TextProcessor:
         """
         if not isinstance(text, str):
             return None
-        if len(text) == 0:
+        if not text:
             return None
 
         result = []
@@ -169,7 +169,9 @@ class TextProcessor:
         if len(element) != 1:
             return None
 
-        if element not in self._storage:
+        current_id = self._storage.get(element)
+
+        if current_id is None:
             if element == self._end_of_word_token:
                 self._storage[element] = 0
             else:
@@ -191,6 +193,22 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        if not all(isinstance(el, int) and not isinstance(el, bool) for el in encoded_corpus):
+            return None
+
+        decoded_tokens = self._decode(encoded_corpus)
+
+        if decoded_tokens is None:
+            return None
+
+        text = self._postprocess_decoded_text(decoded_tokens)
+        if text is None:
+            return None
+
+        return text
+
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
