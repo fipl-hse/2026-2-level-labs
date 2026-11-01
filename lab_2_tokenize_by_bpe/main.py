@@ -185,7 +185,6 @@ def train(
                 -len(item[0][0] + item[0][1]),
                 (item[0][0] + item[0][1])[::-1],
             ),
-            3.
         )
         pair_to_merge = best_item[0]
 

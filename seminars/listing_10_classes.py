@@ -195,7 +195,7 @@ print("*" * 15 + " TASKS " + "*" * 15)
 #  Task 2
 # easy level
 # class ...:
-
+#
 #     def ...:
 #         ...
 
@@ -223,31 +223,13 @@ print("*" * 15 + " TASKS " + "*" * 15)
 
 # Task 4
 # medium level
-class Student:
+# class Student:
 #     """
 #     If I have less than three deadlines, my mood is Good!
 #     If I have from 3 to 5 deadlines, my mood is So-so...
 #     If I have more than 5 deadlines, my mood is Bad!!!
 #     """
-    def __init__(self, deadlines):
-            self.deadlines = deadlines
-    def mood(self):
-        if self.deadlines < 3:
-            return "Good"
-        elif 3 <= self.deadlines <= 5:
-            return "So-so"
-        else:
-            return "Bad"
 
-
-student = Student(2)
-print(student.mood())  # Good
-
-student.deadlines = 4
-print(student.mood())  # So-so
-
-student.deadlines = 1000
-print(student.mood())  # Bad
 
 # implement a class so that the following code works
 # student = Student(2)
