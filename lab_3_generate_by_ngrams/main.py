@@ -359,7 +359,7 @@ class NGramLanguageModel:
 
         total_freq_ngrams = {}
         for element in n_grams:
-            total_freq_ngrams[element] = n_grams.count(element)
+            total_freq_ngrams[element] = total_freq_ngrams.get(element, 0) + 1
 
         context_counts = {}
         for n_gram in n_grams:
@@ -385,6 +385,25 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (isinstance(sequence, tuple) and sequence
+        and all(isinstance(element, int) for element in sequence)
+        ):
+            return None
+
+        size_of_context = self.__n_gram_size - 1
+        if size_of_context - 1 > len(sequence):
+            return None
+
+        sequence_context = sequence[-size_of_context:]
+        print(sequence_context)
+        potential_letters = {}
+
+        print(self._n_gram_frequencies)
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if n_gram[:size_of_context] == sequence_context:
+                potential_letters[n_gram[len(n_gram)-1]] = freq
+
+        return potential_letters
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
