@@ -383,10 +383,9 @@ class NGramLanguageModel:
             contexts[head] = contexts.get(head, 0) + 1
 
         self._n_gram_frequencies = {
-            gram: counts[gram] / contexts[gram[:-1]] for gram in counts
+            gram: count / contexts[gram[:-1]] for gram, count in counts.items()
         }
         return True
-
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> dict | None:
         """
