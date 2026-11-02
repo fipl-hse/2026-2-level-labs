@@ -47,19 +47,17 @@ class TextProcessor:
 
         words = text.split()
         if not words:
-            return ()
+            return None
 
         tokens = []
         for index, word in enumerate(words):
-            # Очищаем слово: приводим к нижнему регистру, оставляем только буквы
             cleaned_chars = [char.lower() for char in word if char.isalpha()]
             if cleaned_chars:
                 tokens.extend(cleaned_chars)
-                # Добавляем маркер конца слова, если это не последнее слово
-                # или если исходный текст заканчивался пробелом/знаком препинания
                 if index < len(words) - 1 or text.endswith((' ', '.', '!', '?', ',', ';', ':')):
                     tokens.append(self._end_of_word_token)
-
+        if not tokens:
+            return None
         return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
@@ -123,7 +121,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         tokens = self._tokenize(text)
-        if tokens is None:
+        if not tokens:
             return None
         encoded = []
         for token in tokens:
@@ -144,6 +142,10 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not isinstance(element, str) or len(element) != 1:
+            return
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
@@ -161,6 +163,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+
+        decoded_tuple = self._decode(encoded_corpus)
+        if decoded_tuple is None:
+            return None
+
+        return self._postprocess_decoded_text(decoded_tuple)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -169,7 +179,15 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-
+        if not isinstance(content, dict) or not content or "freq" not in content:
+            return
+        if not isinstance(content["freq"], dict):
+            return
+        for ngram in content["freq"]:
+            if isinstance(ngram, str):
+                for char in ngram.lower():
+                    if char.isalpha() or char == self._end_of_word_token:
+                        self._put(char)
     def _decode(self, corpus: tuple[int, ...]) -> tuple[str, ...] | None:
         """
         Decode sentence by replacing ids with corresponding letters.
@@ -183,6 +201,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple):
+            return None
+
+        decoded = []
+        for token_id in corpus:
+            if not isinstance(token_id, int) or isinstance(token_id, bool):
+                return None
+            token = self.get_token(token_id)
+            if token is None:
+                return None
+            decoded.append(token)
+
+        return tuple(decoded)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -199,8 +230,25 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
 
+        for token in decoded_corpus:
+            if not isinstance(token, str):
+                return None
 
+        text = "".join(decoded_corpus)
+        text = text.replace(self._end_of_word_token, " ")
+
+        while "  " in text:
+            text = text.replace("  ", " ")
+
+        text = text.strip()
+        if not text:
+            return None
+
+        processed = text[0].upper() + text[1:] + "."
+        return processed
 class WordProcessor(TextProcessor):
     """
     Handle text tokenization, encoding and decoding on the level of words.
