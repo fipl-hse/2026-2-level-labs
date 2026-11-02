@@ -109,6 +109,13 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int):
+            return None
+
+        for token, identifier in self._storage.items():
+            if identifier == element_id:
+                return token
+            
 
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
@@ -222,6 +229,16 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple):
+            return None
+        text = "".join(decoded_corpus)
+        text = text.replace(self._end_of_word_token, "")
+        text = " ".join(text.split()).capitalize()
+        if not text:
+            return ""
+        return text + "."
+
+
 
 
 class WordProcessor(TextProcessor):
