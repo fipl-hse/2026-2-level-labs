@@ -62,6 +62,8 @@ class TextProcessor:
         if text and text[-1].isalpha() and tokens:
             tokens.pop()
 
+        if not tokens:
+            return None
         return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
@@ -128,7 +130,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         tokens = self._tokenize(text)
-        if tokens is None:
+        if not tokens:
             return None
 
         encoded = []
