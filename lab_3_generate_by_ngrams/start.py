@@ -3,6 +3,7 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
+from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel
 
 
 def main() -> None:
@@ -15,8 +16,24 @@ def main() -> None:
         "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
-    result = None
-    assert result
+
+    processor = TextProcessor("_")
+
+    encoded_text = processor.encode(text)
+    assert encoded_text, "Text can not be encoded"
+    print(encoded_text[:101])
+
+    decoded_text =  processor.decode(encoded_text)
+    assert decoded_text, "Text can not be decoded"
+    print(decoded_text[:101])
+
+    n_gram_lang_model = NGramLanguageModel(encoded_text, 3)
+    n_gram_freq = n_gram_lang_model.build()
+    print(n_gram_freq)
+    print(n_gram_lang_model._n_gram_frequencies)
+
+    #result = None
+    #assert result
 
 
 if __name__ == "__main__":
