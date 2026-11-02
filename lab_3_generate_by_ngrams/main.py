@@ -128,7 +128,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         tokens = self._tokenize(text)
-        if not tokens:
+        if tokens is None:
             return None
 
         encoded = []
