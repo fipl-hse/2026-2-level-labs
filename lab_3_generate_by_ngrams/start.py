@@ -3,6 +3,7 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
+from main import TextProcessor
 
 
 def main() -> None:
@@ -15,9 +16,19 @@ def main() -> None:
         "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
-    result = None
-    assert result
+    # result = None
+    # assert result
 
+    #mark 4
+    text_processor = TextProcessor("_")
+
+    encoded_corpus = text_processor.encode(text)
+    print (f"Encoded text (100 numbers):\n {encoded_corpus[:100]}")
+    assert encoded_corpus, "Text can not be encoded"
+
+    decoded_corpus = text_processor.decode(encoded_corpus)
+    print (f"Decoded text (150 chars):\n {decoded_corpus[:150]}")
+    assert decoded_corpus, "Text can not be decoded"
 
 if __name__ == "__main__":
     main()
