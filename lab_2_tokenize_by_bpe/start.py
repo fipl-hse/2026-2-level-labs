@@ -10,9 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 sys.path.append(root_dir)
 
-from lab_2_tokenize_by_bpe.main import (
-    collect_frequencies,
-)
+from lab_2_tokenize_by_bpe.main import collect_frequencies
 
 
 def main() -> None:
