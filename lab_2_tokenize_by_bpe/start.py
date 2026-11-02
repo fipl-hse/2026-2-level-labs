@@ -31,7 +31,7 @@ def main() -> None:
 
 
 
-    frequency = collect_frequencies(text, start_of_word=None, end_of_word= "</s>")
+    frequency = collect_frequencies(text, start_of_word=None, end_of_word="</s>")
     print(frequency)
 
     assert frequency, "Translation not working"
