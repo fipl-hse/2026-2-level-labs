@@ -168,4 +168,4 @@ def test_word_processor_greedy_generation(word_processor: WordProcessor) -> None
     language_model = NGramLanguageModel(encoded, 3)
     language_model.build()
     generator = GreedyTextGenerator(language_model, word_processor)
-    assert "The cat sat on the sofa." == generator.run(6, "The cat")
+    assert "The cat sat on the sofa." == generator.run("The cat", 6)
