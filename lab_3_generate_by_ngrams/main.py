@@ -58,6 +58,10 @@ class TextProcessor:
         text = "".join(cleaned_text)
 
         words = text.split()
+
+        if not words:
+            return None
+
         tokens = []
 
         for word in words:
@@ -145,8 +149,7 @@ class TextProcessor:
             token_id = self.get_id(token)
             if token_id is None:
                 return None
-
-        encoded.append(token_id)
+            encoded.append(token_id)
 
         return tuple(encoded)
 
@@ -183,6 +186,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple):
+            return None
+
+        if not encoded_corpus:
+            return None
+
+        if not all(isinstance(item, int) for item in encoded_corpus):
+            return None
+
+        decode = self._decode(encoded_corpus)
+        postprocess_decoded_text = self._postprocess_decoded_text(decode)
+
+        return postprocess_decoded_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -205,6 +221,24 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple):
+            return None
+
+        if not corpus:
+            return None
+
+        if not all(isinstance(item, int) for item in corpus):
+            return None
+
+        decoded_corpus = []
+
+        for item in corpus:
+            symbol = self.get_token(item)
+            if symbol is None:
+                return None
+            decoded_corpus.append(symbol)
+
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -221,6 +255,31 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple):
+            return None
+
+        if not all(isinstance(item, str) for item in decoded_corpus):
+            return None
+
+        decoded_corpus_str = ""
+
+        for char in decoded_corpus:
+            if char == self._end_of_word_token:
+                decoded_corpus_str += " "
+            else:
+                decoded_corpus_str += char
+
+        decoded_corpus_str = " ".join(decoded_corpus_str.split())
+
+        if len(decoded_corpus_str) > 0:
+            decoded_corpus_str = decoded_corpus_str.capitalize()
+        else:
+            return None
+
+        if not decoded_corpus_str.endswith("."):
+            decoded_corpus_str += "."
+
+        return decoded_corpus_str
 
 
 class WordProcessor(TextProcessor):
