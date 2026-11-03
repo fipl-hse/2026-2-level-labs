@@ -168,7 +168,7 @@ def calculate_power() -> int:
 
 
 # Task 3:
-def calculate_factorial() -> int:
+def calculate_factorial(number: int) -> int:
     """
     Calculate factorial of the received number.
 
@@ -178,7 +178,10 @@ def calculate_factorial() -> int:
     Returns:
         int: factorial of the received number
     """
-    # student implementation goes here
+    while number > 1:
+        res += number
+        number
+
 
 
 # Function calls with expected result:
@@ -188,7 +191,7 @@ def calculate_factorial() -> int:
 
 
 # Task 4:
-def encode_message() -> list:
+def encode_message(message: str, encode_dict: dict) -> list:
     """
     Encode the message.
 
@@ -199,7 +202,10 @@ def encode_message() -> list:
     Returns:
         list: list of digits as an encoded message
     """
-    # student implementation goes here
+    result = ""
+    for ch in message:
+        reuslt = result + encode_dict[ch]
+    return result
 
 
 # Function calls with expected result:
@@ -208,7 +214,7 @@ def encode_message() -> list:
 
 
 # Task 5:
-def capitalize_string() -> str:
+def capitalize_string(input_string: str) -> str:
     """
     Return capitalized version of the string.
 
@@ -218,7 +224,7 @@ def capitalize_string() -> str:
     Returns:
         str: capitalized string
     """
-    # student implementation goes here
+    return input_string.upper()
 
 
 # Function calls with expected result:
