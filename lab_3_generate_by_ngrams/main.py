@@ -76,12 +76,7 @@ class TextProcessor:
         if not isinstance(element, str) or len(element) != 1:
             return None
 
-        if element not in self._storage:
-            return None
-
-        self._storage[element] = len(self._storage)
-
-        return self._storage[element]
+        return self._storage.get(element, None)
 
     def get_end_of_word_token(self) -> str:  # type: ignore[empty-body]
         """
@@ -90,6 +85,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> str | None:
         """
@@ -103,6 +99,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int):
+            return None
+
+        id_token = {value: key for key, value in self._storage.items()}
+
+        return id_token.get(element_id, None)
 
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
