@@ -347,6 +347,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self.__n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -355,6 +356,9 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not isinstance(frequencies, dict):
+            return
+        self._n_gram_frequencies = frequencies
 
     def build(self) -> bool:
         """
@@ -399,6 +403,21 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+
+        context_len = self.__n_gram_size - 1
+        if len(sequence) < context_len:
+            return None
+
+        context = sequence[-context_len:] if context_len > 0 else ()
+
+        next_tokens = {}
+        for gram, ngram_prob in self._n_gram_frequencies.items():
+            if gram[:-1] == context:
+                next_tokens[gram[-1]] = ngram_prob
+
+        return next_tokens
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -445,6 +464,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
         """
@@ -460,7 +481,36 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(prompt, str) or not prompt:
+            return None
+        if not isinstance(seq_len, int) or isinstance(seq_len, bool) or seq_len <= 0:
+            return None
 
+        encoded = self._text_processor.encode(prompt)
+        if encoded is None:
+            return None
+
+        sequence = encoded
+        for _ in range(seq_len):
+            candidates = self._model.generate_next_token(sequence)
+            if not candidates:
+                break
+
+            best_token = None
+            best_frequency = -1.0
+            for token, frequency in candidates.items():
+                if frequency > best_frequency or (
+                    frequency == best_frequency and token > best_token
+                ):
+                    best_token = token
+                    best_frequency = frequency
+
+            if isinstance(best_token, int):
+                sequence = sequence + (best_token,)
+            else:
+                break
+
+        return self._text_processor.decode(sequence)
 
 class BeamSearcher:
     """
