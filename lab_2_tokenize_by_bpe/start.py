@@ -35,9 +35,27 @@ def main() -> None:
         ) as text_file:
         translation_encoded_raw = text_file.read()
 
+<<<<<<< HEAD
+    print('Mark 4: Word frequency dictionary.')
+    freq_dict = collect_frequencies(text, None, '</s>')
+    for i, (tokenized_word, freq) in enumerate(freq_dict.items()):
+        if i < 5:
+            print(f'{tokenized_word}: {freq}')
+
+    print('Mark 6: Decoded text.')
+    trained_freq = train(freq_dict, 10)
+
+    if trained_freq is None:
+        return
+
+    vocabulary = get_vocabulary(trained_freq, '<unk>')
+    encoded = [int(token_id) for token_id in translation_encoded_raw.replace(',', ' ').split()]
+    result = decode(encoded, vocabulary, '</s>')
+=======
     result = collect_frequencies(text, None, "</s>")
 
     assert result, "Frequency dictionary is None"
+>>>>>>> bf876d9f25982c189f00f967f9e15b23da42abc8
     print(result)
 
     bpe_train = train(result, 100)
@@ -45,9 +63,15 @@ def main() -> None:
         return
     print(bpe_train)
 
+<<<<<<< HEAD
+    print('Mark 8: Encoded texts.')
+    load_vocab = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    rus_encoded = encode(russian_text, load_vocab, '\u2581', None, '<unk>')
+=======
     vocabulary = get_vocabulary(bpe_train,'<unk>')
     if vocabulary is None:
         return
+>>>>>>> bf876d9f25982c189f00f967f9e15b23da42abc8
 
     # "secret"
     secret3 = [int(number) for number in secret3_raw.split()]
@@ -56,9 +80,15 @@ def main() -> None:
         return
     print(secret)
 
+<<<<<<< HEAD
+    print('Mark 10: Comparison and BLEU')
+    model_decoded = decode(encoded, load_vocab, None)
+    model_decoded = model_decoded.replace('\u2581', ' ')
+=======
     # "mark 8"
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
         ru_text = text_file.read()
+>>>>>>> bf876d9f25982c189f00f967f9e15b23da42abc8
 
     ru_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
     if ru_vocabulary is None:
