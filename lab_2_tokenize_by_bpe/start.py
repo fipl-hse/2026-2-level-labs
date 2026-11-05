@@ -5,6 +5,7 @@ BPE Tokenizer starter
 # pylint:disable=too-many-locals, unused-variable
 from lab_2_tokenize_by_bpe.main import (
     calculate_bleu,
+    calculate_rouge,
     collect_frequencies,
     decode,
     encode,
@@ -38,12 +39,12 @@ def main() -> None:
     result = collect_frequencies(text, None, "</s>")
 
     assert result, "Frequency dictionary is None"
-    print(result)
+    # print(result)
 
     bpe_train = train(result, 100)
     if bpe_train is None:
         return
-    print(bpe_train)
+    # print(bpe_train)
 
     vocabulary = get_vocabulary(bpe_train,'<unk>')
     if vocabulary is None:
@@ -54,7 +55,7 @@ def main() -> None:
     secret = decode(secret3, vocabulary, '</s>')
     if secret is None:
         return
-    print(secret)
+    # print(secret)
 
     # "mark 8"
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
@@ -109,6 +110,14 @@ def main() -> None:
     print("Predicted translation:", translation_decoded)
     print("Reference translation:", text_reference_translation)
     print("BLEU:", bleu)
+
+    rouge = calculate_rouge(
+            translation_decoded,
+            text_reference_translation,
+            3
+        )
+
+    print("ROUGE:", bleu)
 
 if __name__ == "__main__":
     main()

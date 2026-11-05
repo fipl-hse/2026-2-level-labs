@@ -529,6 +529,57 @@ def calculate_precision(
 
     return matches / len(set(actual))
 
+def count_ngrams(ngrams):
+    counts = {}
+    for ngram  in ngrams:
+        counts[ngram] = counts.get(ngram, 0) + 1
+    return counts
+
+
+def calculate_rouge_n(actual, reference):
+    actual_counts = count_ngrams(actual)
+    reference_counts = count_ngrams(reference)
+
+    TP = 0
+    for ngram, ref_count in reference_counts.items():
+        act_count = actual_counts.get(ngram, 0)
+        if act_count > 0:
+            TP += min(act_count, ref_count)
+
+    recall = TP / len(reference)
+
+    if not actual:
+        return 0.0
+
+    precision = TP / len(actual)
+
+    if precision + recall == 0:
+        f1 = 0.0
+    else:
+        f1 = 2 * precision * recall / (precision + recall)
+
+    return precision, recall, f1
+
+def calculate_rouge(actual, reference, max_order):
+    results = {}
+    for order in range(1, max_order + 1):
+        actual_ngrams = collect_ngrams(actual, order)
+        reference_ngrams = collect_ngrams(reference, order)
+
+        if actual_ngrams is None or reference_ngrams is None:
+            return None
+
+        rounge_n = calculate_rouge_n(actual_ngrams, reference_ngrams)
+
+        if rounge_n is None:
+            return None
+
+        f1 = rounge_n[2]
+        results = [f"rouge-{f1}"]
+
+    return results
+
+
 
 def calculate_geo_mean(precisions: Sequence[float], max_order: int) -> float | None:
     """
