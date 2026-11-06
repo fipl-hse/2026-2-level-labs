@@ -94,12 +94,12 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(frequencies, dict):
+    if not isinstance(word_frequencies, dict):
         return None
 
     pairs: dict[tuple[str, str], int] = {}
 
-    for word, count in frequencies.items():
+    for word, count in word_frequencies.items():
         if not isinstance(word, tuple):
             return None
         if not isinstance(count, int) or isinstance(count, bool):
