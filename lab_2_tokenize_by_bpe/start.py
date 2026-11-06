@@ -33,6 +33,16 @@ def main() -> None:
 
     result = frequencies
 
+    pairs = count_tokens_pairs(frequencies)
+    assert pairs is not None, "count_tokens_pairs failed"
+    assert pairs, "Pairs dictionary is empty"
+
+    top_pairs = sorted(
+        pairs.items(), key=lambda item: item[1], reverse=True
+    )[:10]
+    for pair, count in top_pairs:
+        print(pair, "->", count)
+
     assert result, "Translation not working"
 
 
