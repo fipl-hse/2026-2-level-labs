@@ -2,17 +2,18 @@
 Language detection starter.
 """
 
-# pylint: disable=unused-variable, duplicate-code, too-many-return-statements, too-many-locals
-
+# pylint: disable=unused-variable, duplicate-code, too-many-return-statements
 from lab_1_classify_profile.main import (
     calculate_frequencies,
-    check_profile,
-    compare_profiles_by_top_n,
+    collect_profiles,
     create_language_profile,
+    detect_language_advanced,
     detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
+    print_report,
     remove_stop_words,
+    save_profile,
     tokenize,
 )
 
@@ -21,60 +22,65 @@ def main() -> None:
     """
     Launches an implementation.
     """
-    with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
-        en_text = file.read()
     with open("lab_1_classify_profile/assets/texts/de.txt", "r", encoding="utf-8") as file:
         de_text = file.read()
     with open("lab_1_classify_profile/assets/texts/unknown.txt", "r", encoding="utf-8") as file:
         unknown_text = file.read()
     with open("lab_1_classify_profile/assets/stopwords.txt", "r", encoding="utf-8") as file:
-        stopwords = file.read().splitlines()
+        stopwords = file.read().split("\n")
+    with open("lab_1_classify_profile/assets/texts/en.txt", "r", encoding="utf-8") as file:
+        en_text = file.read()
 
-    tokens = tokenize(en_text)
-    if tokens is None:
-        print("Ошибка токенизации")
-        return
+    result = None
 
-    filtered_tokens = remove_stop_words(tokens, stopwords)
-    if filtered_tokens is None:
-        print("Ошибка удаления стоп-слов")
-        return
+    tokenized_text = tokenize(de_text)
+    if tokenized_text is None:
+        return None
 
-    freq_dict = calculate_frequencies(filtered_tokens)
-    if freq_dict is None:
-        print("Ошибка подсчета частот")
-        return
+    text_without_stopwords = remove_stop_words(tokenized_text, stopwords)
+    if text_without_stopwords is None:
+        return None
 
-    top_7 = get_top_n_words(freq_dict, 7)
+    calculated_frequencies = calculate_frequencies(text_without_stopwords)
 
-    print("Токены (первые 20):", tokens[:20])
-    print("Без стоп-слов (первые 20):", filtered_tokens[:20])
-    print("Топ-7 популярных слов:", top_7)
+    if calculated_frequencies is None:
+        return None
 
-    en_profile = create_language_profile("en", en_text, stopwords)
+    unk_profile = create_language_profile("unknown", unknown_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
-    unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
+    en_profile = create_language_profile("en", en_text, stopwords)
 
-    if en_profile is None or de_profile is None or unknown_profile is None:
-        print("Не удалось создать профили")
-        return
+    if (unk_profile is None
+        or de_profile is None
+        or en_profile is None):
+        return None
 
-    print("Профиль en корректен:", check_profile(en_profile))
+    print(get_top_n_words(calculated_frequencies, 7))
+    print(detect_language_by_top_n(unk_profile, en_profile, de_profile, 15))
+    result = detect_language_by_mse(unk_profile, en_profile, de_profile)
 
-    en_score = compare_profiles_by_top_n(unknown_profile, en_profile, 15)
-    de_score = compare_profiles_by_top_n(unknown_profile, de_profile, 15)
-    print("Доля пересечения с en:", en_score)
-    print("Доля пересечения с de:", de_score)
+    save_profile(unk_profile, 'lab_1_classify_profile/assets/profiles')
+    save_profile(de_profile, 'lab_1_classify_profile/assets/profiles')
+    save_profile(en_profile, 'lab_1_classify_profile/assets/profiles')
 
-    result = detect_language_by_top_n(unknown_profile, en_profile, de_profile, 15)
+    list_of_paths = ['lab_1_classify_profile/assets/profiles/la.json',
+                     'lab_1_classify_profile/assets/profiles/de.json',
+                     'lab_1_classify_profile/assets/profiles/en.json']
+    collected_profiles = collect_profiles(list_of_paths)
 
-    assert result is not None, "Detection result is None"
-    print("Определённый язык:", result)
+    if collected_profiles is None:
+        return None
 
-    result_mse = detect_language_by_mse(unknown_profile, en_profile, de_profile)
+    advanced_detection = detect_language_advanced(unk_profile, collected_profiles, 15)
 
-    assert result_mse is not None, "Detection result by MSE is None"
-    print("Определённый язык (MSE):", result_mse)
+    if advanced_detection is None:
+        return None
+
+    print_report(unk_profile, advanced_detection, 15)
+
+    assert result, "Detection result is None"
+    return None
+
 
 if __name__ == "__main__":
     main()
