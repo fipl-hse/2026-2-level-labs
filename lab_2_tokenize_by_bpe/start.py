@@ -3,14 +3,12 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
+
 from lab_2_tokenize_by_bpe.main import (
-    calculate_bleu,
     collect_frequencies,
-    decode,
-    encode,
-    get_vocabulary,
-    load_vocabulary,
-    train,
+    count_tokens_pairs,
+    merge_tokens,
+    prepare_word,
 )
 
 
@@ -18,97 +16,54 @@ def main() -> None:
     """
     Launches an implementation
     """
-    with open(
-        "lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8"
-        )as text_file:
+    with open("lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    with open(
-        "lab_2_tokenize_by_bpe/assets/secrets/secret_3.txt", "r", encoding="utf-8"
-        ) as text_file:
-        secret3_raw = text_file.read()
-    with open(
-        "lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8"
-        ) as text_file:
+    with open("lab_2_tokenize_by_bpe/assets/en_raw.txt", "r", encoding="utf-8") as text_file:
         text_reference_translation = text_file.read()
-    with open(
-        "lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8"
-        ) as text_file:
+    with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
+    result = None
 
-    result = collect_frequencies(text, None, "</s>")
+    assert prepare_word("It's", None, "</s>") == ("I", "t", "'", "s", "</s>")
 
-    assert result, "Frequency dictionary is None"
-    print(result)
+    frequencies = collect_frequencies(text, None, "</s>")
+    assert frequencies is not None, "collect_frequencies failed"
+    assert frequencies, "Frequencies dictionary is empty"
 
-    bpe_train = train(result, 100)
-    if bpe_train is None:
-        return
-    print(bpe_train)
+    most_common = sorted(
+        frequencies.items(), key=lambda item: item[1], reverse=True
+    )[:10]
+    for word, count in most_common:
+        print("".join(word), "->", count)
 
-    vocabulary = get_vocabulary(bpe_train,'<unk>')
-    if vocabulary is None:
-        return
+    pairs = count_tokens_pairs(frequencies)
+    assert pairs is not None, "count_tokens_pairs failed"
+    assert pairs, "Pairs dictionary is empty"
 
-    # "secret"
-    secret3 = [int(number) for number in secret3_raw.split()]
-    secret = decode(secret3, vocabulary, '</s>')
-    if secret is None:
-        return
-    print(secret)
+    top_pairs = sorted(
+        pairs.items(), key=lambda item: item[1], reverse=True
+    )[:10]
+    for pair, count in top_pairs:
+        print(pair, "->", count)
 
-    # "mark 8"
-    with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
-        ru_text = text_file.read()
+    if pairs:
+        top_pair = max(pairs.items(), key=lambda item: item[1])[0]
+        merged_frequencies = merge_tokens(frequencies, top_pair)
+        assert merged_frequencies is not None, "merge_tokens failed"
 
-    ru_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
-    if ru_vocabulary is None:
-        return
+        for word in merged_frequencies:
+            for token in word:
+                assert token != "", "empty token found"
 
-    encoded_ru = encode(
-        ru_text,
-        ru_vocabulary,
-        start_of_word_token="\u2581",
-        end_of_word_token=None,
-        unknown_token="<unk>",
-    )
-    if encoded_ru is None:
-        return
-    # "comparison"
-    with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as encoded_file:
-        ru_to_compare_raw = encoded_file.read()
+        merged_top = sorted(
+            merged_frequencies.items(), key=lambda item: item[1], reverse=True
+        )[:10]
+        for word, count in merged_top:
+            print("".join(word), "->", count)
 
-    ru_to_compare = [int(number) for number in ru_to_compare_raw.split()]
+    result = frequencies
+    assert result, "Translation not working"
 
-    n = 20
-    # print("Encoded: ", encoded_ru[:n])
-    # print("To compare: ", ru_to_compare[:n])
-
-    # "mark 10"
-    translation_encoded = [int(number) for number in translation_encoded_raw.split()]
-
-    en_vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
-    if en_vocabulary is None:
-        return
-
-    translation_decoded = decode(
-        translation_encoded,
-        en_vocabulary,
-        None,
-    )
-    assert translation_decoded, "Decoded translation is None"
-
-    translation_decoded = translation_decoded.replace("\u2581", " ")
-
-    bleu = calculate_bleu(
-        translation_decoded,
-        text_reference_translation,
-    )
-
-    assert bleu, "BLEU is None"
-
-    print("Predicted translation:", translation_decoded)
-    print("Reference translation:", text_reference_translation)
-    print("BLEU:", bleu)
 
 if __name__ == "__main__":
     main()
