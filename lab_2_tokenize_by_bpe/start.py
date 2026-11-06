@@ -7,6 +7,7 @@ BPE Tokenizer starter
 from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     count_tokens_pairs,
+    merge_tokens,
     prepare_word,
 )
 
@@ -35,8 +36,6 @@ def main() -> None:
     for word, count in most_common:
         print("".join(word), "->", count)
 
-    result = frequencies
-
     pairs = count_tokens_pairs(frequencies)
     assert pairs is not None, "count_tokens_pairs failed"
     assert pairs, "Pairs dictionary is empty"
@@ -47,6 +46,22 @@ def main() -> None:
     for pair, count in top_pairs:
         print(pair, "->", count)
 
+    if pairs:
+        top_pair = max(pairs.items(), key=lambda item: item[1])[0]
+        merged_frequencies = merge_tokens(frequencies, top_pair)
+        assert merged_frequencies is not None, "merge_tokens failed"
+
+        for word in merged_frequencies:
+            for token in word:
+                assert token != "", "empty token found"
+
+        merged_top = sorted(
+            merged_frequencies.items(), key=lambda item: item[1], reverse=True
+        )[:10]
+        for word, count in merged_top:
+            print("".join(word), "->", count)
+
+    result = frequencies
     assert result, "Translation not working"
 
 

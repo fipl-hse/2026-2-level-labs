@@ -134,7 +134,48 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(pair, tuple) or len(pair) != 2:
+        return None
+    if not isinstance(pair[0], str) or not isinstance(pair[1], str):
+        return None
 
+    merged_token = pair[0] + pair[1]
+    if merged_token == "":
+        return None
+
+    result: dict[tuple[str, ...], int] = {}
+
+    for word, count in word_frequencies.items():
+        if not isinstance(word, tuple):
+            return None
+        if not isinstance(count, int) or isinstance(count, bool):
+            return None
+        if count <= 0:
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
+
+        new_word: list[str] = []
+        index = 0
+        while index < len(word):
+            if (
+                index + 1 < len(word)
+                and word[index] == pair[0]
+                and word[index + 1] == pair[1]
+            ):
+                new_word.append(merged_token)
+                index += 2
+            else:
+                new_word.append(word[index])
+                index += 1
+
+        key = tuple(new_word)
+        result[key] = result.get(key, 0) + count
+
+    return result
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
