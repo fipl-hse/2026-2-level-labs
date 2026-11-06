@@ -6,6 +6,7 @@ BPE Tokenizer starter
 
 from lab_2_tokenize_by_bpe.main import collect_frequencies, prepare_word
 
+
 def main() -> None:
     """
     Launches an implementation
