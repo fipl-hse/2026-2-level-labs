@@ -30,7 +30,6 @@ class BankAccount:
             Checks if a transaction amount is valid.
     """
 
-
 class Bank:
     """
     Represents a bank that manages accounts and provides financial services.
