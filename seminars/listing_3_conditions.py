@@ -140,6 +140,13 @@ def max_of_two(a: int, b: int) -> int:
     Returns:
         int: The larger of a and b
     """
+    if a > b:
+        return a
+    else:
+        return b
+    return a if a > b else b
+
+
     # student implementation goes here
 
 
@@ -164,7 +171,17 @@ def grade(score: int) -> str:
     Returns:
         str: Letter grade
     """
-    # student implementation goes here
+    if score >= 90:
+        return 'A'
+    elif score >= 80:
+        return 'B'
+    elif score >= 60:
+        return 'D'
+    else:
+        return 'F'
+
+
+print(grade(6))
 
 
 # grade(95) → "A"
@@ -185,6 +202,11 @@ def is_in_range(n: int, low: int, high: int) -> bool:
     Returns:
         bool: True if low <= n <= high, False otherwise
     """
+    if low <= n <= high:
+        return True
+    else:
+        return False
+
     # student implementation goes here
 
 
@@ -207,6 +229,9 @@ def complex_condition(a: bool, b: bool, c: bool) -> bool:
     Returns:
         bool: Result of the expression
     """
+    return (a and b) or not c
+
+
     # student implementation goes here
 
 
