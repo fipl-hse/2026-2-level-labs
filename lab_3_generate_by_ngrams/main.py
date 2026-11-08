@@ -270,11 +270,11 @@ class TextProcessor:
 
         raw_text = []
 
-        for i, el in enumerate(decoded_corpus):
-            if el == "_":
+        for _, token in enumerate(decoded_corpus):
+            if token == "_":
                 raw_text.append(" ")
             else:
-                raw_text.append(el)
+                raw_text.append(token)
 
         result = "".join(raw_text)
         result = result.strip().capitalize()
@@ -436,10 +436,8 @@ class NGramLanguageModel:
         if len(sequence) < n - 1:
             return None
 
-        if n > 1:
-            context = sequence[-(n - 1):]
-        else:
-            context = tuple()
+
+        context = sequence[-(n - 1):]
 
         next_tokens = {}
 
@@ -470,6 +468,8 @@ class NGramLanguageModel:
             return None
         if self._encoded_corpus is None:
             return tuple()
+        if not encoded_corpus:
+            return None
 
         n = self.__n_gram_size
         corpus = self._encoded_corpus
