@@ -32,9 +32,9 @@ def main() -> None:
     print(n_gram_freq)
 
     greedy_text_generator = GreedyTextGenerator(n_gram_lang_model, processor)
-    generated_text = greedy_text_generator.run("Vernon", 51)
-    assert generated_text, "Impossible to generate text"
-    print(generated_text)
+    result = greedy_text_generator.run("Vernon", 51)
+    assert result, "Impossible to generate text"
+    print(result)
 
 if __name__ == "__main__":
     main()
