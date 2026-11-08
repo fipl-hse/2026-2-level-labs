@@ -46,7 +46,7 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
         text = text.lower()
-        cleaned = re.sub(r"[^a-zа-яё\s]"," ",text)
+        cleaned = re.sub(r"[^a-zа-яё\s]","",text)
         words = cleaned.split()
         if not words:
             return None
@@ -57,7 +57,8 @@ class TextProcessor:
                 tokens.append(symb)
             is_last = (i == len(words) - 1)
             if not is_last or ends_with_separator:
-                tokens.append(self._end_of_word_token)
+                    if not tokens or tokens[-1] != self._end_of_word_token:
+                        tokens.append(self._end_of_word_token)
         return tuple(tokens)
 
 
@@ -140,12 +141,13 @@ class TextProcessor:
 
     def _put(self, element: str) -> None:
         """
-        Put a word into the storage, assign a unique id to it.
+        Put an element into the storage, assign a unique id to it.
 
         Args:
-            element (str): A word to put into storage
+            element (str): An element to put into storage
 
-        In case of corrupt input arguments, an element is not added to storage
+        In case of corrupt input arguments or invalid argument length,
+        an element is not added to storage
         """
         if not isinstance(element, str) or len(element) !=1:
             return None
@@ -315,6 +317,10 @@ class NGramLanguageModel:
             encoded_corpus (tuple | None): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self.__n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
+
 
     def get_n_gram_size(self) -> int:  # type: ignore[empty-body]
         """
@@ -372,6 +378,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        n_gram = self.__n_gram_size
+        if n_gram <=0  or len(encoded_corpus) < n_gram:
+            return None
+        result = []
+        for i in range(len(encoded_corpus) - n_gram +1):
+            result.append(encoded_corpus[i: i+n_gram])
+        return tuple(result)
 
 
 class GreedyTextGenerator:
