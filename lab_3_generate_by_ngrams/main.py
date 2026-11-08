@@ -391,14 +391,12 @@ class NGramLanguageModel:
             return None
 
         size_of_context = self.__n_gram_size - 1
-        if size_of_context - 1 > len(sequence):
+        if size_of_context > len(sequence):
             return None
 
         sequence_context = sequence[-size_of_context:]
-        print(sequence_context)
         potential_letters = {}
 
-        print(self._n_gram_frequencies)
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:size_of_context] == sequence_context:
                 potential_letters[n_gram[len(n_gram)-1]] = freq
@@ -453,6 +451,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
         """
@@ -468,7 +468,29 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not (isinstance(prompt, str) and
+        isinstance(seq_len, int)
+        and seq_len > 0
+        ):
+            return None
 
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+
+        encoded_seq = list(encoded_prompt)
+
+        while seq_len > 0:
+            potential_tokens = self._model.generate_next_token(tuple(encoded_seq))
+            if not potential_tokens:
+                break
+            sorted_potential_tokens = sorted(potential_tokens, key = lambda x: (potential_tokens[x], x), reverse = True)
+            best_token = sorted_potential_tokens[0]
+            encoded_seq.append(best_token)
+            seq_len -= 1
+
+        decoded_seq = self._text_processor.decode(tuple(encoded_seq))
+        return decoded_seq
 
 class BeamSearcher:
     """
