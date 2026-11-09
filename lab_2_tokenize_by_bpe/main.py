@@ -203,7 +203,6 @@ def train(
         return None
 
     current = word_frequencies
-    merges: list[tuple[str, str]] = []
 
     for _ in range(num_merges):
         pairs = count_tokens_pairs(current)
@@ -226,9 +225,8 @@ def train(
             return None
 
         current = merged
-        merges.append(best_pair)
 
-    return current, merges
+    return current
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
