@@ -289,7 +289,44 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
+    if encoded_text is None:
+        return None
+    if not isinstance(encoded_text, (list, tuple)):
+        return None
+    if vocabulary is None or not isinstance(vocabulary, dict) or not vocabulary:
+        return None
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+        return None
 
+    unknown_token = "<unk>"
+    if unknown_token not in vocabulary:
+        return None
+
+    id_to_token: dict[int, str] = {}
+    for token, token_id in vocabulary.items():
+        if not isinstance(token, str) or token == "":
+            return None
+        if not isinstance(token_id, int) or isinstance(token_id, bool):
+            return None
+        if token_id < 0:
+            return None
+        if token_id in id_to_token:
+            return None
+        id_to_token[token_id] = token
+
+    parts: list[str] = []
+    for token_id in encoded_text:
+        if not isinstance(token_id, int) or isinstance(token_id, bool):
+            return None
+        if token_id < 0:
+            return None
+        token = id_to_token.get(token_id, unknown_token)
+        if end_of_word_token is not None and token == end_of_word_token:
+            parts.append(" ")
+        else:
+            parts.append(token)
+
+    return "".join(parts)
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
