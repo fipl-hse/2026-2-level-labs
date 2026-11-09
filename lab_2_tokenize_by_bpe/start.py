@@ -65,13 +65,13 @@ def main() -> None:
             print("".join(word), "->", count)
 
     trained_frequencies = train(frequencies, 100)
-assert trained_frequencies is not None, "train failed"
+    assert trained_frequencies is not None, "train failed"
 
-final_top = sorted(
-    trained_frequencies.items(), key=lambda item: item[1], reverse=True
+    final_top = sorted(
+        trained_frequencies.items(), key=lambda item: item[1], reverse=True
 )[:10]
-for word, count in final_top:
-    print(" ".join(word), "->", count)
+    for word, count in final_top:
+        print(" ".join(word), "->", count)
 
     vocabulary = get_vocabulary(trained_frequencies, "<unk>")
     assert vocabulary is not None, "get_vocabulary failed"
