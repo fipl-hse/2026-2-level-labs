@@ -195,7 +195,40 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(num_merges, int) or isinstance(num_merges, bool):
+        return None
+    if num_merges < 0:
+        return None
 
+    current = word_frequencies
+    merges: list[tuple[str, str]] = []
+
+    for _ in range(num_merges):
+        pairs = count_tokens_pairs(current)
+        if pairs is None:
+            return None
+        if not pairs:
+            break
+
+        best_pair = min(
+            pairs.items(),
+            key=lambda item: (
+                -item[1],
+                -len(item[0][0] + item[0][1]),
+                item[0][0] + item[0][1],
+            ),
+        )[0]
+
+        merged = merge_tokens(current, best_pair)
+        if merged is None:
+            return None
+
+        current = merged
+        merges.append(best_pair)
+
+    return current, merges
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
