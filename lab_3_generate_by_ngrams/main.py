@@ -44,7 +44,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         if (text is None
-                or not isinstance(text, str)
+                    or not isinstance(text, str)
                 ):
             return None
 
@@ -118,9 +118,9 @@ class TextProcessor:
         ):
             return None
 
-        for k, v in self._storage.items():
-            if v == element_id:
-                return k
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
 
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
@@ -138,6 +138,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if (
+            not isinstance(text, str)
+            or text is None
+        ):
+            return None
+
+        text = self._tokenize(text)
+        for char in text:
+            if self._put(char) is None:
+                return None
+            self._put(char)
+
+        return tuple([self.get_id(char) for char in text])
 
     def _put(self, element: str) -> None:
         """
@@ -149,6 +162,12 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if (
+            isinstance(element, str)
+            and len(element) == 1
+            and element not in self._storage
+        ):
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
@@ -166,6 +185,20 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if (
+            not isinstance(encoded_corpus, tuple)
+            or not all(isinstance(el, int) for el in encoded_corpus)
+        ):
+            return None
+
+        resulting_text = ""
+
+        for token_id in encoded_corpus:
+            if self.get_token(token_id) is None:
+                return None
+            resulting_text += self.get_token(token_id)
+
+        return resulting_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
