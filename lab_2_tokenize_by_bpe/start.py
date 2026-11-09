@@ -89,6 +89,25 @@ def main() -> None:
 
     result = vocabulary
 
+    import os
+
+    secrets_dir = "lab_2_tokenize_by_bpe/assets/secrets"
+    secret_files = sorted(os.listdir(secrets_dir)) if os.path.isdir(secrets_dir) else []
+    assert secret_files, "No secret files found"
+
+    secret_path = os.path.join(secrets_dir, secret_files[0])
+    with open(secret_path, "r", encoding="utf-8") as secret_file:
+        secret_raw = secret_file.read()
+
+    cleaned = secret_raw.replace("[", " ").replace("]", " ").replace(",", " ")
+    secret_ids = [int(x) for x in cleaned.split()]
+
+    decoded_secret = decode(secret_ids, vocabulary, "</s>")
+    assert decoded_secret is not None, "decode failed"
+    print(f"Secret ({secret_files[0]}): {decoded_secret}")
+
+    result = decoded_secret
+
     result = frequencies
     assert result, "Translation not working"
 
