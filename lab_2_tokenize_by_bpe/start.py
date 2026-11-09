@@ -7,6 +7,7 @@ BPE Tokenizer starter
 from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     count_tokens_pairs,
+    get_vocabulary,
     merge_tokens,
     prepare_word,
     train,
@@ -76,6 +77,17 @@ def main() -> None:
     )[:10]
     for word, count in final_top:
         print(" ".join(word), "->", count)
+
+    vocabulary = get_vocabulary(trained_frequencies, "<unk>")
+    assert vocabulary is not None, "get_vocabulary failed"
+    assert vocabulary, "Vocabulary is empty"
+
+    print(f"Vocabulary size: {len(vocabulary)}")
+    top_tokens = sorted(vocabulary.items(), key=lambda item: item[1])[:20]
+    for token, token_id in top_tokens:
+        print(f"{token_id}: {token!r}")
+
+    result = vocabulary
 
     result = frequencies
     assert result, "Translation not working"
