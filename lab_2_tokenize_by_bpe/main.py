@@ -246,7 +246,29 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(unknown_token, str) or unknown_token == "":
+        return None
 
+    unique_tokens: set[str] = {unknown_token}
+
+    for word, count in word_frequencies.items():
+        if not isinstance(word, tuple):
+            return None
+        if not isinstance(count, int) or isinstance(count, bool):
+            return None
+        if count <= 0:
+            return None
+        for token in word:
+            if not isinstance(token, str):
+                return None
+            unique_tokens.add(token)
+            for char in token:
+                unique_tokens.add(char)
+
+    sorted_tokens = sorted(unique_tokens, key=lambda t: (-len(t), t))
+    return {token: idx for idx, token in enumerate(sorted_tokens)}
 
 def decode(
     encoded_text: Sequence[int] | None,
