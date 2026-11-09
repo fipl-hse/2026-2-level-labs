@@ -23,6 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self.end_of_word_token = end_of_word_token
 
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
@@ -41,6 +42,13 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        no_punc_text = text
+        for punctuation in ',?.;!",-':
+            no_punc_text.replace(punctuation, '')
+
+        tokens = tuple(no_punc_text.lower().split(self.end_of_word_token))
+
+        return tokens
 
     def get_id(self, element: str) -> int | None:
         """
