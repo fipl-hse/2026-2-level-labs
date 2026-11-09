@@ -9,6 +9,7 @@ from lab_2_tokenize_by_bpe.main import (
     count_tokens_pairs,
     merge_tokens,
     prepare_word,
+    train,
 )
 
 
@@ -60,6 +61,21 @@ def main() -> None:
         )[:10]
         for word, count in merged_top:
             print("".join(word), "->", count)
+
+    training_result = train(frequencies, 100)
+    assert training_result is not None, "train failed"
+    trained_frequencies, merges = training_result
+
+    print(f"Performed {len(merges)} merges (target: 100)")
+
+    for pair in merges[-20:]:
+        print(f"merged {pair} -> {pair[0] + pair[1]}")
+
+    final_top = sorted(
+        trained_frequencies.items(), key=lambda item: item[1], reverse=True
+    )[:10]
+    for word, count in final_top:
+        print(" ".join(word), "->", count)
 
     result = frequencies
     assert result, "Translation not working"
