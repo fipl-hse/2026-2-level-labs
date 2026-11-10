@@ -5,7 +5,7 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-
+import math
 
 class TextProcessor:
     """
@@ -529,6 +529,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> list[tuple[int, float]] | None:
         """
@@ -547,6 +549,19 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+        candidates = self._model.generate_next_token(sequence)
+
+        if candidates is None:
+            return None
+        if not candidates:
+            return []
+
+        items = list(candidates.items())
+        items.sort(key=lambda pair: (pair[1], pair[0]), reverse=True)
+
+        return items[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -570,6 +585,25 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if (
+            not isinstance(sequence, tuple)
+            or not isinstance(next_tokens, list)
+            or not isinstance(sequence_candidates, dict)
+        ):
+            return None
+        if not next_tokens or len(next_tokens) > self._beam_width:
+            return None
+        if sequence not in sequence_candidates:
+            return None
+
+        new_candidates = dict(sequence_candidates)
+        current_penalty = new_candidates.pop(sequence)
+
+        for token, prob in next_tokens:
+            new_seq = sequence + (token,)
+            new_candidates[new_seq] = current_penalty - math.log(prob)
+
+        return new_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
