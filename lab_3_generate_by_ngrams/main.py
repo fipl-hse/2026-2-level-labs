@@ -350,6 +350,40 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         False is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
+            return False
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if n_grams is None:
+            return False
+
+        n_gram_counts = {}
+        for i in n_gram_counts:
+            n_gram_counts[i] = n_grams.get(i, 0) +1
+
+        context_counts = {}
+        for n_gr in n_grams:
+            context = n_gr[:-1]
+            context_counts[context] = context_counts.get(n_gr, 0) +1
+
+        self._n_gram_frequencies = {}
+        for n_gr, cnt in n_gram_counts.items():
+            context = n_gr[:-1]
+            self._n_gram_frequencies[n_gr] = cnt / context_counts[context]
+
+        return True
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> dict | None:
         """
