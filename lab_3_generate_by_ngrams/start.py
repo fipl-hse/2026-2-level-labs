@@ -53,7 +53,7 @@ def main() -> None:
     beam_generated_text = beam_generator.run(
         prompt="Vernon",
         seq_len=56)
-    print(f"Greedy generated text: {beam_generated_text}")
+    print(f"Beam generated text: {beam_generated_text}")
 
 if __name__ == "__main__":
     main()
