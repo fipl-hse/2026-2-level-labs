@@ -698,12 +698,9 @@ class BeamSearchTextGenerator:
         if encoded_prompt is None:
             return None
 
-        print(encoded_prompt)
-        print(self._text_processor.decode(tuple(encoded_prompt)))
-
         sequence_candidates = {encoded_prompt : 0.0}
 
-        while seq_len-1 > 0:
+        for i in range(seq_len):
             for sequence in list(sequence_candidates):
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
@@ -719,8 +716,6 @@ class BeamSearchTextGenerator:
                 return None
 
             sequence_candidates = pruned_candidates
-
-            seq_len -= 1
 
         result_sequence = min(sequence_candidates.items(), key=lambda x: (x[1], x[0]))[0]
         decoded_prompt = self._text_processor.decode(result_sequence)

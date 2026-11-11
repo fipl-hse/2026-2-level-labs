@@ -3,7 +3,7 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor, BeamSearchTextGenerator
 
 
 def main() -> None:
@@ -32,9 +32,14 @@ def main() -> None:
     print(n_gram_freq)
 
     greedy_text_generator = GreedyTextGenerator(n_gram_lang_model, processor)
-    result = greedy_text_generator.run("Vernon", 51)
-    assert result, "Impossible to generate text"
-    print(result)
+    result_greedy_generator = greedy_text_generator.run("Vernon", 51)
+    assert result_greedy_generator, "Impossible to generate text"
+    print(result_greedy_generator)
+
+    beam_search_generator = BeamSearchTextGenerator(n_gram_lang_model, processor, 7)
+    result_beam_generator = beam_search_generator.run("Vernon", 56)
+    assert result_beam_generator, "Impossible to generate text"
+    print(result_beam_generator)
 
 if __name__ == "__main__":
     main()
