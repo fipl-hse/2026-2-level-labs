@@ -20,7 +20,6 @@ def main() -> None:
         "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
-    # Шаг 1.10 (на 4 балла): кодирование и декодирование текста
     processor = TextProcessor("_")
     encoded = processor.encode(text)
     if not encoded:
@@ -28,7 +27,6 @@ def main() -> None:
     decoded = processor.decode(encoded)
     print(decoded)
 
-    # Шаг 2.3 и 3.3 (на 6 баллов): построение модели N-грамм и жадная генерация
     model = NGramLanguageModel(encoded, n_gram_size=7)
     model.build()
 

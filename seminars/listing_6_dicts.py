@@ -198,6 +198,7 @@ def bake_cakes(recipe: dict[str, int], ingredients: dict[str, int]) -> int:
         int: Maximum number of cakes that can be baked.
     """
     # student realisation goes here
+    
 
 
 # Function calls with expected result:
