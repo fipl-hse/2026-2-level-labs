@@ -3,7 +3,12 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-from main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from main import (
+    BeamSearchTextGenerator,
+    GreedyTextGenerator,
+    NGramLanguageModel,
+    TextProcessor,
+)
 
 
 def main() -> None:
@@ -32,17 +37,20 @@ def main() -> None:
     # assert decoded_corpus, "decoded text is None"
 
     #mark6
-    n_gram_size = 7
-    language_model = NGramLanguageModel(encoded_corpus, n_gram_size)
+    language_model = NGramLanguageModel(encoded_corpus, 7)
 
     build_model = language_model.build()
     assert build_model, "failed to build the language model"
 
     generator = GreedyTextGenerator(language_model, text_processor)
-    prompt = "Vernon"
-    seq_len = 51
-    result = generator.run(prompt, seq_len)
+    result = generator.run("Vernon", 51)
     print(result)
+
+    #mark8
+    beam_search_generator = BeamSearchTextGenerator(language_model, text_processor, 7)
+    result_beam = beam_search_generator.run("Vernon", 56)
+    #assert result_beam, "Impossible to generate text"
+    print(result_beam)
 
 
 if __name__ == "__main__":
