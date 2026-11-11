@@ -4,11 +4,12 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 from lab_3_generate_by_ngrams.main import (
-    BeamSearcher,
+    BeamSearchTextGenerator,
     GreedyTextGenerator,
     NGramLanguageModel,
     TextProcessor,
 )
+
 
 def main() -> None:
     """
@@ -33,9 +34,13 @@ def main() -> None:
 
     greedy_generator = GreedyTextGenerator(language_model, text_processor)
     greedy_text = greedy_generator.run("Vernon", 51)
-    assert greedy_text is not None, " the Greedy generation is failed"
+    assert greedy_text is not None, " The Greedy generation is failed"
 
-    result = greedy_text
+    beam_generator = BeamSearchTextGenerator(language_model, text_processor, 3)
+    beam_text = beam_generator.run("Vernon", 56)
+    assert beam_text is not None, "The Beam Search Generation is failed"
+
+    result = beam_text
     assert result
 
 if __name__ == "__main__":
