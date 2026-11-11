@@ -329,6 +329,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self.__n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -357,13 +358,13 @@ class NGramLanguageModel:
             return False
 
         n_gram_counts = {}
-        for i in n_gram_counts:
-            n_gram_counts[i] = n_grams.get(i, 0) +1
+        for i in n_grams:
+            n_gram_counts[i] = n_gram_counts.get(i, 0) +1
 
         context_counts = {}
         for n_gr in n_grams:
             context = n_gr[:-1]
-            context_counts[context] = context_counts.get(n_gr, 0) +1
+            context_counts[context] = context_counts.get(context, 0) +1
 
         self._n_gram_frequencies = {}
         for n_gr, cnt in n_gram_counts.items():
@@ -371,18 +372,6 @@ class NGramLanguageModel:
             self._n_gram_frequencies[n_gr] = cnt / context_counts[context]
 
         return True
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> dict | None:
@@ -397,6 +386,26 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+
+        n_gram_size = self.__n_gram_size
+        if n_gram_size <= 0:
+            return None
+
+        cnt_len = n_gram_size - 1
+        if len(sequence) < cnt_len:
+            return None
+
+        cnt = sequence[-cnt_len:]
+        result = {}
+        for n_gram, prob in self._n_gram_frequencies.items():
+            if n_gram[:-1] == cnt:
+                next_token = n_gram[-1]
+                result[next_token] = prob
+
+        return result
+
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]

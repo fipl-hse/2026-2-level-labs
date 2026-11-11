@@ -4,7 +4,10 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-from lab_3_generate_by_ngrams.main import TextProcessor
+from lab_3_generate_by_ngrams.main import (
+    TextProcessor,
+    NGramLanguageModel
+)
 
 def main() -> None:
     """
@@ -16,10 +19,21 @@ def main() -> None:
         "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
+
     processor = TextProcessor("_")
     encoded = processor.encode(text)
     result = processor.decode(encoded)
-    print(result)
+
+    model = NGramLanguageModel(encoded, 3)
+    build_result = model.build()
+    frequencies = model._n_gram_frequencies
+    for i, (n_gram, prob) in enumerate(frequencies.items()):
+        if i >= 10:
+            break
+        print(f"  {n_gram}: {prob}")
+    n_gram_size = model.get_n_gram_size()
+    print(n_gram_size)
+
     assert result
 
 
