@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 import math
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -168,7 +169,7 @@ class TextProcessor:
         an element is not added to storage
         """
         if not isinstance(element, str) or len(element) != 1:
-            return None
+            return
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -442,8 +443,6 @@ class NGramLanguageModel:
         ):
             return None
 
-        context_size = self.__n_gram_size - 1
-
         if len(sequence) < self.__n_gram_size - 1:
             return None
 
@@ -609,12 +608,12 @@ class BeamSearcher:
         if not candidates:
             return []
 
-        candidates = sorted(
+        sorted_candidates = sorted(
         candidates.items(),
         key=lambda x: (x[1], x[0]),
         reverse=True)
 
-        return candidates[:self._beam_width]
+        return sorted_candidates[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -789,15 +788,17 @@ class BeamSearchTextGenerator:
 
                 sequence_candidates = updated_candidates
 
-            sequence_candidates = (
+            pruned_candidates = (
             self.beam_searcher.prune_sequence_candidates(
                 sequence_candidates))
-            if sequence_candidates is None:
+            if pruned_candidates is None:
                 return None
+
+            sequence_candidates = pruned_candidates
 
         best_sequence = min(
         sequence_candidates,
-        key=sequence_candidates.get)
+        key=lambda sequence: sequence_candidates[sequence])
 
         return self._text_processor.decode(best_sequence)
 
