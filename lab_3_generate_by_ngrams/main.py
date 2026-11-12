@@ -135,7 +135,7 @@ class TextProcessor:
 
         for element in tokenized_text:
             if element is not None:
-                new_storage = self._put(element)
+               self._put(element)
 
         encoded_text = []
         for token in tokenized_text:
@@ -162,8 +162,6 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
-
-
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
@@ -660,7 +658,7 @@ class BeamSearcher:
             key = lambda x: (x[1], x[0]))
         sorted_sequence_candidates = sorted_sequence_candidates[:self._beam_width]
 
-        result_sequence_candidates = {key : value for key, value in sorted_sequence_candidates}
+        result_sequence_candidates = dict(sorted_sequence_candidates)
 
         return result_sequence_candidates
 
@@ -717,13 +715,15 @@ class BeamSearchTextGenerator:
 
         sequence_candidates = {encoded_prompt : 0.0}
 
-        for i in range(seq_len):
+        while seq_len > 1:
             for sequence in list(sequence_candidates):
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
                     return None
 
-                new_candidates = self.beam_searcher.continue_sequence(sequence, next_tokens, sequence_candidates)
+                new_candidates = self.beam_searcher.continue_sequence(
+                    sequence, next_tokens, sequence_candidates
+                    )
                 if new_candidates is None:
                     continue
                 sequence_candidates = new_candidates
@@ -733,6 +733,8 @@ class BeamSearchTextGenerator:
                 return None
 
             sequence_candidates = pruned_candidates
+
+            seq_len -= 1
 
         result_sequence = min(sequence_candidates.items(), key=lambda x: (x[1], x[0]))[0]
         decoded_prompt = self._text_processor.decode(result_sequence)
