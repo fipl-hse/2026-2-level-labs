@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
+
 import math
 
 class TextProcessor:
@@ -357,6 +358,8 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         False is returned
         """
+        if self._encoded_corpus is None:
+            return False
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
         if n_grams is None:
