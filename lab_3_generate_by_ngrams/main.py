@@ -8,6 +8,7 @@ Beam-search and natural language generation evaluation
 
 import math
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -163,8 +164,6 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
-
-        return self._storage
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
