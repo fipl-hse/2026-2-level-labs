@@ -8,6 +8,8 @@ from lab_3_generate_by_ngrams.main import (
     GreedyTextGenerator,
     NGramLanguageModel,
     TextProcessor,
+    NGramLanguageModelReader,
+    BackOffGenerator
 )
 
 
@@ -45,6 +47,21 @@ def main() -> None:
     result_beam_generator = beam_search_generator.run("Vernon", 56)
     assert result_beam_generator, "Impossible to generate text"
     print(result_beam_generator)
+
+    reader = NGramLanguageModelReader("./lab_3_generate_by_ngrams/assets/en_own.json", "_")
+    language_models = []
+
+    for n_gram_size in (2, 3, 4):
+        model = reader.load(n_gram_size)
+        if model is not None:
+            language_models.append(model)
+
+    language_models = tuple(language_models)
+
+    back_off_generator = BackOffGenerator(language_models, reader.get_text_processor())
+    result_backoff_generator = back_off_generator.run("Vernon", 100)
+    assert result_backoff_generator, "Text can not be generated"
+    print(result_backoff_generator)
 
 if __name__ == "__main__":
 
