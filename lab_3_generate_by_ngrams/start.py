@@ -5,6 +5,7 @@ Generation by NGrams starter
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
 from lab_3_generate_by_ngrams.main import (
+    GreedyTextGenerator,
     TextProcessor,
     NGramLanguageModel
 )
@@ -33,6 +34,12 @@ def main() -> None:
         print(f"  {n_gram}: {prob}")
     n_gram_size = model.get_n_gram_size()
     print(n_gram_size)
+
+    generator = GreedyTextGenerator(model, processor)
+    prompt = "Drako Malfoy"
+    seq_len = 20
+    generated = generator.run(prompt, seq_len)
+    print(f"Generated: {generated}")
 
     assert result
 

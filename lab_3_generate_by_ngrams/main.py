@@ -449,6 +449,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
         """
@@ -464,6 +466,23 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(prompt, str) or not isinstance(seq_len, int) or isinstance(seq_len, bool):
+            return None
+        if seq_len <= 0:
+           return None
+        encoded = self._text_processor.encode(prompt)
+        if encoded is None:
+            return None
+        sequence = list(encoded)
+        for i in range(seq_len):
+            candidates = self._model.generate_next_token(tuple(sequence))
+            if not candidates:
+                break
+            best_token = max(candidates, key=lambda t: (candidates[t], t))
+            sequence.append(best_token)
+        return self._text_processor.decode(tuple(sequence))
+
+
 
 
 class BeamSearcher:
