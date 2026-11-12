@@ -136,7 +136,7 @@ class TextProcessor:
 
         for element in tokenized_text:
             if element is not None:
-               self._put(element)
+                self._put(element)
 
         encoded_text = []
         for token in tokenized_text:
@@ -163,6 +163,8 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+
+        return self._storage
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
