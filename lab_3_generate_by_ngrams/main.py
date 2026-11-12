@@ -359,8 +359,6 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         False is returned
         """
-        if self._encoded_corpus is None:
-            return None
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
         if n_grams is None:
@@ -493,7 +491,10 @@ class GreedyTextGenerator:
             potential_tokens = self._model.generate_next_token(tuple(encoded_seq))
             if not potential_tokens:
                 break
-            sorted_potential_tokens = sorted(potential_tokens, key = lambda x: (potential_tokens[x], x), reverse = True)
+            sorted_potential_tokens = sorted(
+                potential_tokens,
+                key = lambda x: (potential_tokens[x], x),
+                reverse = True)
             best_token = sorted_potential_tokens[0]
             encoded_seq.append(best_token)
             seq_len -= 1
@@ -550,7 +551,10 @@ class BeamSearcher:
         if not potential_tokens:
             return []
 
-        sorted_potential_tokens = sorted(potential_tokens.items(), key = lambda x: (x[1], x[0]), reverse = True)
+        sorted_potential_tokens = sorted(
+            potential_tokens.items(),
+            key = lambda x: (x[1], x[0]),
+            reverse = True)
         if not sorted_potential_tokens:
             return None
 
@@ -616,7 +620,9 @@ class BeamSearcher:
             improved_sequence = list(sequence)
 
             improved_sequence.append(token)
-            new_candidates[tuple(improved_sequence)] = sequence_candidates.get(sequence, 0.0) - math.log(freq)
+            new_candidates[tuple(improved_sequence)] = (
+                sequence_candidates.get(sequence, 0.0) - math.log(freq)
+            )
 
         sequence_candidates.update(new_candidates)
         sequence_candidates.pop(sequence)
@@ -649,7 +655,9 @@ class BeamSearcher:
         ):
                 return None
 
-        sorted_sequence_candidates = sorted(sequence_candidates.items(), key = lambda x: (x[1], x[0]))
+        sorted_sequence_candidates = sorted(
+            sequence_candidates.items(),
+            key = lambda x: (x[1], x[0]))
         sorted_sequence_candidates = sorted_sequence_candidates[:self._beam_width]
 
         result_sequence_candidates = {key : value for key, value in sorted_sequence_candidates}
