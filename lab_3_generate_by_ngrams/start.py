@@ -8,6 +8,7 @@ from lab_3_generate_by_ngrams.main import (
     GreedyTextGenerator,
     NGramLanguageModel,
     TextProcessor,
+    BeamSearchTextGenerator
 )
 
 def main() -> None:
