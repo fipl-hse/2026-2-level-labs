@@ -134,7 +134,8 @@ class TextProcessor:
             return None
 
         for element in tokenized_text:
-            new_storage = self._put(element)
+            if element is not None:
+                new_storage = self._put(element)
 
         encoded_text = []
         for token in tokenized_text:
@@ -160,7 +161,9 @@ class TextProcessor:
             return None
 
         if element not in self._storage:
-            self._storage[element]= len(self._storage)
+            self._storage[element] = len(self._storage)
+
+
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
@@ -180,6 +183,9 @@ class TextProcessor:
         """
 
         decoded_text = self._decode(encoded_corpus)
+        if decoded_text is None:
+            return None
+
         result_text = self._postprocess_decoded_text(decoded_text)
 
         return result_text
@@ -353,6 +359,9 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         False is returned
         """
+        if self._encoded_corpus is None:
+            return None
+
         n_grams = self._extract_n_grams(self._encoded_corpus)
         if n_grams is None:
             return False
