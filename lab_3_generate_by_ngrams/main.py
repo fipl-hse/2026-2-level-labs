@@ -173,6 +173,12 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        decoded = self._decode(encoded_corpus)
+        if decoded is None:
+            return None
+        return self._postprocess_decoded_text(decoded)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -181,6 +187,15 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict):
+            return None
+        for ngram in content.get("ngrams", []):
+            if not isinstance(ngram, (list, tuple)):
+                continue
+            for token in ngram:
+                if isinstance(token, str) and len(token) == 1:
+                    self._put(token)
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> tuple[str, ...] | None:
         """
@@ -195,6 +210,15 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple):
+            return None
+        result = []
+        for tid in corpus:
+            token = self.get_token(tid)
+            if token is None:
+                return None
+            result.append(token)
+        return tuple(result)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -211,6 +235,26 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
+
+        chars = []
+        for token in decoded_corpus:
+            if not isinstance(token, str) or len(token) != 1:
+                return None
+            if token == self._end_of_word_token:
+                # Пробел, но без ведущих/двойных пробелов
+                if chars and chars[-1] != " ":
+                    chars.append(" ")
+            else:
+                chars.append(token)
+
+        text = "".join(chars).rstrip()
+        if not text:
+            return None
+        text = text[0].upper() + text[1:]
+        return text + "."
+
 
 
 class WordProcessor(TextProcessor):
