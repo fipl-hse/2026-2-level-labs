@@ -50,15 +50,15 @@ class TextProcessor:
         words = cleaned.split()
         if not words:
             return None
+
         tokens = []
-        ends_with_separator = bool(re.search(r"[\s\d\W]$", text)) if text else False
-        for i, word in enumerate(words):
-            for symb in word:
-                tokens.append(symb)
-            is_last = (i == len(words) - 1)
-            if not is_last or ends_with_separator:
-                    if not tokens or tokens[-1] != self._end_of_word_token:
-                        tokens.append(self._end_of_word_token)
+        for word in words:
+            tokens.extend(word)
+            tokens.append(self._end_of_word_token)
+
+        if text[-1].isalpha():
+            tokens.pop()
+
         return tuple(tokens)
 
 
@@ -240,7 +240,7 @@ class TextProcessor:
         text = re.sub(r"\s+", " ", text).strip()
         if not text:
             return None
-        text= text[0].upper() + text[1:] + "."
+        text = text.capitalize() + "."
         return text
 
 
@@ -367,9 +367,9 @@ class NGramLanguageModel:
             context_counts[context] = context_counts.get(context, 0) +1
 
         self._n_gram_frequencies = {}
-        for n_gr, cnt in n_gram_counts.items():
-            context = n_gr[:-1]
-            self._n_gram_frequencies[n_gr] = cnt / context_counts[context]
+        for n_gram, context in n_gram_counts.items():
+            context = n_gram[:-1]
+            self._n_gram_frequencies[n_gram] = context / context_counts[context]
 
         return True
 
@@ -393,14 +393,14 @@ class NGramLanguageModel:
         if n_gram_size <= 0:
             return None
 
-        cnt_len = n_gram_size - 1
-        if len(sequence) < cnt_len:
+        context_len = n_gram_size - 1
+        if len(sequence) < context_len:
             return None
 
-        cnt = sequence[-cnt_len:]
+        context = sequence[-context_len:]
         result = {}
         for n_gram, prob in self._n_gram_frequencies.items():
-            if n_gram[:-1] == cnt:
+            if n_gram[:-1] == context:
                 next_token = n_gram[-1]
                 result[next_token] = prob
 
@@ -424,11 +424,11 @@ class NGramLanguageModel:
         if not isinstance(encoded_corpus, tuple):
             return None
         n_gram = self.__n_gram_size
-        if n_gram <=0  or len(encoded_corpus) < n_gram:
+        if n_gram <= 0  or len(encoded_corpus) < n_gram:
             return None
         result = []
-        for i in range(len(encoded_corpus) - n_gram +1):
-            result.append(encoded_corpus[i: i+n_gram])
+        for i in range(len(encoded_corpus) - n_gram + 1):
+            result.append(encoded_corpus[i: i + n_gram])
         return tuple(result)
 
 
