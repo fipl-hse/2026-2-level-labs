@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 import math
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -555,13 +556,17 @@ class BeamSearcher:
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
         if (
-            not isinstance(sequence, tuple)
-            or not sequence
-            or not isinstance(next_tokens, list)
-            or not next_tokens
-            or not isinstance(sequence_candidates, dict)
-            or sequence not in sequence_candidates
-            or len(next_tokens) > self._beam_width
+          not isinstance(sequence, tuple)
+          or not sequence
+          or not isinstance(next_tokens, list)
+          or not next_tokens
+        ):
+            return None
+
+        if (
+          not isinstance(sequence_candidates, dict)
+          or sequence not in sequence_candidates
+          or len(next_tokens) > self._beam_width
         ):
             return None
 
