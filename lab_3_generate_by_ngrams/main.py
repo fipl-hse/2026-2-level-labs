@@ -483,8 +483,6 @@ class GreedyTextGenerator:
         return self._text_processor.decode(tuple(sequence))
 
 
-
-
 class BeamSearcher:
     """
     Beam Search algorithm for diverse text generation.
