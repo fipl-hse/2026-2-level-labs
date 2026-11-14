@@ -237,22 +237,12 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
-        for token in decoded_corpus:
-            if not isinstance(token, str):
-                return None
-
-        text = "".join(decoded_corpus)
-        text = text.replace(self._end_of_word_token, " ")
-
-        while "  " in text:
-            text = text.replace("  ", " ")
-
-        text = text.strip()
-        if not text:
+        text = "".join(decoded_corpus).replace(self._end_of_word_token, " ")
+        words = text.split()
+        if not words:
             return None
 
-        processed = text[0].upper() + text[1:] + "."
-        return processed
+        return " ".join(words).capitalize() + "."
 class WordProcessor(TextProcessor):
     """
     Handle text tokenization, encoding and decoding on the level of words.
@@ -378,10 +368,10 @@ class NGramLanguageModel:
             context_counts[context] = context_counts.get(context, 0) + 1
 
         for ngram, count in ngram_counts.items():
-            context = ngram[:-1]
-            self._n_gram_frequencies[ngram] = count / context_counts[context]
+            self._n_gram_frequencies[ngram] = count / context_counts[ngram[:-1]]
 
         return True
+
     def generate_next_token(self, sequence: tuple[int, ...]) -> dict | None:
         """
         Retrieve tokens that can continue the given sequence along with their probabilities.
@@ -394,22 +384,19 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or not sequence:
+        if (
+            not isinstance(sequence, tuple)
+            or not sequence
+            or len(sequence) < self.__n_gram_size - 1
+        ):
             return None
 
-        context_len = self.__n_gram_size - 1
-        if len(sequence) < context_len:
-            return None
-
-        context = sequence[-context_len:]
-        candidates = {}
-
-        for ngram, freq in self._n_gram_frequencies.items():
-            if ngram[:-1] == context:
-                candidates[ngram[-1]] = freq
-
-        return candidates
-
+        context = sequence[-(self.__n_gram_size - 1) :]
+        return {
+            ngram[-1]: freq
+            for ngram, freq in self._n_gram_frequencies.items()
+            if ngram[:-1] == context
+        }
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
     ) -> tuple[tuple[int, ...], ...] | None:
@@ -424,18 +411,13 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if (
-            not isinstance(encoded_corpus, tuple)
-            or not encoded_corpus
-            or not isinstance(self.__n_gram_size, int)
-            or self.__n_gram_size < 2
-        ):
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
-        n_grams = []
-        for i in range(len(encoded_corpus) - self.__n_gram_size + 1):
-            n_grams.append(tuple(encoded_corpus[i : i + self.__n_gram_size]))
-
+        n_grams = [
+            tuple(encoded_corpus[i : i + self.__n_gram_size])
+            for i in range(len(encoded_corpus) - self.__n_gram_size + 1)
+        ]
         if not n_grams:
             return None
         return tuple(n_grams)
@@ -670,21 +652,21 @@ class BeamSearchTextGenerator:
         seq_candidates = {encoded_prompt: 0.0}
         for _ in range(seq_len):
             new_candidates = dict(seq_candidates)
-            continued_any = False
             for seq in seq_candidates:
                 next_tokens = self._get_next_token(seq)
                 if next_tokens is None:
                     return None
+                if not next_tokens:
+                    continue
 
                 updated = self.beam_searcher.continue_sequence(
-                    seq, next_tokens, new_candidates
-                )
+                 seq, next_tokens, new_candidates
+             )
                 if updated is None:
                     break
                 new_candidates = updated
-                continued_any = True
 
-            if not continued_any:
+            if new_candidates == seq_candidates:
                 break
 
             pruned = self.beam_searcher.prune_sequence_candidates(new_candidates)
@@ -694,7 +676,6 @@ class BeamSearchTextGenerator:
 
         best_seq = min(seq_candidates.items(), key=lambda item: (item[1], item[0]))[0]
         return self._text_processor.decode(best_seq)
-
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
