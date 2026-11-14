@@ -10,9 +10,7 @@ import math
 from typing import Sequence
 
 
-def prepare_word(
-    raw_word: str, start_of_word: str | None, end_of_word: str | None
-) -> tuple[str, ...] | None:
+def prepare_word(raw_word: str, start_of_word: str | None, end_of_word: str | None) -> tuple[str, ...] | None:
     """
     Tokenize a word into characters and attach optional boundary tokens.
 
@@ -46,9 +44,7 @@ def prepare_word(
     return tuple(tokens)
 
 
-def collect_frequencies(
-    text: str, start_of_word: str | None, end_of_word: str
-) -> dict[tuple[str, ...], int] | None:
+def collect_frequencies(text: str, start_of_word: str | None, end_of_word: str | None) -> dict[tuple[str, ...], int] | None:
     """
     Count number of occurrences of each word.
 
