@@ -1,0 +1,14 @@
+{
+    "name": "de",
+    "freq": {
+        "hause": 0.1,
+        "auslande": 0.1,
+        "man": 0.6,
+        "an": 0.4,
+        "freunde": 0.1,
+        "bin": 0.1,
+        "gute": 0.1,
+        "minuten": 0.1
+    },
+    "n_words": 8
+}
