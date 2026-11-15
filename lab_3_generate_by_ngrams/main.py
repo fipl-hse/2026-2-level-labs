@@ -6,6 +6,7 @@ Beam-search and natural language generation evaluation
 
 # pylint:disable=too-few-public-methods
 import math
+import time
 
 
 class TextProcessor:
@@ -414,18 +415,17 @@ class NGramLanguageModel:
         if not n_grams_corpus or n_grams_corpus is None:
             return False
 
-        frequencies = {}
+        ngram_counts = {}
+        context_counts = {}
 
         for n_gram in n_grams_corpus:
-            count_n_grams = n_grams_corpus.count(n_gram)
-
+            ngram_counts[n_gram] = ngram_counts.get(n_gram, 0) + 1
             context = n_gram[:-1]
-            count_context = 0
-            for current_n_gram in n_grams_corpus:
-                if current_n_gram[:-1] == context:
-                    count_context += 1
+            context_counts[context] = context_counts.get(context, 0) + 1
 
-            frequencies[n_gram] = count_n_grams / count_context
+        frequencies = {}
+        for n_gram, exact_count in ngram_counts.items():
+            frequencies[n_gram] = exact_count / context_counts[n_gram[:-1]]
 
         self._n_gram_frequencies = frequencies
 
