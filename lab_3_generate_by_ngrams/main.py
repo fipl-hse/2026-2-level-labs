@@ -143,7 +143,7 @@ class TextProcessor:
         encoded_text = []
 
         for token in tokens:
-            if len(token) == 1:
+            if token != self._end_of_word_token:
                 if self._put(token) is None:
                     return None
 
