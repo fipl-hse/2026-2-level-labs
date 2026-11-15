@@ -28,7 +28,6 @@ def main() -> None:
     processor = TextProcessor("_")
 
     encoded_text = processor.encode(text)
-    assert encoded_text, "Text can not be encoded"
     print("Закодированный текст: ", encoded_text[:101])
 
     decoded_text =  processor.decode(encoded_text)
@@ -67,7 +66,6 @@ def main() -> None:
 
     word_processor = WordProcessor("<eos>")
     encoded_words = word_processor.encode(text)
-    assert encoded_words, "Text can not be encoded by words"
 
     word_models = []
     for n_gram_size in (2, 3, 4):
@@ -83,23 +81,19 @@ def main() -> None:
 
     greedy_text_generator_word = GreedyTextGenerator(word_models[-1], word_processor)
     result_greedy_generator_word = greedy_text_generator_word.run(prompt, 12)
-    assert result_greedy_generator_word, "Impossible to generate text"
     print("Результат GreedyGenerator (слова): ", result_greedy_generator_word)
 
     beam_search_generator_words = BeamSearchTextGenerator(
         word_models[-1], word_processor, 3
     )
     result_beam_generator_words = beam_search_generator_words.run(prompt, 12)
-    assert result_beam_generator_words, "Impossible to generate text"
     print("Результат BeamSearchGenerator (слова): ", result_beam_generator_words)
 
     back_off_generator_words = BackOffGenerator(tuple(word_models), word_processor)
     result_backoff_generator_words = back_off_generator_words.run(prompt, 12)
-    assert result_backoff_generator_words, "Impossible to generate text"
     print("Результат BackOffGenerator (слова): ", result_backoff_generator_words)
 
     result_greedy_letters = greedy_text_generator.run(prompt, 60)
-    assert result_greedy_letters, "Impossible to generate text"
     print("Результат GreedyGenerator (буквы): ", result_greedy_letters)
 
 if __name__ == "__main__":

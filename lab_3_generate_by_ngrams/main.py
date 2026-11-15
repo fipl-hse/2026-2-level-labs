@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 
 import math
+
 import json
 
 class TextProcessor:
@@ -275,7 +276,7 @@ class WordProcessor(TextProcessor):
         _end_of_word_token (str): A token denoting sentence boundary
         _storage (dict): Dictionary in the form of <token: identifier>
     """
-    def __init__(self, end_of_word_token):
+    def __init__(self, end_of_word_token) -> None:
         """
         Initialize an instance of WordProcessor.
 
@@ -959,7 +960,6 @@ class BackOffGenerator:
             return None
 
         encoded_seq = list(encoded_prompt)
-
         for _ in range(seq_len - 1):
             candidates = self._get_next_token(tuple(encoded_seq))
             if candidates is None:
