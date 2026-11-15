@@ -470,16 +470,17 @@ class GreedyTextGenerator:
         if not isinstance(prompt, str) or not isinstance(seq_len, int) or isinstance(seq_len, bool):
             return None
         if seq_len <= 0:
-           return None
+            return None
         encoded = self._text_processor.encode(prompt)
         if encoded is None:
             return None
         sequence = list(encoded)
-        for i in range(seq_len):
+        for _ in range(seq_len):
             candidates = self._model.generate_next_token(tuple(sequence))
             if not candidates:
                 break
-            best_token = max(candidates, key=lambda t: (candidates[t], t))
+            current_candidates = candidates
+            best_token = max(current_candidates, key=lambda t: (current_candidatescandidates[t], t))
             sequence.append(best_token)
         return self._text_processor.decode(tuple(sequence))
 
@@ -569,7 +570,10 @@ class BeamSearcher:
         penalty = updated.pop(sequence)
 
         for token, probable in next_tokens:
-            if not isinstance(token, int) or not isinstance(probable, (int, float)) or probable <= 0:
+            if (not isinstance(token, int)
+                or not isinstance(probable, (int, float))
+                or probable <= 0
+            ):
                 return None
             new_sequence = sequence + (token,)
             updated[new_sequence] = penalty - math.log(probable)
@@ -654,7 +658,7 @@ class BeamSearchTextGenerator:
             return None
         candidates = {encoded: 0.0}
 
-        for i in range(seq_len):
+        for _ in range(seq_len):
             new_candidates = {}
 
             for sequence, penalty in candidates.items():

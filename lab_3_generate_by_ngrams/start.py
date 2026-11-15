@@ -7,8 +7,8 @@ Generation by NGrams starter
 from lab_3_generate_by_ngrams.main import (
     BeamSearchTextGenerator,
     GreedyTextGenerator,
-    TextProcessor,
-    NGramLanguageModel
+    NGramLanguageModel,
+    TextProcessor
 )
 
 def main() -> None:
@@ -24,17 +24,17 @@ def main() -> None:
 
     processor = TextProcessor("_")
     encoded = processor.encode(text)
+    if encoded is None:
+        return None
     result = processor.decode(encoded)
     print("Greedy Text Generator")
     model = NGramLanguageModel(encoded, 7)
     build_result = model.build()
-    frequencies = model._n_gram_frequencies
-    for i, (n_gram, prob) in enumerate(frequencies.items()):
-        if i >= 10:
-            break
-        print(f"  {n_gram}: {prob}")
-    #n_gram_size = model.get_n_gram_size()
-    #print(n_gram_size)
+    #frequencies = model._n_gram_frequencies
+    #for i, (n_gram, prob) in enumerate(frequencies.items()):
+        #if i >= 10:
+            #break
+        #print(f"  {n_gram}: {prob}")
 
     generator = GreedyTextGenerator(model, processor)
     generated = generator.run('Vernon', 51)
