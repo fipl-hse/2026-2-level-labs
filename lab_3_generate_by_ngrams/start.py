@@ -18,8 +18,6 @@ def main() -> None:
         "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
-    # result = None
-    # assert result
 
     # Mark 4
 
@@ -42,9 +40,12 @@ def main() -> None:
     prompt = "Vernon"
     seq_len = 51
     result = greedy_text_generator.run(prompt, seq_len)
-    print(f"Затравка: '{prompt}'")
-    print(f"Результат генерации (длина {seq_len}):")
+    print(f"Checking: '{prompt}'")
+    print(f"The result of generation (length {seq_len}):")
     print(result)
+
+    # result = None
+    assert result
 
 if __name__ == "__main__":
     main()

@@ -46,18 +46,7 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
 
-        text = text.lower()
-        cleaned_text = []
-
-        for char in text:
-            if char.isalpha():
-                cleaned_text.append(char)
-            else:
-                cleaned_text.append(" ")
-
-        text = "".join(cleaned_text)
-
-        words = text.split()
+        words = text.lower().split()
 
         if not words:
             return None
@@ -65,9 +54,16 @@ class TextProcessor:
         tokens = []
 
         for word in words:
-            for char in word:
-                tokens.append(char)
-            tokens.append(self._end_of_word_token)
+            letters = [char for char in word if char.isalpha()]
+            if letters:
+                tokens.extend(letters)
+                tokens.append(self._end_of_word_token)
+
+        if not tokens:
+            return None
+
+        if text[-1].isalpha():
+            tokens.pop()
 
         return tuple(tokens)
 
