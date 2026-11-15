@@ -19,16 +19,20 @@ def main() -> None:
         text = text_file.read()
     processor = TextProcessor("_")
 
-    encoded_corpus = processor.encode(text)
-    print(encoded_corpus)
-
-    decoded_text = processor.decode(encoded_corpus)
-    print(decoded_text)
+     text_processor = TextProcessor('<eow>')
+    encoded = text_processor.encode(text)
+    print(f'Encoded corpus size: {len(encoded)}')
 
 
-    result = decoded_text
-    assert result
+    language_model = NGramLanguageModel(encoded, 2)
+    print(f'Is built: {language_model.build()}')
+    print(list(language_model._n_gram_frequencies.items())[:10])
 
+
+    language_model = NGramLanguageModel(encoded, 7)
+    language_model.build()
+    generator = GreedyTextGenerator(language_model, text_processor)
+    print(generator.run('Vernon', 51))
 
 if __name__ == "__main__":
     main()
