@@ -43,15 +43,24 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
 
         tokens = []
-        for char in text:
-            if char.isalpha():
-                tokens.append(char.lower())
-            elif char == " " or not char.isdigit():
+        i = 0
+
+        while len(text) > i:
+            if text[i].isalpha():
+                tokens.append(text[i].lower())
+                i += 1
+            elif text[i] == " " or text[i]=="\n":
+                while len(text) > i and not text[i].isalpha():
+                    i += 1
                 tokens.append(self._end_of_word_token)
+            elif not text[i].isalpha():
+                i += 1
+        if text[i-1]!=" " and not text[i-1].isalpha() and not text[i-1].isdigit():
+            tokens.append(self._end_of_word_token)
 
         return tuple(tokens)
 
@@ -69,7 +78,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if not isinstance(element, str):
+        if not isinstance(element, str) or not element:
             return None
 
         return self._storage.get(element)
@@ -121,6 +130,9 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+
         tokens = self._tokenize(text)
 
         if tokens is None:
@@ -152,7 +164,7 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str) or not element or len(element) != 1:
             return None
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -175,7 +187,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
@@ -206,7 +218,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple):
+        if not isinstance(corpus, tuple) or not corpus:
             return None
 
         decoded_corpus = []
@@ -238,7 +250,7 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple):
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
         if not all(isinstance(token, str) for token in decoded_corpus):
@@ -246,12 +258,11 @@ class TextProcessor:
 
         text = ''.join(decoded_corpus)
         text = text.replace(self._end_of_word_token, ' ')
-        text = ' '.join(text.split())
 
         if not text:
             return None
 
-        text = text[0].upper() + text[1:]
+        text = text.capitalize()
 
         if not text.endswith('.'):
             text += '.'
@@ -351,7 +362,7 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-        if not isinstance(frequencies, dict):
+        if not isinstance(frequencies, dict) or not frequencies:
             return None
 
         self._n_gram_frequencies = frequencies
@@ -421,7 +432,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple):
+        if not isinstance(sequence, tuple) or not sequence:
             return None
 
         if not all(isinstance(token, int) for token in sequence):
@@ -455,7 +466,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
         if not all(isinstance(token, int) for token in encoded_corpus):
@@ -506,7 +517,7 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str):
+        if not isinstance(prompt, str) or not prompt:
             return None
 
         if not isinstance(seq_len, int) or seq_len <= 0:
