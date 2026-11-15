@@ -26,8 +26,7 @@ def main() -> None:
     encoded = processor.encode(text)
     result = processor.decode(encoded)
     print("Greedy Text Generator")
-    n_gram_size = int(input("Введите размер н-граммы: "))
-    model = NGramLanguageModel(encoded, n_gram_size)
+    model = NGramLanguageModel(encoded, 7)
     build_result = model.build()
     frequencies = model._n_gram_frequencies
     for i, (n_gram, prob) in enumerate(frequencies.items()):
@@ -38,17 +37,12 @@ def main() -> None:
     #print(n_gram_size)
 
     generator = GreedyTextGenerator(model, processor)
-    prompt = input("Введите промпт для генерации текста: ")
-    seq_len =  int(input("Введите количество токенов для генерации: "))
-    generated = generator.run(prompt, seq_len)
+    generated = generator.run('Vernon', 51)
     print(f"Generated: {generated}")
 
     print("Beam Search Text Generator")
-    n_gram_size2 = int(input("Введите размер н-граммы: "))
-    beamgenerator = BeamSearchTextGenerator(model, processor, n_gram_size2)
-    prompt2 =  input("Введите промпт для генерации текста: ")
-    seq_len2 =  int(input("Введите количество токенов для генерации: "))
-    generated2 = beamgenerator.run(prompt2, seq_len2)
+    beamgenerator = BeamSearchTextGenerator(model, processor, 7)
+    generated2 = beamgenerator.run('Vernon', 56)
     print(f"Generated: {generated2}")
 
     assert result
