@@ -367,9 +367,9 @@ class NGramLanguageModel:
             context_counts[context] = context_counts.get(context, 0) +1
 
         self._n_gram_frequencies = {}
-        for n_gram, context in n_gram_counts.items():
+        for n_gram, count in n_gram_counts.items():
             context = n_gram[:-1]
-            self._n_gram_frequencies[n_gram] = context / context_counts[context]
+            self._n_gram_frequencies[n_gram] = count / context_counts[context]
 
         return True
 
