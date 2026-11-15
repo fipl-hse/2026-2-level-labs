@@ -43,9 +43,10 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if (text is None
-                or not isinstance(text, str)
-            ):
+        if (
+            not text
+            or not isinstance(text, str)
+        ):
             return None
 
         text = text.lower()
@@ -57,7 +58,7 @@ class TextProcessor:
             elif text_tokenized and text_tokenized[-1] != self._end_of_word_token:
                 text_tokenized += self._end_of_word_token
 
-        return tuple(text_tokenized)
+        return tuple(text_tokenized) if text_tokenized else None
 
     def get_id(self, element: str) -> int | None:
         """
@@ -73,7 +74,7 @@ class TextProcessor:
         None is returned
         """
         if (
-            element is None
+            not element
             or not isinstance(element, str)
             or element not in self._storage
         ):
@@ -103,9 +104,9 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
         if (
-            element_id is None
+            not element_id
             or not isinstance(element_id, int)
-            or element_id not in (self._storage.values())
+            or not any(value == element_id for _, value in self._storage.items())
         ):
             return None
 
@@ -189,9 +190,9 @@ class TextProcessor:
         resulting_text = ""
 
         for token_id in encoded_corpus:
-            if self.get_token(token_id) is None:
+            if not self.get_token(token_id):
                 return None
-            resulting_text += self.get_token(token_id)
+            "".join(resulting_text, self.get_token(token_id))
 
         return resulting_text
 
@@ -202,6 +203,25 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict):
+            return None
+
+        n_grams = content.get("freq")
+        if not n_grams:
+            return None
+
+        for n_gram, value in n_grams.items():
+            if not (
+                isinstance(n_gram, str)
+                and isinstance(value, int)
+                and all(isinstance(symbol, str) for symbol in n_gram)
+            ):
+                return
+
+        for n_gram in n_grams.keys():
+            for symbol in n_gram:
+                if symbol.isalpha():
+                    self._put(symbol.lower())
 
     def _decode(self, corpus: tuple[int, ...]) -> tuple[str, ...] | None:
         """
