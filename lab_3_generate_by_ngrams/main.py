@@ -919,19 +919,7 @@ class BackOffGenerator:
             if not candidates:
                 break
 
-            best_token = None
-            best_freq = -1.0
-            for token, freq in candidates.items():
-                if freq > best_freq or (
-                    freq == best_freq
-                    and (best_token is None or token > best_token)
-                ):
-                    best_token = token
-                    best_freq = freq
-
-            if best_token is None:
-                break
-
+            best_token, _ = max(candidates.items(), key=lambda item: (item[1], item[0]))
             current.append(best_token)
 
         return self._text_processor.decode(tuple(current))
