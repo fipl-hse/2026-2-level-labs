@@ -24,6 +24,8 @@ def main() -> None:
     ) as text_file:
         text = text_file.read()
 
+    result = None
+
     processor = TextProcessor('_')
 
     encoded_text = processor.encode(text)
@@ -47,8 +49,12 @@ def main() -> None:
 
     beam_generator =BeamSearchTextGenerator(language_model, processor, 3)
 
-    beam_generated_text = beam_generator.run("Vernon", 56)
-    print(f"Beam generated text: {beam_generated_text}")
+    result = beam_generator.run("Vernon", 56)
+    print(f"Beam generated text: {result}")
+
+    assert result
+    return None
+
 
 if __name__ == "__main__":
     main()
