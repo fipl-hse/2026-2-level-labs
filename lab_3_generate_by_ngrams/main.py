@@ -480,7 +480,7 @@ class GreedyTextGenerator:
             if not candidates:
                 break
             current_candidates = candidates
-            best_token = max(current_candidates, key=lambda t: (current_candidatescandidates[t], t))
+            best_token = max(current_candidates, key=lambda t: (current_candidates[t], t))
             sequence.append(best_token)
         return self._text_processor.decode(tuple(sequence))
 
@@ -600,8 +600,15 @@ class BeamSearcher:
         ):
             return None
 
-        sorted_by_key = sorted(sequence_candidates.items(), key = lambda i: i[0], reverse = True) #keys по убыванию
-        sorted_by_penalty = sorted(sorted_by_key, key = lambda i: i[1]) #теперь отсюда чем меньше штраф тем выше
+        sorted_by_key = sorted(
+            sequence_candidates.items(),
+            key = lambda i: i[0],
+            reverse = True
+        ) #keys по убыванию
+        sorted_by_penalty = sorted(
+            sorted_by_key,
+            key = lambda i: i[1]
+        ) #теперь отсюда чем меньше штраф тем выше
 
         return dict(sorted_by_penalty[: self._beam_width])
 
