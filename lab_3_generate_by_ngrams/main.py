@@ -5,6 +5,8 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
+# pylint:disable=inconsistent-return-statements
+
 import re
 import math
 

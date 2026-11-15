@@ -3,13 +3,12 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-# pylint:disable=inconsistent-return-statements
 
 from lab_3_generate_by_ngrams.main import (
     BeamSearchTextGenerator,
     GreedyTextGenerator,
     NGramLanguageModel,
-    TextProcessor
+    TextProcessor,
 )
 
 def main() -> None:
@@ -26,7 +25,7 @@ def main() -> None:
     processor = TextProcessor("_")
     encoded = processor.encode(text)
     if encoded is None:
-        return None
+        return
     result = processor.decode(encoded)
     print("Greedy Text Generator")
     model = NGramLanguageModel(encoded, 7)
