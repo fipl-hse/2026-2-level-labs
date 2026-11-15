@@ -44,28 +44,19 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         if (text is None
-                    or not isinstance(text, str)
-                ):
+                or not isinstance(text, str)
+            ):
             return None
 
         text = text.lower()
-        text_tokenized = ""
-
-        for char in text:
-            if not char.isalpha() and not char.isspace():
-                text = text.replace(char, "")
+        text_tokenized = []
 
         for char in text:
             if char.isalpha():
                 text_tokenized += char
-            elif char.isspace():
+            elif text_tokenized and text_tokenized[-1] != self._end_of_word_token:
                 text_tokenized += self._end_of_word_token
 
-        while self._end_of_word_token*2 in text_tokenized:
-            text_tokenized = text_tokenized.replace(
-                "self._end_of_word_token*2 ", "self._end_of_word_token")
-
-        text_tokenized += self._end_of_word_token
         return tuple(text_tokenized)
 
     def get_id(self, element: str) -> int | None:
@@ -140,17 +131,21 @@ class TextProcessor:
         """
         if (
             not isinstance(text, str)
-            or text is None
+            or not text
         ):
             return None
 
-        text = self._tokenize(text)
-        for char in text:
-            if self._put(char) is None:
-                return None
-            self._put(char)
+        if not self._tokenize(text):
+            return None
 
-        return tuple([self.get_id(char) for char in text])
+        tokens = self._tokenize(text)
+
+        for t in tokens:
+            self._put(t)
+
+        result = [self.get_id(t) for t in tokens]
+
+        return tuple(result) if None not in result else None
 
     def _put(self, element: str) -> None:
         """
@@ -221,6 +216,25 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if (
+            not corpus
+            or not isinstance(corpus, tuple)
+            or not all(isinstance(el, int) for el in corpus)
+        ):
+            return None
+
+        if not all(isinstance(el, int) and not isinstance(el, bool) for el in corpus):
+            return None
+
+        result = []
+
+        for el in corpus:
+            token = self.get_token(el)
+            if token is None:
+                return None
+            result.append(token)
+
+        return tuple(result)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -237,6 +251,25 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if (
+            not isinstance(decoded_corpus, tuple)
+            or not all(isinstance(token, str) for token in decoded_corpus)
+        ):
+            return None
+
+        text = ''.join(decoded_corpus)
+        text = text.replace(self._end_of_word_token, ' ')
+        text = ' '.join(text.split())
+
+        if not text:
+            return None
+
+        text = text[0].upper() + text[1:]
+
+        if text[-1] != '.':
+            text += '.'
+
+        return text
 
 
 class WordProcessor(TextProcessor):
