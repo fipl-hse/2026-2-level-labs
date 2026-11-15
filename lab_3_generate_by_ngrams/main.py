@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
+import math
 
 class TextProcessor:
     """
@@ -113,7 +114,7 @@ class TextProcessor:
         for token, token_id in self._storage.items():
             if token_id == element_id:
                 return token
-
+        return None
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
         Encode text.
@@ -162,10 +163,10 @@ class TextProcessor:
         an element is not added to storage
         """
         if not isinstance(element, str):
-            return None
+            return
 
         if len(element) != 1:
-            return None
+            return
 
         current_id = self._storage.get(element)
 
@@ -237,8 +238,8 @@ class TextProcessor:
 
         result = []
 
-        for el in corpus:
-            token = self.get_token(el)
+        for id in corpus:
+            token = self.get_token(id)
             if token is None:
                 return None
             result.append(token)
@@ -611,9 +612,6 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        import math
-
-
         if (
         not isinstance(sequence, tuple)
         or not isinstance(next_tokens, list)
@@ -677,8 +675,9 @@ class BeamSearcher:
 
         candidates_list = list(sequence_candidates.items())
 
-        candidates_list.sort(key=lambda x: x[0], reverse=True)
-        candidates_list.sort(key=lambda x: x[1], reverse=False)
+        candidates_list.sort(
+            key=lambda x: (x[1], tuple(-token for token in x[0]))
+        )
 
         top_candidates = candidates_list[:self._beam_width]
 
@@ -760,7 +759,10 @@ class BeamSearchTextGenerator:
 
             current_candidates = pruned_candidates
 
-        best_sequence = min(current_candidates, key=current_candidates.get)
+        best_sequence = min(
+            current_candidates,
+            key=lambda sequence: current_candidates[sequence]
+        )
 
         return self._text_processor.decode(best_sequence)
 
