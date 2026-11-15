@@ -260,8 +260,10 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not (isinstance(decoded_corpus, tuple) and decoded_corpus
-        and all(isinstance(token, str) for token in decoded_corpus)
+        if not (
+            isinstance(decoded_corpus, tuple)
+            and decoded_corpus
+            and all(isinstance(token, str) for token in decoded_corpus)
         ):
             return None
 
@@ -280,6 +282,8 @@ class WordProcessor(TextProcessor):
         _end_of_word_token (str): A token denoting sentence boundary
         _storage (dict): Dictionary in the form of <token: identifier>
     """
+    def __init__(self, end_of_word_token):
+        super().__init__("<eos>")
 
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
@@ -297,6 +301,32 @@ class WordProcessor(TextProcessor):
         In case of corrupt input arguments, None is returned.
         In case text does not contain any words, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+
+        low_text = text.lower().split()
+
+        tokens = []
+
+        for element in low_text:
+            word = []
+            for char in element:
+                if char.isalpha():
+                    word.append(char)
+
+            ready_word = "".join(word)
+            if not ready_word:
+                continue
+
+            tokens.append(ready_word)
+
+            if element[-1] in ".?!":
+                tokens.append(self._end_of_word_token)
+
+        if not tokens:
+            return None
+
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -307,6 +337,11 @@ class WordProcessor(TextProcessor):
 
         In case of corrupt input arguments, an element is not added to storage
         """
+        if not isinstance(element, str) or not element:
+            return None
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -324,7 +359,43 @@ class WordProcessor(TextProcessor):
         In case of corrupt input arguments, None is returned.
         In case decoded corpus does not contain any words, None is returned.
         """
+        if not (
+            isinstance(decoded_corpus, tuple)
+            and decoded_corpus
+            and all(isinstance(element, str) for element in decoded_corpus)
+        ):
+            return None
 
+        result_sequence = []
+
+        for count, element in enumerate(decoded_corpus):
+            if element == self._end_of_word_token:
+                if result_sequence:
+                    result_sequence.pop()
+                    result_sequence.append(". ")
+
+            elif (
+                count == 0
+                or decoded_corpus[count - 1] == self._end_of_word_token
+            ):
+                lst_element = list(element)
+                lst_element[0] = lst_element[0].upper()
+                result_sequence.append("".join(lst_element))
+                result_sequence.append(" ")
+
+            else:
+                result_sequence.append(element)
+                result_sequence.append(" ")
+
+        if not result_sequence:
+            return None
+
+        result = "".join(result_sequence).strip()
+
+        if not result.endswith("."):
+            result += "."
+
+        return result
 
 class NGramLanguageModel:
     """
@@ -416,8 +487,10 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not (isinstance(sequence, tuple) and sequence
-        and all(isinstance(element, int) for element in sequence)
+        if not (
+            isinstance(sequence, tuple)
+            and sequence
+            and all(isinstance(element, int) for element in sequence)
         ):
             return None
 
@@ -499,9 +572,10 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(prompt, str)
-        and isinstance(seq_len, int)
-        and seq_len > 0
+        if not (
+            isinstance(prompt, str)
+            and isinstance(seq_len, int)
+            and seq_len > 0
         ):
             return None
 
@@ -741,7 +815,7 @@ class BeamSearchTextGenerator:
 
         sequence_candidates = {encoded_prompt : 0.0}
 
-        while seq_len > 0:
+        while seq_len > 1:
             for sequence in list(sequence_candidates):
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
@@ -933,7 +1007,7 @@ class BackOffGenerator:
 
         encoded_seq = list(encoded_prompt)
 
-        for _ in range(seq_len):
+        for _ in range(seq_len - 1):
             candidates = self._get_next_token(tuple(encoded_seq))
             if candidates is None:
                 return None
