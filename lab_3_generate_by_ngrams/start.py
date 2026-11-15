@@ -2,9 +2,11 @@
 Generation by NGrams starter
 """
 
-# pylint:disable=too-many-locals, unused-import, unused-variable
-
-from lab_3_generate_by_ngrams.main import TextProcessor
+from lab_3_generate_by_ngrams.main import (
+    TextProcessor,
+    NGramLanguageModel,
+    GreedyTextGenerator,
+)
 
 
 def main() -> None:
