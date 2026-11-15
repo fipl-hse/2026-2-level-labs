@@ -10,6 +10,7 @@ Beam-search and natural language generation evaluation
 import math
 import re
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -481,8 +482,7 @@ class GreedyTextGenerator:
             candidates = self._model.generate_next_token(tuple(sequence))
             if not candidates:
                 break
-            current_candidates = candidates
-            best_token = max(candidates, key=lambda t, c=candidates: (c[t], t))
+            best_token = max(candidates, key=lambda t, c=candidates: (c[t], t)) # type: ignore[misc]
             sequence.append(best_token)
         return self._text_processor.decode(tuple(sequence))
 
