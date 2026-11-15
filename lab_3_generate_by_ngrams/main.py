@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 import math
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -238,8 +239,8 @@ class TextProcessor:
 
         result = []
 
-        for id in corpus:
-            token = self.get_token(id)
+        for element_id in corpus:
+            token = self.get_token(element_id)
             if token is None:
                 return None
             result.append(token)
