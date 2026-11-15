@@ -3,6 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+
 import json
 # pylint:disable=too-few-public-methods
 
@@ -62,6 +63,8 @@ class TextProcessor:
                 result.append(self._end_of_word_token)
             elif ends_with_sep:
                 result.append(self._end_of_word_token)
+        if not result:
+            return None
 
         return tuple(result)
 
@@ -211,6 +214,8 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         if not isinstance(corpus, tuple):
+            return None
+        if not corpus:
             return None
         result = []
         for token_id in corpus:
