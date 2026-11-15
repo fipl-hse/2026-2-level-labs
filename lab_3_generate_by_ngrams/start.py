@@ -4,13 +4,13 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 from lab_3_generate_by_ngrams.main import (
+    BackOffGenerator,
     BeamSearchTextGenerator,
     GreedyTextGenerator,
     NGramLanguageModel,
-    TextProcessor,
     NGramLanguageModelReader,
-    BackOffGenerator,
-    WordProcessor
+    TextProcessor,
+    WordProcessor,
 )
 
 
@@ -37,7 +37,7 @@ def main() -> None:
 
     n_gram_lang_model = NGramLanguageModel(encoded_text, 7)
     n_gram_freq = n_gram_lang_model.build()
-    print("Построенная модель: ", tuple(n_gram_lang_model._n_gram_frequencies.items())[:10])
+    print("Построенная модель: ", n_gram_lang_model.build())
     assert n_gram_freq, "Model can not be build"
 
     greedy_text_generator = GreedyTextGenerator(n_gram_lang_model, processor)
@@ -51,14 +51,14 @@ def main() -> None:
     print("Результат BeamSearchGenerator: ", result_beam_generator)
 
     reader = NGramLanguageModelReader("./lab_3_generate_by_ngrams/assets/en_own.json", "_")
-    language_models = []
+    language_models_lst = []
 
     for n_gram_size in (2, 3, 4):
         model = reader.load(n_gram_size)
         if model is not None:
-            language_models.append(model)
+            language_models_lst.append(model)
 
-    language_models = tuple(language_models)
+    language_models = tuple(language_models_lst)
 
     back_off_generator = BackOffGenerator(language_models, reader.get_text_processor())
     result_backoff_generator = back_off_generator.run("Vernon", 100)
@@ -75,21 +75,19 @@ def main() -> None:
         assert word_model.build() is not None, "Model can not be build"
         print(
             f"Построенная по словам модель({n_gram_size}): ",
-            tuple(word_model._n_gram_frequencies.items())[:10],
+            word_model.build(),
         )
         word_models.append(word_model)
 
-    model_ngram_two, model_ngram_three, model_ngram_four = word_models
-
     prompt = "Harry looked at"
 
-    greedy_text_generator_word = GreedyTextGenerator(model_ngram_four, word_processor)
+    greedy_text_generator_word = GreedyTextGenerator(word_models[-1], word_processor)
     result_greedy_generator_word = greedy_text_generator_word.run(prompt, 12)
     assert result_greedy_generator_word, "Impossible to generate text"
     print("Результат GreedyGenerator (слова): ", result_greedy_generator_word)
 
     beam_search_generator_words = BeamSearchTextGenerator(
-        model_ngram_four, word_processor, 3
+        word_models[-1], word_processor, 3
     )
     result_beam_generator_words = beam_search_generator_words.run(prompt, 12)
     assert result_beam_generator_words, "Impossible to generate text"
