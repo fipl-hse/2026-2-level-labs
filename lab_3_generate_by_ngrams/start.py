@@ -4,7 +4,7 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-from main import(
+from lab_3_generate_by_ngrams.main import (
     BeamSearcher,
     BeamSearchTextGenerator,
     GreedyTextGenerator,
@@ -38,10 +38,10 @@ def main() -> None:
     encoded_corpus=encoded_text,
     n_gram_size=7)
 
-    # print(f"Build algorythm: {language_model.build()}")
+    print(f"Build algorythm: {language_model.build()}")
 
-    # if language_model.build():
-    #     print(f"N-gram frequencies: {language_model._n_gram_frequencies}")
+    if language_model.build():
+        print(f"N-gram frequencies: {language_model._n_gram_frequencies}")
 
     greedy_generator = GreedyTextGenerator(language_model, processor)
 
