@@ -48,29 +48,29 @@ class TextProcessor:
             return None
 
         text = text.lower()
-
-        tokens = []
-
         words = text.split()
 
-        if not words:
-            return tuple(tokens)
+        tokens = []
+        prev_was_significant = False
 
-        for i, word in enumerate(words):
-            cleaned_word = "".join(char for char in word if char.isalpha())
-
-            if not cleaned_word:
+        for word in words:
+            cleaned = "".join(ch for ch in word if ch.isalpha())
+            if not cleaned:
                 continue
 
-        tokens.extend(cleaned_word)
+            if prev_was_significant:
+                tokens.append(self._end_of_word_token)
 
-        if i < len(words) - 1:
+            tokens.extend(cleaned)
+            prev_was_significant = True
+
+        if prev_was_significant:
+            last_char = text[-1]
+            if not last_char.isalpha() and not last_char.isdigit():
                 tokens.append(self._end_of_word_token)
-        else:
-            if text[-1].isalnum():
-                pass
-            else:
-                tokens.append(self._end_of_word_token)
+
+        if not tokens:
+            return None
 
         return tuple(tokens)
 
@@ -231,7 +231,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
-        if not isinstance(corpus, tuple):
+        if not isinstance(corpus, tuple) or not corpus:
             return None
 
         decoded_tokens = []
