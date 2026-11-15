@@ -61,6 +61,8 @@ class TextProcessor:
                 i += 1
         if text[i-1]!=" " and not text[i-1].isalpha() and not text[i-1].isdigit():
             tokens.append(self._end_of_word_token)
+        if not tokens:
+            return None
 
         return tuple(tokens)
 
@@ -264,6 +266,7 @@ class TextProcessor:
 
         text = text.capitalize()
 
+        text = text.rstrip()
         if not text.endswith('.'):
             text += '.'
 
@@ -500,7 +503,7 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-        self._language_model = language_model
+        self._model = language_model
         self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
@@ -531,7 +534,7 @@ class GreedyTextGenerator:
         generated_sequence = list(encoded_prompt)
 
         for _ in range(seq_len):
-            candidates = self._language_model.generate_next_token(tuple(generated_sequence))
+            candidates = self._model.generate_next_token(tuple(generated_sequence))
 
             if not candidates:
                 break
