@@ -53,7 +53,6 @@ def main() -> None:
     print(f"Beam generated text: {result}")
 
     assert result
-    return None
 
 
 if __name__ == "__main__":
