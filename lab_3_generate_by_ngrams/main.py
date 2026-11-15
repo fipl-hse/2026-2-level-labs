@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 import math
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
@@ -182,10 +183,13 @@ class TextProcessor:
         if not encoded_corpus:
             return None
 
-        if not all(type(item) is int for item in encoded_corpus):
+        if not all(isinstance(item, int) for item in encoded_corpus):
             return None
 
         decoded_text_1 = self._decode(encoded_corpus)
+        if decoded_text_1 is None:
+            return None
+
         decoded_text_final = self._postprocess_decoded_text(decoded_text_1)
 
         return decoded_text_final
@@ -230,7 +234,7 @@ class TextProcessor:
         if not corpus:
             return None
 
-        if not all(type(item) is int for item in corpus):
+        if not all(isinstance(item, int) for item in corpus):
             return None
 
         decoded_tokens = []
@@ -266,7 +270,7 @@ class TextProcessor:
         if not decoded_corpus:
             return None
 
-        if not all(type(letter) is str for letter in decoded_corpus):
+        if not all(isinstance(letter, str) for letter in decoded_corpus):
             return None
 
         text = []
@@ -402,7 +406,7 @@ class NGramLanguageModel:
         if not self._encoded_corpus:
             return False
 
-        if not all(type(item) is int for item in self._encoded_corpus):
+        if not all(isinstance(item, int) for item in self._encoded_corpus):
             return False
 
         n_grams_corpus = self._extract_n_grams(self._encoded_corpus)
@@ -445,7 +449,7 @@ class NGramLanguageModel:
         if not sequence:
             return None
 
-        if not all(type(item) is int for item in sequence):
+        if not all(isinstance(item, int) for item in sequence):
             return None
 
         context_size = self.__n_gram_size - 1
@@ -454,7 +458,7 @@ class NGramLanguageModel:
             return None
 
         if context_size == 0:
-            context = ()
+            context: tuple[int, ...] = ()
         else:
             context = sequence[-context_size:]
 
@@ -486,7 +490,7 @@ class NGramLanguageModel:
         if not encoded_corpus:
             return None
 
-        if not all(type(item) is int for item in encoded_corpus):
+        if not all(isinstance(item, int) for item in encoded_corpus):
             return None
 
         extracted_n_grams = []
@@ -518,52 +522,52 @@ class GreedyTextGenerator:
         self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
-         """
-         Generate sequence based on NGram language model and prompt provided.
+        """
+        Generate sequence based on NGram language model and prompt provided.
 
-         Args:
-             prompt (str): Beginning of sequence
-             seq_len (int): Number of tokens to generate
+        Args:
+            prompt (str): Beginning of sequence
+            seq_len (int): Number of tokens to generate
 
-         Returns:
-             str | None: Generated sequence
+        Returns:
+            str | None: Generated sequence
 
-         In case of corrupt input arguments or methods used return None,
-         None is returned
-         """
-         if (
-             prompt is None
-             or not isinstance(prompt, str)
-             or not isinstance(seq_len, int)
-             or seq_len <= 0
-         ):
-             return None
+        In case of corrupt input arguments or methods used return None,
+        None is returned
+        """
+        if (
+            prompt is None
+            or not isinstance(prompt, str)
+            or not isinstance(seq_len, int)
+            or seq_len <= 0
+        ):
+            return None
 
-         encoded_prompt = self._text_processor.encode(prompt)
-         if encoded_prompt is None:
-             return None
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
 
-         n_gram_size = self._model.get_n_gram_size()
-         if not n_gram_size or n_gram_size < 1:
-             return None
+        n_gram_size = self._model.get_n_gram_size()
+        if not n_gram_size or n_gram_size < 1:
+            return None
 
-         context_size = n_gram_size - 1
+        context_size = n_gram_size - 1
 
-         if len(encoded_prompt) < context_size:
-             return None
+        if len(encoded_prompt) < context_size:
+            return None
 
-         sequence = encoded_prompt
+        sequence = encoded_prompt
 
-         for _ in range(seq_len):
-             possible_letters = self._model.generate_next_token(sequence)
-             if not possible_letters or possible_letters is None:
-                 break
+        for _ in range(seq_len):
+            possible_letters = self._model.generate_next_token(sequence)
+            if not possible_letters or possible_letters is None:
+                break
 
-             next_letter, _ = max(possible_letters.items(), key=lambda item: (item[1], item[0]))
+            next_letter, _ = max(possible_letters.items(), key=lambda item: (item[1], item[0]))
 
-             sequence = (*sequence, next_letter)
+            sequence = (*sequence, next_letter)
 
-         return self._text_processor.decode(sequence)
+        return self._text_processor.decode(sequence)
 
 class BeamSearcher:
     """
@@ -605,7 +609,7 @@ class BeamSearcher:
         if not isinstance(sequence, tuple):
             return None
 
-        if not all(type(item) is int for item in sequence):
+        if not all(isinstance(item, int) for item in sequence):
             return None
 
         possible_letters = self._model.generate_next_token(sequence)
@@ -644,7 +648,7 @@ class BeamSearcher:
         if not isinstance(sequence, tuple):
             return None
 
-        if not all(type(item) is int for item in sequence):
+        if not all(isinstance(item, int) for item in sequence):
             return None
 
         if (
@@ -798,7 +802,7 @@ class BeamSearchTextGenerator:
 
             sequence_candidates = pruned_sequence
 
-        best_sequence = min(sequence_candidates, key=sequence_candidates.get)
+        best_sequence = min(sequence_candidates, key=lambda key: sequence_candidates[key])
 
         return self._text_processor.decode(best_sequence)
 
@@ -820,7 +824,7 @@ class BeamSearchTextGenerator:
         """
         if (
         not isinstance(sequence_to_continue, tuple)
-        or not all(type(item) is int for item in sequence_to_continue)
+        or not all(isinstance(item, int) for item in sequence_to_continue)
         ):
             return None
 
