@@ -19,7 +19,7 @@ def main() -> None:
         text = text_file.read()
     processor = TextProcessor("_")
 
-     text_processor = TextProcessor('<eow>')
+    text_processor = TextProcessor('<eow>')
     encoded = text_processor.encode(text)
     print(f'Encoded corpus size: {len(encoded)}')
 
