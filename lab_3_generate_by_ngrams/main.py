@@ -50,7 +50,7 @@ class TextProcessor:
 
         words = text.split()
         if not words:
-            return ()
+            return None
 
         result = []
         for i, word in enumerate(words):
@@ -105,8 +105,8 @@ class TextProcessor:
         """
         if type(element_id) is not int:
             return None
-        for token, tid in self._storage.items():
-            if tid == element_id:
+        for token, token_id in self._storage.items():
+            if token_id == element_id:
                 return token
         return None
 
@@ -135,10 +135,10 @@ class TextProcessor:
             self._put(token)
         result = []
         for token in tokens:
-            tid = self.get_id(token)
-            if tid is None:
+            token_id = self.get_id(token)
+            if token_id is None:
                 return None
-            result.append(tid)
+            result.append(token_id)
         return tuple(result)
 
     def _put(self, element: str) -> None:
@@ -213,8 +213,8 @@ class TextProcessor:
         if not isinstance(corpus, tuple):
             return None
         result = []
-        for tid in corpus:
-            token = self.get_token(tid)
+        for token_id in corpus:
+            token = self.get_token(token_id)
             if token is None:
                 return None
             result.append(token)
@@ -243,7 +243,6 @@ class TextProcessor:
             if not isinstance(token, str) or len(token) != 1:
                 return None
             if token == self._end_of_word_token:
-                # Пробел, но без ведущих/двойных пробелов
                 if chars and chars[-1] != " ":
                     chars.append(" ")
             else:
