@@ -7,8 +7,8 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 # pylint:disable=inconsistent-return-statements
 
-import re
 import math
+import re
 
 class TextProcessor:
     """
@@ -482,7 +482,7 @@ class GreedyTextGenerator:
             if not candidates:
                 break
             current_candidates = candidates
-            best_token = max(current_candidates, key=lambda t: (current_candidates[t], t))
+            best_token = max(candidates, key=lambda t, c=candidates: (c[t], t))
             sequence.append(best_token)
         return self._text_processor.decode(tuple(sequence))
 
