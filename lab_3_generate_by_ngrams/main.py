@@ -35,9 +35,6 @@ class TextProcessor:
         self._end_of_word_token = end_of_word_token
         self._storage = {end_of_word_token: 0}
 
-        self._end_of_word_token = end_of_word_token
-        self._storage = {end_of_word_token : 0}
-
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
         Tokenize text into unigrams, separating words with special token.
@@ -77,22 +74,6 @@ class TextProcessor:
         if not tokens:
             return None
 
-        return tuple(tokens)
-
-        if not isinstance(text, str):
-            return None
-        if all(not element.isalpha() for element in text):
-            return None
-
-        low_text = text.lower().split()
-
-        tokens = []
-
-        for element in low_text:
-            characters = [character for character in element if character.isalpha()]
-            if characters:
-                tokens.extend(characters)
-                tokens.append(self._end_of_word_token)
         return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
@@ -220,13 +201,6 @@ class TextProcessor:
 
         return self._postprocess_decoded_text(decoded)
 
-        decoded_text = self._decode(encoded_corpus)
-        if decoded_text is None:
-            return None
-
-        result_text = self._postprocess_decoded_text(decoded_text)
-        return result_text
-
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -309,11 +283,6 @@ class TextProcessor:
 
         return decoded_element.capitalize() + "."
 
-        lst_decoded_corpus = list(decoded_corpus)
-        lst_decoded_corpus[0] = lst_decoded_corpus[0].upper()
-        result_text = "".join(lst_decoded_corpus).replace(self._end_of_word_token, " ").strip()
-        result_text += "."
-        return result_text
 
 class WordProcessor(TextProcessor):
     """
@@ -323,14 +292,6 @@ class WordProcessor(TextProcessor):
         _end_of_word_token (str): A token denoting sentence boundary
         _storage (dict): Dictionary in the form of <token: identifier>
     """
-    def __init__(self, end_of_word_token : str) -> None:
-        """
-        Initialize an instance of WordProcessor.
-
-        Args:
-            end_of_word_token (str): A token denoting sentence boundary
-        """
-        super().__init__("<eos>")
 
     def _tokenize(self, text: str) -> tuple[str, ...] | None:
         """
@@ -423,33 +384,6 @@ class WordProcessor(TextProcessor):
 
         return f'{'. '.join(sentences)}.'
 
-        result_sequence = []
-
-        for count, element in enumerate(decoded_corpus):
-            if element == self._end_of_word_token:
-                if result_sequence:
-                    result_sequence.pop()
-                    result_sequence.append(". ")
-            elif (
-                count == 0
-                or decoded_corpus[count - 1] == self._end_of_word_token
-            ):
-                lst_element = list(element)
-                lst_element[0] = lst_element[0].upper()
-                result_sequence.append("".join(lst_element))
-                result_sequence.append(" ")
-            else:
-                result_sequence.append(element)
-                result_sequence.append(" ")
-
-        if not result_sequence:
-            return None
-
-        result = "".join(result_sequence).strip()
-
-        if not result.endswith("."):
-            result += "."
-        return result
 
 class NGramLanguageModel:
     """
@@ -590,16 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        n_grams = []
-
-        for i, element in enumerate(encoded_corpus):
-            count = self.__n_gram_size
-            n_gramma = []
-            if i+count <= len(encoded_corpus):
-                for idx in range(i, i+count):
-                    n_gramma.append(encoded_corpus[idx])
-                n_grams.append(tuple(n_gramma))
-        return tuple(n_grams)
 
 class GreedyTextGenerator:
     """
@@ -655,26 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        encoded_prompt = self._text_processor.encode(prompt)
-        if encoded_prompt is None:
-            return None
-
-        encoded_seq = list(encoded_prompt)
-
-        while seq_len > 0:
-            potential_tokens = self._model.generate_next_token(tuple(encoded_seq))
-            if not potential_tokens:
-                break
-            sorted_potential_tokens = sorted(
-                potential_tokens,
-                key = lambda x: (potential_tokens[x], x),
-                reverse = True)
-            best_token = sorted_potential_tokens[0]
-            encoded_seq.append(best_token)
-            seq_len -= 1
-
-        decoded_seq = self._text_processor.decode(tuple(encoded_seq))
-        return decoded_seq
 
 class BeamSearcher:
     """
@@ -797,9 +701,6 @@ class BeamSearcher:
 
         return dict(sorted_candidates[:self._beam_width])
 
-        return dict(
-            sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))[: self._beam_width]
-        )
 
 class BeamSearchTextGenerator:
     """
@@ -907,10 +808,6 @@ class BeamSearchTextGenerator:
         """
         return self.beam_searcher.get_next_token(sequence_to_continue)
 
-        potential_tokens = self.beam_searcher.get_next_token(sequence_to_continue)
-        if potential_tokens is None:
-            return None
-        return potential_tokens
 
 class NGramLanguageModelReader:
     """
