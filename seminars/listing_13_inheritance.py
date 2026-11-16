@@ -23,8 +23,6 @@ class Vehicle:
     """
 
 
-
-
 class Car:
     """
     Represents a car, which is a type of vehicle.
@@ -42,14 +40,6 @@ class Car:
     """
 
 
-    def move(self) :
-
-
-    def stay(self) :
-
-        print(f"Car ({self.colour}) has stopped.")
-
-
 class Bicycle:
     """
     Represents a bicycle, which is a type of vehicle.
@@ -65,13 +55,6 @@ class Bicycle:
         freestyle() -> None:
             Simulates performing a freestyle trick.
     """
-    def __init__(self, number_of_wheels, colour, max_speed) :
-
-
-    def move(self) :
-
-
-    def freestyle(self) :
 
 
 class Aircraft:
@@ -87,13 +70,6 @@ class Aircraft:
         move() -> None:
             Simulates aircraft movement.
     """
-    def __init__(self, number_of_engines, colour, max_speed) :
-        super().__init__(max_speed, colour)
-        self.number_of_engines = number_of_engines
-
-    def move(self) :
-        print("Aircraft moves")
-
 
 
 def main() -> None:
