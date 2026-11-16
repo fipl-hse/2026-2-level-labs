@@ -11,6 +11,16 @@ from lab_3_generate_by_ngrams.main import (
 
 # pylint:disable=too-many-locals, unused-import, unused-variable, protected-access, too-many-statements
 
+from lab_3_generate_by_ngrams.main import (
+    BackOffGenerator,
+    BeamSearchTextGenerator,
+    GreedyTextGenerator,
+    NGramLanguageModel,
+    NGramLanguageModelReader,
+    TextProcessor,
+    WordProcessor,
+)
+
 
 def main() -> None:
     """
@@ -23,86 +33,99 @@ def main() -> None:
     ) as text_file:
         text = text_file.read()
 
-    processor = TextProcessor("_")
+    print('Mark 4 task')
 
-    encoded = processor.encode(text)
-    if encoded is None:
-        print("Encoding error")
+    text_processor = TextProcessor('_')
+    encoded_text = text_processor.encode(text)
+    if encoded_text is None:
         return
 
-    print(f"Encoded corpus length: {len(encoded)} tokens")
-    print(f"Storage size: {len(processor._storage)} unique characters")
-    print(f"First 100 encoded tokens: {encoded[:100]}")
-
-    decoded = processor.decode(encoded)
-    if decoded is None:
-        print("Decoding error")
+    decoded_text = text_processor.decode(encoded_text)
+    if decoded_text is None:
         return
 
-    print(f"Decoded text length: {len(decoded)} characters")
-    print(f"First 500 characters of decoded text:\n{decoded[:500]}\n")
+    print(
+        f'Encoded text:\n{encoded_text[-100:]}\n\n'
+        f'Decoded text:\n{decoded_text[-100:]}'
+    )
 
-    n_gram_size = 7
-    model = NGramLanguageModel(encoded, n_gram_size)
+    print('\nNGram LM check task')
 
-    if not model.build():
-        print("Model build error")
+    model = NGramLanguageModel(encoded_text, 7)
+    print('Model built:', model.build())
+
+    print('\nMark 6 task')
+
+    greedy_generator = GreedyTextGenerator(model, text_processor)
+    generated_text = greedy_generator.run('Vernon', 51)
+    print('Generated text:')
+    print(generated_text)
+
+    print('\nMark 8 task')
+    generator = BeamSearchTextGenerator(
+        language_model=model,
+        text_processor=text_processor,
+        beam_width=3,
+    )
+    generated = generator.run('Vernon', 56)
+    print('Generated text:')
+    print(generated)
+
+    print('\nMark 10 task 1')
+    reader = NGramLanguageModelReader(
+        "./lab_3_generate_by_ngrams/assets/en_own.json", '_'
+    )
+    models = []
+    for ngram_size in (2, 3, 4):
+        loaded_model = reader.load(ngram_size)
+        if loaded_model is not None:
+            models.append(loaded_model)
+
+    backoff_generator = BackOffGenerator(
+        tuple(models),
+        reader.get_text_processor(),
+    )
+    backoff_generated = backoff_generator.run('Vernon', 100)
+    print(backoff_generated)
+
+    print('\nMark 10 task 2')
+    prompt = 'Harry looked at'
+
+    word_processor = WordProcessor('<eos>')
+    encoded_text_2 = word_processor.encode(text)
+    if encoded_text_2 is None:
         return
 
-    print(f"Model successfully built for N={n_gram_size}.")
-    print(f"Number of unique {n_gram_size}-grams: {len(model._n_gram_frequencies)}")
+    word_models = {}
+    for ngram_size in (2, 3, 4):
+        word_model = NGramLanguageModel(encoded_text_2, ngram_size)
+        word_model.build()
+        word_models[ngram_size] = word_model
 
-    print("\nExamples of n-grams and their probabilities:")
-    count = 0
-    for ngram, prob in model._n_gram_frequencies.items():
-        letters = tuple(processor.get_token(token_id) for token_id in ngram)
-        print(f"  {ngram} (letters: {letters}) -> probability: {prob:.4f}")
-        count += 1
-        if count >= 5:
-            break
+    print(
+        '\nGreedy algorithm continue:\n'
+        f'{GreedyTextGenerator(word_models[4], word_processor).run(prompt, 12)}'
+    )
 
-    sequence = tuple(encoded[:n_gram_size])
-    print(f"\nPrediction for context {sequence}:")
+    beam_continue = BeamSearchTextGenerator(
+        language_model=word_models[4],
+        text_processor=word_processor,
+        beam_width=3,
+    )
+    print(f'\nBeam Search algorithm continue:\n{beam_continue.run(prompt, 12)}')
 
-    next_tokens = model.generate_next_token(sequence)
-    if next_tokens is None:
-        print("Failed to get next token")
-    else:
-        print(f"Possible next tokens (id: probability): {next_tokens}")
-        for token_id, prob in next_tokens.items():
-            token_letter = processor.get_token(token_id)
-            print(f"  Token {token_id} ('{token_letter}') with probability: {prob:.4f}")
+    backoff_continue = BackOffGenerator(
+        tuple(word_models.values()),
+        word_processor,
+    )
+    print(f'\nBackOff algorithm continue:\n{backoff_continue.run(prompt, 12)}')
 
-    generator = GreedyTextGenerator(model, processor)
+    print(
+        '\nComparison to greedy generated text at the level of letters:\n'
+        f'{greedy_generator.run(prompt, 60)}'
+    )
 
-    prompt = "Vernon"
-    seq_len = 51
-
-    print(f"Generating text for prompt: '{prompt}'")
-    generated_text = generator.run(prompt, seq_len)
-
-    if generated_text is None:
-        print("Generation error")
-    else:
-        print(f"Generation result:\n{generated_text}")
-
-    beam_width = 3
-    beam_generator = BeamSearchTextGenerator(model, processor, beam_width)
-
-    seq_len_beam = 56
-    print(f"Generating text for prompt: '{prompt}'")
-    print(f"Beam Search Algorithm, Beam width: {beam_width}, "
-          f"Sequence length: {seq_len_beam} tokens"
-          )
-
-    beam_generated_text = beam_generator.run(prompt, seq_len_beam)
-
-    if beam_generated_text is None:
-        print("Beam Search generation error")
-    else:
-        print(f"Beam Search result:\n{beam_generated_text}")
-
-    result = beam_generated_text
+    result = backoff_generated
     assert result
 
 
