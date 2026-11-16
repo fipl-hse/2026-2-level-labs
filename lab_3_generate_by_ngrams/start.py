@@ -2,7 +2,7 @@
 Generation by NGrams starter
 """
 
-from lab_3_generate_by_ngrams.main import NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
@@ -68,7 +68,20 @@ def main() -> None:
             token_letter = processor.get_token(token_id)
             print(f"  Токен {token_id} ('{token_letter}') с вероятностью {prob:.4f}")
 
-    result = decoded
+    generator = GreedyTextGenerator(model, processor)
+
+    prompt = "Vernon"
+    seq_len = 51
+
+    print(f"\nГенерация текста по затравке '{prompt}' (длина {seq_len}):")
+    generated_text = generator.run(prompt, seq_len)
+
+    if generated_text is None:
+        print("Ошибка генерации")
+    else:
+        print(f"Результат:\n{generated_text}")
+
+    result = generated_text
     assert result
 
 
