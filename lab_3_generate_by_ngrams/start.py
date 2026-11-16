@@ -4,7 +4,7 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-#import time
+
 from lab_3_generate_by_ngrams.main import (
     BeamSearchTextGenerator,
     GreedyTextGenerator,
@@ -12,7 +12,6 @@ from lab_3_generate_by_ngrams.main import (
     TextProcessor,
 )
 
-#start = time.time()
 def main() -> None:
     """
     Launches an implementation.
@@ -36,16 +35,17 @@ def main() -> None:
     generated = generator.run('Vernon', 51)
     print(f"Generated: {generated}")
 
+    #start = time.time()
     print("Beam Search Text Generator")
-    beamgenerator = BeamSearchTextGenerator(model, processor, 7)
+    beamgenerator = BeamSearchTextGenerator(model, processor, 12)
     generated2 = beamgenerator.run('Vernon', 56)
     print(f"Generated: {generated2}")
 
     assert result
 
-#end = time.time()
-#total = end - start
-#print(total)
+    #end = time.time()
+    #total = end - start
+    #print(f"время {total}")
 
 if __name__ == "__main__":
     main()
