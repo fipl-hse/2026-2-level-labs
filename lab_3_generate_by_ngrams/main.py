@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-# pylint:disable=inconsistent-return-statements
 
 import math
 import re
@@ -606,11 +605,11 @@ class BeamSearcher:
             sequence_candidates.items(),
             key = lambda i: i[0],
             reverse = True
-        ) #keys по убыванию
+        )
         sorted_by_penalty = sorted(
             sorted_by_key,
             key = lambda i: i[1]
-        ) #теперь отсюда чем меньше штраф тем выше
+        )
 
         return dict(sorted_by_penalty[: self._beam_width])
 
@@ -671,14 +670,14 @@ class BeamSearchTextGenerator:
             new_candidates = {}
 
             for sequence, penalty in candidates.items():
-                next_tokens = self._get_next_token(sequence) #топ кандидатов для продолжения
+                next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
                     return None
                 if not next_tokens:
                     new_candidates[sequence] = penalty
                     continue
 
-                updated = self.beam_searcher.continue_sequence( #расширяем последовательность
+                updated = self.beam_searcher.continue_sequence(
                 sequence, next_tokens, {sequence: penalty}
             )
                 if updated is None:
@@ -686,16 +685,16 @@ class BeamSearchTextGenerator:
                     continue
                 new_candidates.update(updated)
 
-            pruned = self.beam_searcher.prune_sequence_candidates(new_candidates)  #топ н
+            pruned = self.beam_searcher.prune_sequence_candidates(new_candidates)
             if pruned is None:
                 return None
             candidates = pruned
 
         if not candidates:
             return None
-        best_sequence = min(candidates, key=lambda seq: candidates[seq]) #выбор лучшей
+        best_sequence = min(candidates, key=lambda seq: candidates[seq])
 
-        return self._text_processor.decode(best_sequence) #decode
+        return self._text_processor.decode(best_sequence)
 
 
     def _get_next_token(

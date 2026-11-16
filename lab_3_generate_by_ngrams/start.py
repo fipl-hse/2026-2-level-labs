@@ -30,12 +30,6 @@ def main() -> None:
     result = processor.decode(encoded)
     print("Greedy Text Generator")
     model = NGramLanguageModel(encoded, 7)
-    build_result = model.build()
-    #frequencies = model._n_gram_frequencies
-    #for i, (n_gram, prob) in enumerate(frequencies.items()):
-        #if i >= 10:
-            #break
-        #print(f"  {n_gram}: {prob}")
 
     generator = GreedyTextGenerator(model, processor)
     generated = generator.run('Vernon', 51)
