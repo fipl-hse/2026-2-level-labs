@@ -712,7 +712,11 @@ class BeamSearchTextGenerator:
                 else:
                     new_candidates[seq] = penalty
 
-            candidates = self.beam_searcher.prune_sequence_candidates(new_candidates)
+            filtered = self.beam_searcher.prune_sequence_candidates(new_candidates)
+            if filtered is None:
+                return None
+
+            candidates = filtered
 
             if not candidates:
                 break
