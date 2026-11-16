@@ -2,7 +2,12 @@
 Generation by NGrams starter
 """
 
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import (
+    BeamSearchTextGenerator,
+    GreedyTextGenerator,
+    NGramLanguageModel,
+    TextProcessor,
+)
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
@@ -81,7 +86,21 @@ def main() -> None:
     else:
         print(f"Generation result:\n{generated_text}")
 
-    result = generated_text
+    beam_width = 3
+    beam_generator = BeamSearchTextGenerator(model, processor, beam_width)
+
+    seq_len_beam = 56
+    print(f"Generating text for prompt: '{prompt}'")
+    print(f"Beam Search Algorithm, Beam width: {beam_width}, Sequence length: {seq_len_beam} tokens")
+
+    beam_generated_text = beam_generator.run(prompt, seq_len_beam)
+
+    if beam_generated_text is None:
+        print("Beam Search generation error")
+    else:
+        print(f"Beam Search result:\n{beam_generated_text}")
+
+    result = beam_generated_text
     assert result
 
 
