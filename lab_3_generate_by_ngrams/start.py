@@ -19,7 +19,7 @@ def main() -> None:
     In any case returns, None is returned
     """
     with open(
-        "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
+        "./assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
 
@@ -34,18 +34,12 @@ def main() -> None:
     generator = GreedyTextGenerator(model, processor)
     generated = generator.run('Vernon', 51)
     print(f"Generated: {generated}")
-
-    #start = time.time()
     print("Beam Search Text Generator")
-    beamgenerator = BeamSearchTextGenerator(model, processor, 12)
+    beamgenerator = BeamSearchTextGenerator(model, processor, beam_width)
     generated2 = beamgenerator.run('Vernon', 56)
     print(f"Generated: {generated2}")
 
     assert result
-
-    #end = time.time()
-    #total = end - start
-    #print(f"время {total}")
 
 if __name__ == "__main__":
     main()

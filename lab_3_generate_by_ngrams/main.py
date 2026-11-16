@@ -128,10 +128,10 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        encoded: list[int] = []
         if isinstance(text, str):
             tokens = self._tokenize(text)
             if tokens is not None:
-                encoded = []
                 for i in tokens:
                     self._put(i)
                     token_id = self.get_id(i)
@@ -140,6 +140,8 @@ class TextProcessor:
                     encoded.append(token_id)
         if encoded:
             return tuple(encoded)
+        return None
+
 
     def _put(self, element: str) -> None:
         """
