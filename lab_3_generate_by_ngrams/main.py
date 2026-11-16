@@ -133,13 +133,16 @@ class TextProcessor:
         tokens = self._tokenize(text)
         if tokens is not None:
             encoded = []
-        for i in tokens:
-            self._put(i)
-            token_id = self.get_id(i)
-            if token_id is None:
-                return None
-            encoded.append(token_id)
-        return tuple(encoded)
+            for i in tokens:
+                self._put(i)
+                token_id = self.get_id(i)
+                if token_id is None:
+                    return None
+                encoded.append(token_id)
+            if encoded:
+                result = tuple(encoded)
+
+        return result
 
     def _put(self, element: str) -> None:
         """
