@@ -35,7 +35,7 @@ def main() -> None:
     generated = generator.run('Vernon', 51)
     print(f"Generated: {generated}")
     print("Beam Search Text Generator")
-    beamgenerator = BeamSearchTextGenerator(model, processor, beam_width)
+    beamgenerator = BeamSearchTextGenerator(model, processor, 7)
     generated2 = beamgenerator.run('Vernon', 56)
     print(f"Generated: {generated2}")
 
