@@ -9,7 +9,7 @@ from lab_3_generate_by_ngrams.main import (
     TextProcessor,
 )
 
-# pylint:disable=too-many-locals, unused-import, unused-variable
+# pylint:disable=too-many-locals, unused-import, unused-variable, protected-access, too-many-statements
 
 
 def main() -> None:
@@ -91,7 +91,9 @@ def main() -> None:
 
     seq_len_beam = 56
     print(f"Generating text for prompt: '{prompt}'")
-    print(f"Beam Search Algorithm, Beam width: {beam_width}, Sequence length: {seq_len_beam} tokens")
+    print(f"Beam Search Algorithm, Beam width: {beam_width}, "
+          f"Sequence length: {seq_len_beam} tokens"
+          )
 
     beam_generated_text = beam_generator.run(prompt, seq_len_beam)
 
