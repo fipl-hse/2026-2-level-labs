@@ -129,19 +129,18 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
         result = None
-        if not isinstance(text, str):
-            return None
-        tokens = self._tokenize(text)
-        if tokens is not None:
-            encoded = []
-            for i in tokens:
-                self._put(i)
-                token_id = self.get_id(i)
-                if token_id is None:
-                    break
-                encoded.append(token_id)
-            if encoded:
-                result = tuple(encoded)
+        if isinstance(text, str):
+            tokens = self._tokenize(text)
+            if tokens is not None:
+                encoded = []
+                for i in tokens:
+                    self._put(i)
+                    token_id = self.get_id(i)
+                    if token_id is None:
+                        break
+                    encoded.append(token_id)
+                if encoded:
+                    result = tuple(encoded)
 
         return result
 
