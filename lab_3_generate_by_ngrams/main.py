@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-import math
 
 import json
 import math
@@ -202,15 +201,6 @@ class TextProcessor:
 
         return self._postprocess_decoded_text(decoded)
 
-        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
-            return None
-
-        decoded_tuple = self._decode(encoded_corpus)
-        if decoded_tuple is None:
-            return None
-
-        return self._postprocess_decoded_text(decoded_tuple)
-
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -293,12 +283,7 @@ class TextProcessor:
 
         return decoded_element.capitalize() + "."
 
-        text = "".join(decoded_corpus).replace(self._end_of_word_token, " ")
-        words = text.split()
-        if not words:
-            return None
 
-        return " ".join(words).capitalize() + "."
 class WordProcessor(TextProcessor):
     """
     Handle text tokenization, encoding and decoding on the level of words.
@@ -410,7 +395,6 @@ class NGramLanguageModel:
         _encoded_corpus (tuple): Encoded text
     """
 
-
     def __init__(self, encoded_corpus: tuple | None, n_gram_size: int) -> None:
         """
         Initialize an instance of NGramLanguageModel.
@@ -514,12 +498,6 @@ class NGramLanguageModel:
 
         return next_tokens_freq
 
-        context = sequence[-(self.__n_gram_size - 1) :]
-        return {
-            ngram[-1]: freq
-            for ngram, freq in self._n_gram_frequencies.items()
-            if ngram[:-1] == context
-        }
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
     ) -> tuple[tuple[int, ...], ...] | None:
@@ -601,21 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        encoded_prompt = self._text_processor.encode(prompt)
-        if not encoded_prompt:
-            return None
-
-        current_sequence = list(encoded_prompt)
-
-        for _ in range(seq_len):
-            candidates = self._model.generate_next_token(tuple(current_sequence))
-            if not candidates:
-                break
-
-            best_token = max(candidates.items(), key=lambda item: (item[1], item[0]))[0]
-            current_sequence.append(best_token)
-
-        return self._text_processor.decode(tuple(current_sequence))
 
 class BeamSearcher:
     """
@@ -738,10 +701,6 @@ class BeamSearcher:
 
         return dict(sorted_candidates[:self._beam_width])
 
-        sorted_seqs = sorted(
-            sequence_candidates.items(), key=lambda item: (item[1], item[0])
-        )
-        return dict(sorted_seqs[: self._beam_width])
 
 class BeamSearchTextGenerator:
     """
