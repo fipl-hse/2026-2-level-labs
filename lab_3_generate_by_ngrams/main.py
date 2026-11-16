@@ -524,19 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        if not all(isinstance(token, int) for token in encoded_corpus):
-            return None
-
-        if len(encoded_corpus) < self.__n_gram_size:
-            return tuple()
-
-        n_grams = []
-
-        for index in range(len(encoded_corpus) - self.__n_gram_size + 1):
-            n_gram = encoded_corpus[index:index + self.__n_gram_size]
-            n_grams.append(n_gram)
-
-        return tuple(n_grams)
 
 class GreedyTextGenerator:
     """
