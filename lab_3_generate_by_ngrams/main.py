@@ -283,17 +283,6 @@ class TextProcessor:
 
         return decoded_element.capitalize() + "."
 
-        text = ""
-        for token in decoded_corpus:
-            if token == self._end_of_word_token:
-                text += " "
-            else:
-                text += token
-
-        text = " ".join(text.split())
-        if not text:
-            return None
-        return text.capitalize() + "."
 
 class WordProcessor(TextProcessor):
     """
@@ -590,25 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        encoded_prompt = self._text_processor.encode(prompt)
-        if not encoded_prompt:
-            return None
-
-        n_gram_size = self._model.get_n_gram_size()
-        generated_sequence = list(encoded_prompt)
-
-        for _ in range(seq_len):
-            context = tuple(generated_sequence[-(n_gram_size - 1):])
-            next_tokens = self._model.generate_next_token(context)
-            if not next_tokens:
-                break
-            # при равенстве вероятностей побеждает токен с большим id
-            next_token = max(
-                next_tokens.items(), key=lambda item: (item[1], item[0])
-            )[0]
-            generated_sequence.append(next_token)
-
-        return self._text_processor.decode(tuple(generated_sequence))
 
 class BeamSearcher:
     """
