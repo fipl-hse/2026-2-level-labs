@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-import math
 
 import json
 import math
@@ -284,34 +283,6 @@ class TextProcessor:
 
         return decoded_element.capitalize() + "."
 
-        if not decoded_corpus:
-            return None
-
-        if not all(isinstance(letter, str) for letter in decoded_corpus):
-            return None
-
-        text = []
-
-        postprocessed_text = ''.join(decoded_corpus)
-
-        for element in postprocessed_text:
-            if element.isalpha():
-                text.append(element)
-            elif text and text[-1] != ' ':
-                text.append(' ')
-        if text and text[-1] == ' ':
-            text.pop()
-
-        cleaned = ''.join(text)
-
-        if not cleaned:
-            return None
-
-        final_text = cleaned[0].upper() + cleaned[1:]
-        if not final_text.endswith('.'):
-            final_text += '.'
-
-        return final_text
 
 class WordProcessor(TextProcessor):
     """
@@ -412,6 +383,7 @@ class WordProcessor(TextProcessor):
             return None
 
         return f'{'. '.join(sentences)}.'
+
 
 class NGramLanguageModel:
     """
@@ -552,19 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        if not encoded_corpus:
-            return None
-
-        if not all(isinstance(item, int) for item in encoded_corpus):
-            return None
-
-        extracted_n_grams = []
-
-        for i in range(len(encoded_corpus) - self.__n_gram_size + 1):
-            n_gram = encoded_corpus[i : i + self.__n_gram_size]
-            extracted_n_grams.append(n_gram)
-
-        return tuple(extracted_n_grams)
 
 class GreedyTextGenerator:
     """
@@ -620,31 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        encoded_prompt = self._text_processor.encode(prompt)
-        if encoded_prompt is None:
-            return None
-
-        n_gram_size = self._model.get_n_gram_size()
-        if not n_gram_size or n_gram_size < 1:
-            return None
-
-        context_size = n_gram_size - 1
-
-        if len(encoded_prompt) < context_size:
-            return None
-
-        sequence = encoded_prompt
-
-        for _ in range(seq_len):
-            possible_letters = self._model.generate_next_token(sequence)
-            if not possible_letters or possible_letters is None:
-                break
-
-            next_letter, _ = max(possible_letters.items(), key=lambda item: (item[1], item[0]))
-
-            sequence = (*sequence, next_letter)
-
-        return self._text_processor.decode(sequence)
 
 class BeamSearcher:
     """
@@ -767,18 +701,6 @@ class BeamSearcher:
 
         return dict(sorted_candidates[:self._beam_width])
 
-        if not sequence_candidates:
-            return None
-
-        sorted_sequence = sorted(
-            sequence_candidates.items(),
-            key=lambda item: (
-            item[1],
-            tuple(-token for token in item[0])))
-
-        top_n_sequence = sorted_sequence[:self._beam_width]
-
-        return dict(top_n_sequence)
 
 class BeamSearchTextGenerator:
     """
@@ -886,10 +808,6 @@ class BeamSearchTextGenerator:
         """
         return self.beam_searcher.get_next_token(sequence_to_continue)
 
-        if not sequence_to_continue:
-            return None
-
-        return self.beam_searcher.get_next_token(sequence_to_continue)
 
 class NGramLanguageModelReader:
     """
@@ -988,6 +906,7 @@ class NGramLanguageModelReader:
             TextProcessor: processor created for the current JSON file.
         """
         return self._text_processor
+
 
 class BackOffGenerator:
     """
