@@ -138,8 +138,8 @@ class TextProcessor:
                     if token_id is None:
                         break
                     encoded.append(token_id)
-
-        return tuple(encoded)
+            if encoded:
+                return tuple(encoded)
 
     def _put(self, element: str) -> None:
         """
