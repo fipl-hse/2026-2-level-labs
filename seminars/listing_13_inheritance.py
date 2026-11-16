@@ -21,6 +21,14 @@ class Vehicle:
         move() -> None:
             Simulates vehicle movement.
     """
+    def __init__(self, max_speed, colour) :
+        self.max_speed = max_speed
+        self.colour = colour
+
+    def move(self) :
+
+        print(f"Vehicle ({self.colour}) moves at max speed {self.max_speed}.")
+
 
 
 class Car:
@@ -38,6 +46,20 @@ class Car:
         stay() -> None:
             Simulates stopping the car.
     """
+    def __init__(self, max_speed, colour, fuel) :
+        super().__init__(max_speed, colour)
+        self.fuel = fuel
+
+    def move(self) :
+
+        print(
+            f"Car ({self.colour}) drives using {self.fuel} "
+            f"at max speed {self.max_speed}."
+        )
+
+    def stay(self) :
+
+        print(f"Car ({self.colour}) has stopped.")
 
 
 class Bicycle:
@@ -55,7 +77,19 @@ class Bicycle:
         freestyle() -> None:
             Simulates performing a freestyle trick.
     """
+    def __init__(self, number_of_wheels, colour, max_speed) :
+        super().__init__(max_speed, colour)
+        self.number_of_wheels = number_of_wheels
 
+    def move(self) :
+        print(
+            f"Bicycle ({self.colour}) with {self.number_of_wheels} wheels "
+            f"rides at max speed {self.max_speed}."
+        )
+
+    def freestyle(self) :
+
+        print(f"Bicycle ({self.colour}) performs a freestyle trick.")
 
 class Aircraft:
     """
@@ -70,6 +104,13 @@ class Aircraft:
         move() -> None:
             Simulates aircraft movement.
     """
+    def __init__(self, number_of_engines, colour, max_speed) :
+        super().__init__(max_speed, colour)
+        self.number_of_engines = number_of_engines
+
+    def move(self) :
+        print("Aircraft moves")
+
 
 
 def main() -> None:

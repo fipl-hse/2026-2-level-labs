@@ -22,6 +22,7 @@ def main() -> None:
     ) as text_file:
         text = text_file.read()
 
+
     text_processor = TextProcessor('<eow>')
     encoded = text_processor.encode(text)
 
@@ -30,16 +31,16 @@ def main() -> None:
     language_model = NGramLanguageModel(encoded, 2)
     print(f'Is built: {language_model.build()}')
 
-    if language_model._n_gram_frequencies:
-        print(list(language_model._n_gram_frequencies.items())[:10])
+
+    print(list(language_model._n_gram_frequencies.items())[:10])
 
     language_model_7 = NGramLanguageModel(encoded, 7)
     language_model_7.build()
 
     generator = GreedyTextGenerator(language_model_7, text_processor)
+
     result = generator.run('Vernon', 51)
     print(result)
-
 
     assert result
 
