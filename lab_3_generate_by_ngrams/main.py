@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-import math
 
 import json
 import math
@@ -250,22 +249,6 @@ class TextProcessor:
 
         return tuple(decoded_corpus)
 
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
-            return None
-        if not all(isinstance(el, int) and not isinstance(el, bool) for el in corpus):
-            return None
-
-        result = []
-
-        for element_id in corpus:
-            token = self.get_token(element_id)
-            if token is None:
-                return None
-            result.append(token)
-
-        return tuple(result)
-
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
         Convert decoded sentence into the string sequence.
@@ -424,10 +407,6 @@ class NGramLanguageModel:
         self.__n_gram_size = n_gram_size
         self._n_gram_frequencies = {}
 
-        self._encoded_corpus = encoded_corpus
-        self.__n_gram_size = n_gram_size
-        self._n_gram_frequencies = {}
-
     def get_n_gram_size(self) -> int:  # type: ignore[empty-body]
         """
         Retrieve value stored in self.__n_gram_size attribute.
@@ -545,11 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        n = self.__n_gram_size
-
-        n_grams = tuple(encoded_corpus[i:i + n] for i in range(len(encoded_corpus) - n + 1))
-
-        return n_grams
 
 class GreedyTextGenerator:
     """
