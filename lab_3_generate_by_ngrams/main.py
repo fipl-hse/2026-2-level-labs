@@ -5,7 +5,6 @@ Beam-search and natural language generation evaluation
 """
 
 # pylint:disable=too-few-public-methods
-import math
 
 import json
 import math
@@ -284,25 +283,6 @@ class TextProcessor:
 
         return decoded_element.capitalize() + "."
 
-        text_parts = []
-        prev_is_space = False
-        for token in decoded_corpus:
-            if token == self._end_of_word_token:
-                if not prev_is_space and text_parts:
-                    text_parts.append(" ")
-                    prev_is_space = True
-            else:
-                text_parts.append(token)
-                prev_is_space = False
-
-        text = "".join(text_parts).rstrip(" ")
-        if not text:
-            return None
-
-        text = text[0].upper() + text[1:]
-        if not text.endswith("."):
-            text += "."
-        return text
 
 class WordProcessor(TextProcessor):
     """
@@ -599,31 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        encoded = self._text_processor.encode(prompt)
-        if encoded is None:
-            return None
-
-        sequence = encoded
-        for _ in range(seq_len):
-            candidates = self._model.generate_next_token(sequence)
-            if not candidates:
-                break
-
-            best_token = None
-            best_frequency = -1.0
-            for token, frequency in candidates.items():
-                if frequency > best_frequency or (
-                    frequency == best_frequency and token > best_token
-                ):
-                    best_token = token
-                    best_frequency = frequency
-
-            if isinstance(best_token, int):
-                sequence = sequence + (best_token,)
-            else:
-                break
-
-        return self._text_processor.decode(sequence)
 
 class BeamSearcher:
     """
