@@ -6,9 +6,9 @@ Beam-search and natural language generation evaluation
 
 # pylint:disable=too-few-public-methods
 
+import json
 import math
 
-import json
 
 class TextProcessor:
     """
@@ -276,7 +276,7 @@ class WordProcessor(TextProcessor):
         _end_of_word_token (str): A token denoting sentence boundary
         _storage (dict): Dictionary in the form of <token: identifier>
     """
-    def __init__(self, end_of_word_token) -> None:
+    def __init__(self, end_of_word_token : str) -> None:
         """
         Initialize an instance of WordProcessor.
 

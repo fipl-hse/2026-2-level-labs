@@ -28,6 +28,7 @@ def main() -> None:
     processor = TextProcessor("_")
 
     encoded_text = processor.encode(text)
+    assert encoded_text, "Text can not be encoded"
     print("Закодированный текст: ", encoded_text[:101])
 
     decoded_text =  processor.decode(encoded_text)
