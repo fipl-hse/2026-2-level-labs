@@ -30,6 +30,7 @@ def main() -> None:
     result = processor.decode(encoded)
     print("Greedy Text Generator")
     model = NGramLanguageModel(encoded, 7)
+    build_result = model.build()
 
     generator = GreedyTextGenerator(model, processor)
     generated = generator.run('Vernon', 51)
