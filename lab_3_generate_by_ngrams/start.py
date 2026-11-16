@@ -3,15 +3,6 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-from lab_3_generate_by_ngrams.main import (
-    BackOffGenerator,
-    BeamSearchTextGenerator,
-    GreedyTextGenerator,
-    NGramLanguageModel,
-    NGramLanguageModelReader,
-    TextProcessor,
-    WordProcessor,
-)
 
 from lab_3_generate_by_ngrams.main import (
     BackOffGenerator,
@@ -129,58 +120,6 @@ def main() -> None:
 
     result = backoff_generated
     assert result
-
-    # Word-level generation
-
-    word_processor = WordProcessor("<eos>")
-    encoded_words = word_processor.encode(text)
-    assert encoded_words is not None
-
-    word_model_2 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=2)
-    word_model_2.build()
-
-    word_model_3 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=3)
-    word_model_3.build()
-
-    word_model_4 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=4)
-    word_model_4.build()
-
-    # Greedy generation
-    word_greedy_generator = GreedyTextGenerator(
-        language_model=word_model_4,
-        text_processor=word_processor)
-
-    word_greedy_text = word_greedy_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level Greedy: {word_greedy_text}")
-
-    # Beam Search generation
-    word_beam_generator = BeamSearchTextGenerator(
-        language_model=word_model_4,
-        text_processor=word_processor,
-        beam_width=3)
-
-    word_beam_text = word_beam_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level Beam Search: {word_beam_text}")
-
-    # BackOff generation
-    word_backoff_generator = BackOffGenerator(
-        language_models=(word_model_2, word_model_3, word_model_4),
-        text_processor=word_processor)
-
-    word_backoff_text = word_backoff_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level BackOff: {word_backoff_text}")
 
 
 if __name__ == "__main__":
