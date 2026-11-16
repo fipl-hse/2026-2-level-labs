@@ -137,7 +137,7 @@ class TextProcessor:
                 self._put(i)
                 token_id = self.get_id(i)
                 if token_id is None:
-                    return None
+                    break
                 encoded.append(token_id)
             if encoded:
                 result = tuple(encoded)
