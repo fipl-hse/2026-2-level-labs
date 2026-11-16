@@ -94,11 +94,6 @@ class TextProcessor:
 
         return self._storage.get(element)
 
-        if not isinstance(element, str):
-            return None
-
-        return self._storage.get(element)
-
     def get_end_of_word_token(self) -> str:  # type: ignore[empty-body]
         """
         Retrieve value stored in self._end_of_word_token attribute.
@@ -106,8 +101,6 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
-        return self._end_of_word_token
-
         return self._end_of_word_token
 
     def get_token(self, element_id: int) -> str | None:
@@ -128,15 +121,6 @@ class TextProcessor:
         for el, el_id in self._storage.items():
             if el_id == element_id:
                 return el
-
-        return None
-
-        if not isinstance(element_id, int) or isinstance(element_id, bool):
-            return None
-
-        for token, token_id in self._storage.items():
-            if token_id == element_id:
-                return token
 
         return None
 
@@ -172,26 +156,6 @@ class TextProcessor:
 
         return tuple(encoded_corpus)
 
-        if not isinstance(text, str):
-            return None
-
-        tokens = self._tokenize(text)
-        if tokens is None:
-            return None
-
-        encoded_ids = []
-
-        for token in tokens:
-            self._put(token)
-
-            token_id = self.get_id(token)
-            if token_id is None:
-                return None
-
-            encoded_ids.append(token_id)
-
-        return tuple(encoded_ids)
-
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -204,12 +168,6 @@ class TextProcessor:
         """
         if not isinstance(element, str) or len(element) != 1:
             return
-
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
-
-        if not isinstance(element, str) or len(element) != 1:
-            return None
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -242,19 +200,6 @@ class TextProcessor:
             return None
 
         return self._postprocess_decoded_text(decoded)
-
-        if not isinstance(encoded_corpus, tuple):
-            return None
-
-        decoded_tokens = self._decode(encoded_corpus)
-        if decoded_tokens is None:
-            return None
-
-        result_text = self._postprocess_decoded_text(decoded_tokens)
-        if result_text is None:
-            return None
-
-        return result_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -304,21 +249,6 @@ class TextProcessor:
 
         return tuple(decoded_corpus)
 
-        if not isinstance(corpus, tuple) or not corpus:
-            return None
-
-        decoded_tokens = []
-
-        for token_id in corpus:
-            token = self.get_token(token_id)
-
-            if token is None:
-                return None
-
-            decoded_tokens.append(token)
-
-        return tuple(decoded_tokens)
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
         Convert decoded sentence into the string sequence.
@@ -352,29 +282,6 @@ class TextProcessor:
             return None
 
         return decoded_element.capitalize() + "."
-
-        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            return None
-
-        text = ""
-        for token in decoded_corpus:
-            if token == self._end_of_word_token:
-                if not text.endswith(" "):
-                    text += " "
-            else:
-                text += token
-
-        text = text.strip()
-
-        if not text:
-            return None
-
-        text = text.capitalize()
-
-        if not text.endswith("."):
-            text += "."
-
-        return text
 
 
 class WordProcessor(TextProcessor):

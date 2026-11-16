@@ -121,18 +121,6 @@ def main() -> None:
     result = backoff_generated
     assert result
 
-    processor = TextProcessor("_")
-
-    encoded = processor.encode(text)
-    print("Encoded corpus (first 100 tokens):")
-    print(encoded[:100] if encoded is not None else None)
-
-    decoded = processor.decode(encoded) if encoded is not None else None
-    print("\nDecoded text (first 300 chars):")
-    print(decoded[:300] if decoded is not None else None)
-
-    result = decoded
-    assert result
 
 if __name__ == "__main__":
     main()
