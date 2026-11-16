@@ -498,7 +498,11 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str) or type(seq_len) is not int:
+        if (
+            not isinstance(prompt, str)
+            or not isinstance(seq_len, int)
+            or isinstance(seq_len, bool)
+        ):
             return None
         if seq_len <= 0:
             return None
@@ -560,9 +564,12 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if (not isinstance(sequence, tuple)
-            or type(self._beam_width) is not int
-            or self._beam_width <= 0):
+        if (
+            not isinstance(sequence, tuple)
+            or not isinstance(self._beam_width, int)
+            or isinstance(self._beam_width, bool)
+            or self._beam_width <= 0
+        ):
             return None
 
         next_tokens = self._model.generate_next_token(sequence)
@@ -637,7 +644,13 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict) or not sequence_candidates or type(self._beam_width) is not int or self._beam_width <= 0:
+        if (
+            not isinstance(sequence_candidates, dict)
+            or not sequence_candidates
+            or not isinstance(self._beam_width, int)
+            or isinstance(self._beam_width, bool)
+            or self._beam_width <= 0
+        ):
             return None
 
         sorted_by_key = dict(sorted(sequence_candidates.items(), key=lambda x: x[0], reverse=True))
@@ -688,7 +701,12 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str) or type(seq_len) is not int or seq_len <= 0:
+        if (
+            not isinstance(prompt, str)
+            or not isinstance(seq_len, int)
+            or isinstance(seq_len, bool)
+            or seq_len <= 0
+        ):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
