@@ -121,33 +121,6 @@ def main() -> None:
     result = backoff_generated
     assert result
 
-    # Mark 4
-
-    processing_text = TextProcessor(end_of_word_token = "_")
-    encoded_text = processing_text.encode(text)
-    print(encoded_text)
-    decoded_text = processing_text.decode(encoded_text)
-    print(decoded_text)
-
-    # N-grams frequencies dictionary
-
-    building_freq_dict = NGramLanguageModel(encoded_text, n_gram_size = 7)
-    frequency_dictionary = building_freq_dict.build()
-    print(frequency_dictionary)
-    print(building_freq_dict._n_gram_frequencies)
-
-    # Mark 6
-
-    greedy_text_generator = GreedyTextGenerator(building_freq_dict, processing_text)
-    prompt = "Vernon"
-    seq_len = 51
-    result = greedy_text_generator.run(prompt, seq_len)
-    print(f"Checking: '{prompt}'")
-    print(f"The result of generation (length {seq_len}):")
-    print(result)
-
-    # result = None
-    assert result
 
 if __name__ == "__main__":
     main()

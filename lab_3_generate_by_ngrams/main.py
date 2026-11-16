@@ -524,23 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        if not encoded_corpus:
-            return None
-
-        if not all(isinstance(item, int) for item in encoded_corpus):
-            return None
-
-        if self.__n_gram_size < 2:
-            return None
-
-        extracted_ngrams = []
-
-        length_encoded_corpus = len(encoded_corpus)
-
-        for i in range(length_encoded_corpus - self.__n_gram_size + 1):
-            extracted_ngrams.append(encoded_corpus[i: i + self.__n_gram_size])
-
-        return tuple(extracted_ngrams)
 
 class GreedyTextGenerator:
     """
@@ -596,35 +579,6 @@ class GreedyTextGenerator:
 
         return self._text_processor.decode(generated_sequence)
 
-        if not isinstance(seq_len, int):
-            return None
-
-        if seq_len <= 0:
-            return None
-
-        encoded_prompt = self._text_processor.encode(prompt)
-
-        if encoded_prompt is None:
-            return None
-
-        context_length = self._model.get_n_gram_size() - 1
-        context = encoded_prompt[-context_length:] if context_length > 0 else ()
-        generated_tokens = list(encoded_prompt)
-
-        for i in range(seq_len):
-            candidates = self._model.generate_next_token(context)
-            if not candidates:
-                break
-            best_token = max(candidates.keys(), key=lambda token: (candidates[token], token))
-            generated_tokens.append(best_token)
-            if context_length > 0:
-                context = tuple(generated_tokens[-context_length:])
-            else:
-                context = ()
-
-        decoded_text = self._text_processor.decode(tuple(generated_tokens))
-
-        return decoded_text
 
 class BeamSearcher:
     """
