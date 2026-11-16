@@ -22,64 +22,64 @@ def main() -> None:
 
     encoded = processor.encode(text)
     if encoded is None:
-        print("Ошибка кодирования")
+        print("Encoding error")
         return
 
-    print(f"Длина закодированного корпуса: {len(encoded)}")
-    print(f"Первые 100 токенов: {encoded[:100]}")
-    print(f"Размер хранилища: {len(processor._storage)}")
+    print(f"Encoded corpus length: {len(encoded)} tokens")
+    print(f"Storage size: {len(processor._storage)} unique characters")
+    print(f"First 100 encoded tokens: {encoded[:100]}")
 
     decoded = processor.decode(encoded)
     if decoded is None:
-        print("Ошибка декодирования")
+        print("Decoding error")
         return
 
-    print(f"Длина декодированного текста: {len(decoded)}")
-    print(f"Первые 500 символов:\n{decoded[:500]}")
+    print(f"Decoded text length: {len(decoded)} characters")
+    print(f"First 500 characters of decoded text:\n{decoded[:500]}\n")
 
-    n_gram_size = 2
+    n_gram_size = 7
     model = NGramLanguageModel(encoded, n_gram_size)
 
     if not model.build():
-        print("Ошибка построения модели")
+        print("Model build error")
         return
 
-    print(f"Модель успешно построена для {n_gram_size}-грамм.")
-    print(f"Количество уникальных {n_gram_size}-грамм в модели: {len(model._n_gram_frequencies)}")
+    print(f"Model successfully built for N={n_gram_size}.")
+    print(f"Number of unique {n_gram_size}-grams: {len(model._n_gram_frequencies)}")
 
-    print("\nПримеры n-грамм и их вероятностей:")
+    print("\nExamples of n-grams and their probabilities:")
     count = 0
     for ngram, prob in model._n_gram_frequencies.items():
         letters = tuple(processor.get_token(token_id) for token_id in ngram)
-        print(f"  {ngram} (буквы: {letters}) -> {prob:.4f}")
+        print(f"  {ngram} (letters: {letters}) -> probability: {prob:.4f}")
         count += 1
         if count >= 5:
             break
 
     sequence = tuple(encoded[:n_gram_size])
-    print(f"\nПредсказание для контекста {sequence}:")
+    print(f"\nPrediction for context {sequence}:")
 
     next_tokens = model.generate_next_token(sequence)
     if next_tokens is None:
-        print("Не удалось получить следующий токен")
+        print("Failed to get next token")
     else:
-        print(f"Возможные следующие токены (id: вероятность): {next_tokens}")
+        print(f"Possible next tokens (id: probability): {next_tokens}")
         for token_id, prob in next_tokens.items():
             token_letter = processor.get_token(token_id)
-            print(f"  Токен {token_id} ('{token_letter}') с вероятностью {prob:.4f}")
+            print(f"  Token {token_id} ('{token_letter}') with probability: {prob:.4f}")
 
     generator = GreedyTextGenerator(model, processor)
 
     prompt = "Vernon"
     seq_len = 51
 
-    print(f"\nГенерация текста по затравке '{prompt}' (длина {seq_len}):")
+    print(f"Generating text for prompt: '{prompt}'")
     generated_text = generator.run(prompt, seq_len)
 
     if generated_text is None:
-        print("Ошибка генерации")
+        print("Generation error")
     else:
-        print(f"Результат:\n{generated_text}")
+        print(f"Generation result:\n{generated_text}")
 
     result = generated_text
     assert result
