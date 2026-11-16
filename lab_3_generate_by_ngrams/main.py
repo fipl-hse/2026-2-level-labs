@@ -4,8 +4,8 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 
-import json
 import math
+
 # pylint:disable=too-few-public-methods
 
 
@@ -560,7 +560,8 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if not isinstance(sequence, tuple) or type(self._beam_width) is not int or self._beam_width <= 0:
+        if not isinstance(sequence, tuple) or type(self._beam_width)
+            is not int or self._beam_width <= 0:
             return None
 
         next_tokens = self._model.generate_next_token(sequence)
