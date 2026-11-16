@@ -560,8 +560,9 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if not isinstance(sequence, tuple) or type(self._beam_width)
-            is not int or self._beam_width <= 0:
+        if (not isinstance(sequence, tuple)
+            or type(self._beam_width) is not int
+            or self._beam_width <= 0):
             return None
 
         next_tokens = self._model.generate_next_token(sequence)
@@ -600,9 +601,13 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not isinstance(sequence, tuple) or not isinstance(next_tokens, list) or not isinstance(sequence_candidates, dict):
+        if (not isinstance(sequence, tuple)
+            or not isinstance(next_tokens, list)
+            or not isinstance(sequence_candidates, dict)):
             return None
-        if not next_tokens or len(next_tokens) > self._beam_width or sequence not in sequence_candidates:
+        if (not next_tokens
+            or len(next_tokens) > self._beam_width
+            or sequence not in sequence_candidates):
             return None
 
         new_candidates = sequence_candidates.copy()
