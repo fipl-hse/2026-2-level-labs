@@ -131,9 +131,8 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
         tokens = self._tokenize(text)
-        if tokens is None:
-            return None
-        encoded = []
+        if tokens is not None:
+            encoded = []
         for i in tokens:
             self._put(i)
             token_id = self.get_id(i)
