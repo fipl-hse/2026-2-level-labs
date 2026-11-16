@@ -2,6 +2,8 @@
 Generation by NGrams starter
 """
 
+# pylint:disable=too-many-locals, unused-import, unused-variable
+
 from lab_3_generate_by_ngrams.main import (
     TextProcessor,
     NGramLanguageModel,
@@ -10,36 +12,36 @@ from lab_3_generate_by_ngrams.main import (
 
 
 def main() -> None:
+    """
+    Launches an implementation.
+
+    In any case returns, None is returned
+    """
     with open(
-        "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt",
-        "r",
-        encoding="utf-8"
+        "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
 
     text_processor = TextProcessor('<eow>')
-
-
-    encoded = tuple(text_processor.encode(text))
+    encoded = text_processor.encode(text)
 
     print(f'Encoded corpus size: {len(encoded)}')
 
     language_model = NGramLanguageModel(encoded, 2)
-    is_built = language_model.build()
-    print(f'Is built: {is_built}')
+    print(f'Is built: {language_model.build()}')
 
-    if is_built:
+    if language_model._n_gram_frequencies:
         print(list(language_model._n_gram_frequencies.items())[:10])
-    else:
-        print("Ошибка: Модель не построилась. Проверьте метод build() в main.py")
-        return
+
+    language_model_7 = NGramLanguageModel(encoded, 7)
+    language_model_7.build()
+
+    generator = GreedyTextGenerator(language_model_7, text_processor)
+    result = generator.run('Vernon', 51)
+    print(result)
 
 
-    language_model = NGramLanguageModel(encoded, 7)
-    language_model.build()
-
-    generator = GreedyTextGenerator(language_model, text_processor)
-    print(generator.run('Vernon', 51))
+    assert result
 
 
 if __name__ == "__main__":
