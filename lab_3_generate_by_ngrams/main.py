@@ -444,6 +444,8 @@ class NGramLanguageModel:
         """
         if not isinstance(encoded_corpus, tuple):
             return None
+        if not encoded_corpus:              # ← ДОБАВИТЬ: пустой кортеж — некорректный вход
+            return None
 
         n = self.__n_gram_size
         if type(n) is not int or n < 2:
