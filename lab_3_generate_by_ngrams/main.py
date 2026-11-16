@@ -128,7 +128,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        result = None
+        result: tuple[int, ...] | None = None
         if isinstance(text, str):
             tokens = self._tokenize(text)
             if tokens is not None:

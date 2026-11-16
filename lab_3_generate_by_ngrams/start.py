@@ -4,6 +4,7 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
+#import time
 from lab_3_generate_by_ngrams.main import (
     BeamSearchTextGenerator,
     GreedyTextGenerator,
@@ -11,7 +12,7 @@ from lab_3_generate_by_ngrams.main import (
     TextProcessor,
 )
 
-
+#start = time.time()
 def main() -> None:
     """
     Launches an implementation.
@@ -42,7 +43,9 @@ def main() -> None:
 
     assert result
 
-
+#end = time.time()
+#total = end - start
+#print(total)
 
 if __name__ == "__main__":
     main()
