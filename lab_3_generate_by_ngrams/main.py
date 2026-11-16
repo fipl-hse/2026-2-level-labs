@@ -107,7 +107,7 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if type(element_id) is not int:
+        if not isinstance(element_id, int) or isinstance(element_id, bool):
             return None
         for token, token_id in self._storage.items():
             if token_id == element_id:
@@ -409,11 +409,11 @@ class NGramLanguageModel:
             return None
 
         n = self.__n_gram_size
-        if type(n) is not int or n < 2:
+        if not isinstance(n, int) or isinstance(n, bool) or n < 2:
             return None
 
         for x in sequence:
-            if type(x) is not int:
+            if not isinstance(x, int) or isinstance(x, bool):
                 return None
 
         if len(sequence) < n - 1:
@@ -448,11 +448,11 @@ class NGramLanguageModel:
             return None
 
         n = self.__n_gram_size
-        if type(n) is not int or n < 2:
+        if not isinstance(n, int) or isinstance(n, bool) or n < 2:
             return None
 
         for x in encoded_corpus:
-            if type(x) is not int:
+            if not isinstance(x, int) or isinstance(x, bool):
                 return None
 
         if len(encoded_corpus) < n:
