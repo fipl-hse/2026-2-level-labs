@@ -18,13 +18,22 @@ def main() -> None:
         text = text_file.read()
 
     text_processor = TextProcessor('<eow>')
-    encoded = text_processor.encode(text)
+
+
+    encoded = tuple(text_processor.encode(text))
 
     print(f'Encoded corpus size: {len(encoded)}')
 
     language_model = NGramLanguageModel(encoded, 2)
-    print(f'Is built: {language_model.build()}')
-    print(list(language_model._n_gram_frequencies.items())[:10])
+    is_built = language_model.build()
+    print(f'Is built: {is_built}')
+
+    if is_built:
+        print(list(language_model._n_gram_frequencies.items())[:10])
+    else:
+        print("Ошибка: Модель не построилась. Проверьте метод build() в main.py")
+        return
+
 
     language_model = NGramLanguageModel(encoded, 7)
     language_model.build()
