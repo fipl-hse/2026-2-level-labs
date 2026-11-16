@@ -631,7 +631,7 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict) or type(self._beam_width) is not int or self._beam_width <= 0:
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates or type(self._beam_width) is not int or self._beam_width <= 0:
             return None
 
         sorted_by_key = dict(sorted(sequence_candidates.items(), key=lambda x: x[0], reverse=True))
