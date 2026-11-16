@@ -6,7 +6,6 @@ Beam-search and natural language generation evaluation
 
 # pylint:disable=too-few-public-methods
 
-
 from collections import Counter
 
 
