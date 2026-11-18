@@ -104,7 +104,6 @@ textprocessor
 textrank
 textranksummarizer
 tf
-tfidf
 tfidfadapter
 tokenization
 tokenize
@@ -114,7 +113,6 @@ tokenizing
 txt
 uml
 uml-диаграмма
-undirected
 unigrams
 unk
 unknownprofile
@@ -123,4 +121,3 @@ valueerror
 vanillatextrank
 wo
 wordprocessor
-ws
