@@ -30,8 +30,8 @@
             "name": "[LAB 3] Start",
             "type": "debugpy",
             "request": "launch",
-            "program": "start.py",
-            "cwd": "${workspaceFolder}/lab_3_generate_by_ngrams",
+            "program": "lab_3_generate_by_ngrams/start.py",
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
