@@ -11,9 +11,8 @@ Summarize text using TextRank algorithm
    Type alias representing a preprocessed sentence as a tuple of strings.
 """
 
-# pylint:disable=too-few-public-methods, unused-argument
-import re
-from typing import Any, Sequence
+# pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
+from typing import Sequence
 
 PreprocessedSentence = tuple[str, ...]
 EncodedSentence = tuple[int, ...]
@@ -25,35 +24,6 @@ class IncorrectArgumentError(ValueError):
 
 class TextGraphError(IncorrectArgumentError):
     """Raised when an invalid graph operation or vertex lookup occurs."""
-
-
-def check_sequence(user_input: Any, elements_type: type, can_be_empty: bool) -> bool:
-    """
-    Checks the type of an object and its elements.
-
-    Args:
-        user_input (Any): Object to check.
-        elements_type (type): Required type of its elements.
-        can_be_empty (bool): Whether the sequence can be empty.
-
-    Returns:
-        bool: True if the object is a valid sequence, otherwise False.
-    """
-
-
-def check_dict(user_input: dict, key_type: type, value_type: type, can_be_empty: bool) -> bool:
-    """
-    Checks whether an object is a dictionary with keys and values of specified types.
-
-    Args:
-        user_input (dict): Object to check.
-        key_type (type): Required type of dictionary keys.
-        value_type (type): Required type of dictionary values.
-        can_be_empty (bool): Whether the dictionary can be empty.
-
-    Returns:
-        bool: True if the object is a valid dictionary, otherwise False.
-    """
 
 
 class Sentence:
@@ -123,12 +93,12 @@ class Sentence:
         """
         return self._encoded
 
-    def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
+    def get_position(self) -> int:
         """
-        Sets the encoded representation of the sentence.
+        Returns the position of the sentence in the text.
 
-        Args:
-            encoded_sentence (EncodedSentence): Encoded sequence of integers.
+        Returns:
+            int: Position of the sentence.
         """
         if not isinstance(encoded_sentence, tuple):
             raise IncorrectArgumentError('Incorrect input value')
@@ -146,29 +116,6 @@ class Sentence:
         """
         return self._preprocessed
 
-    def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
-        """
-        Sets the preprocessed representation of the sentence.
-
-        Args:
-            preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
-        """
-        if not isinstance(preprocessed_sentence, tuple):
-            raise IncorrectArgumentError('Incorrect input value')
-        if any(not isinstance(s, str) for s in preprocessed_sentence):
-            raise IncorrectArgumentError('Incorrect input value')
-
-        self._preprocessed = preprocessed_sentence
-
-    def get_position(self) -> int:
-        """
-        Returns the position of the sentence in the text.
-
-        Returns:
-            int: Position of the sentence.
-        """
-        return self._position
-
     def get_text(self) -> str:
         """
         Returns the text of the sentence.
@@ -177,6 +124,22 @@ class Sentence:
             str: Text of the sentence.
         """
         return self._text
+
+    def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
+        """
+        Sets the encoded representation of the sentence.
+
+        Args:
+            encoded_sentence (EncodedSentence): Encoded sequence of integers.
+        """
+
+    def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
+        """
+        Sets the preprocessed representation of the sentence.
+
+        Args:
+            preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
+        """
 
 
 class SentencePreprocessor:
@@ -242,6 +205,14 @@ class SentencePreprocessor:
 
         return tuple(cleaned)
 
+    def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
+        """
+        Preprocesses a sequence of sentences and stores their token representations.
+
+        Args:
+            sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
+        """
+
     def _remove_stop_words(self, tokens: Sequence[str]) -> tuple[str, ...]:
         """
         Removes stop words from a sequence of tokens.
@@ -263,23 +234,6 @@ class SentencePreprocessor:
                 without_stop_words.append(token)
 
         return tuple(without_stop_words)
-
-    def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
-        """
-        Preprocesses a sequence of sentences and stores their token representations.
-
-        Args:
-            sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
-        """
-        if not isinstance(sentences, (list, tuple)):
-            raise IncorrectArgumentError('Incorrect input value')
-        if not all(isinstance(s, Sentence) for s in sentences):
-            raise IncorrectArgumentError('Incorrect input value')
-
-        for sentence in sentences:
-            text = sentence.get_text()
-            preprocessed = self.preprocess_text(text)
-            sentence.set_preprocessed(preprocessed)
 
     def _split_by_sentence(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -344,6 +298,7 @@ class SentenceEncoder:
     Attributes:
         _word2id (dict[str, int]): Maps words to integers.
         _id2word (dict[int, str]): Maps integers to words.
+        last (int): Counter for the last assigned identifier.
     """
 
     def __init__(self) -> None:
@@ -353,6 +308,14 @@ class SentenceEncoder:
         self._word2id = {}
         self._id2word = {}
         self.last = 999
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the encoder.
+
+        Returns:
+            str: String representation of the encoder.
+        """
 
     def _learn_indices(self, tokens: Sequence[str]) -> None:
         """
@@ -388,15 +351,6 @@ class SentenceEncoder:
             actual = sentence.get_preprocessed()
             self._learn_indices(actual)
             sentence.set_encoded(tuple(self._word2id[token] for token in actual))
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the encoder.
-
-        Returns:
-            str: String representation of the encoder.
-        """
-        return f'SentenceEncoder(vocabulary_size={len(self._word2id)}'
 
 
 def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
@@ -442,31 +396,21 @@ class TextGraph:
             str: Description of the graph.
         """
 
-    def _add_vertex(self, vertex: Sentence) -> None:
-        """Adds a vertex and extends the matrix without computing similarity scores.
-
-        Args:
-            vertex (Sentence): Vertex to add to the graph.
-        """
-
     def _add_edge(self, vertex1: Sentence, vertex2: Sentence) -> None:
         """
-        Adds or overwrites an edge between two vertices in the graph.
+        Adds an edge between two vertices in the graph.
 
         Args:
             vertex1 (Sentence): First vertex.
             vertex2 (Sentence): Second vertex.
         """
 
-    def get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
+    def _add_vertex(self, vertex: Sentence) -> None:
         """
-        Returns the top n sentences with the highest sum of similarity scores.
+        Adds a vertex and extends the matrix without computing similarity scores.
 
         Args:
-            n (int): Number of top sentences to return.
-
-        Returns:
-            tuple[Sentence, ...]: Top n sentences with the highest similarity score sum.
+            vertex (Sentence): Vertex to add to the graph.
         """
 
     def build(self, sentences: Sequence[Sentence]) -> None:
@@ -475,6 +419,17 @@ class TextGraph:
 
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to add.
+        """
+
+    def calculate_inout_score(self, vertex: Sentence) -> int:
+        """
+        Calculates the number of vertices similar to the specified vertex.
+
+        Args:
+            vertex (Sentence): Vertex whose similar vertices should be counted.
+
+        Returns:
+            int: Number of similar vertices.
         """
 
     def get_vertices(self) -> tuple[Sentence, ...]:
@@ -497,23 +452,23 @@ class TextGraph:
             float: Similarity score between the two vertices.
         """
 
-    def calculate_inout_score(self, vertex: Sentence) -> int:
+    def get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
         """
-        Calculates the number of vertices similar to the specified vertex.
+        Returns the top n sentences with the highest sum of similarity scores.
 
         Args:
-            vertex (Sentence): Vertex whose similar vertices should be counted.
+            n (int): Number of top sentences to return.
 
         Returns:
-            int: Number of similar vertices.
+            tuple[Sentence, ...]: Top n sentences with the highest similarity score sum.
         """
 
 
 class NaiveSummarizer:
     """
     Naive graph summarizer and shared interface for graph-based algorithms.
+
     Attributes:
-        _scores (dict[Sentence, float]): Significance scores for each vertex.
         _graph (TextGraph): Graph of sentence vertices and their relations.
     """
 
@@ -545,7 +500,8 @@ class NaiveSummarizer:
         """
 
     def summarize(self, n_sentences: int) -> str:
-        """Returns a summary from the current sentence scores.
+        """
+        Returns a summary from the current sentence scores.
 
         Args:
             n_sentences (int): Number of sentences to include.
@@ -590,26 +546,6 @@ class TextRankSummarizer(NaiveSummarizer):
             str: String representation of the TextRank summarizer.
         """
 
-    def update_vertex_score(
-        self,
-        vertex: Sentence,
-        incidental_vertices: Sequence[Sentence],
-        scores: dict[Sentence, float],
-    ) -> None:
-        """
-        Updates a vertex significance score using the TextRank formula.
-
-        Args:
-            vertex (Sentence): Sentence whose score should be updated.
-            incidental_vertices (Sequence[Sentence]): Vertices related to the sentence.
-            scores (dict[Sentence, float]): Current scores of all vertices.
-        """
-
-    def train(self) -> None:
-        """
-        Iteratively calculates significance scores for all vertices until convergence.
-        """
-
     def _get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
         """
         Returns the top n sentences with the highest significance scores.
@@ -619,4 +555,24 @@ class TextRankSummarizer(NaiveSummarizer):
 
         Returns:
             tuple[Sentence, ...]: Top n sentences with the highest significance scores.
+        """
+
+    def _update_vertex_score(
+        self,
+        vertex: Sentence,
+        incidental_vertices: Sequence[Sentence],
+        current_scores: dict[Sentence, float],
+    ) -> None:
+        """
+        Updates a vertex significance score using the TextRank formula.
+
+        Args:
+            vertex (Sentence): Sentence whose score should be updated.
+            incidental_vertices (Sequence[Sentence]): Vertices related to the sentence.
+            current_scores (dict[Sentence, float]): Current scores of all vertices.
+        """
+
+    def train(self) -> None:
+        """
+        Iteratively calculates significance scores for all vertices until convergence.
         """
