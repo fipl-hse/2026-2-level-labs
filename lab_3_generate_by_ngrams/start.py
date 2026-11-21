@@ -4,12 +4,13 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-from lab_3_generate_by_ngrams.main import (
+from main import (
     BeamSearcher,
     BeamSearchTextGenerator,
     GreedyTextGenerator,
     NGramLanguageModel,
     TextProcessor,
+    WordProcessor,
 )
 
 
@@ -32,6 +33,12 @@ def main() -> None:
     assert encoded_text is not None
     print(f"Encoded text: {encoded_text[:30]}")
 
+    processor_2 = WordProcessor('<eos>')
+
+    encoded_text = processor_2.encode(text)
+    assert encoded_text is not None
+    print(f"Encoded text: {}")
+
     decoded_text = processor.decode(encoded_text)
     assert decoded_text is not None
     print(f"Decoded text: {decoded_text[:30]}")
@@ -49,8 +56,12 @@ def main() -> None:
 
     beam_generator =BeamSearchTextGenerator(language_model, processor, 3)
 
+    b = WordProcessor("<eos>")
+    text = b.encode(text)
+
     result = beam_generator.run("Vernon", 56)
-    print(f"Beam generated text: {result}")
+    print(f"Beam generated text: {b.run(text)}")
+
 
     assert result
 

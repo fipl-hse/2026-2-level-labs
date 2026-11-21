@@ -123,7 +123,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or text is None:
             return None
 
         text_tokenized = self._tokenize(text)
@@ -186,13 +186,11 @@ class TextProcessor:
         if not all(isinstance(item, int) for item in encoded_corpus):
             return None
 
-        decoded_text_1 = self._decode(encoded_corpus)
-        if decoded_text_1 is None:
+        decoded_text = self._decode(encoded_corpus)
+        if decoded_text is None:
             return None
 
-        decoded_text_final = self._postprocess_decoded_text(decoded_text_1)
-
-        return decoded_text_final
+        return self._postprocess_decoded_text(decoded_text)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -321,6 +319,23 @@ class WordProcessor(TextProcessor):
         In case of corrupt input arguments, None is returned.
         In case text does not contain any words, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+
+        text_tokenized = []
+
+        for word in text.lower().split():
+            cleaned = ''.join(char for char in word if char.isalpha())
+            if not cleaned:
+                continue
+            text_tokenized.append(cleaned)
+            if word[-1] in '.!?':
+                text_tokenized.append(self._end_of_word_token)
+
+        if not text_tokenized:
+            return None
+
+        return tuple(text_tokenized)
 
     def _put(self, element: str) -> None:
         """
@@ -331,6 +346,11 @@ class WordProcessor(TextProcessor):
 
         In case of corrupt input arguments, an element is not added to storage
         """
+        if not isinstance(element, str) or not element:
+            return
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -348,6 +368,27 @@ class WordProcessor(TextProcessor):
         In case of corrupt input arguments, None is returned.
         In case decoded corpus does not contain any words, None is returned.
         """
+        if not isinstance(decoded_corpus, tuple):
+            return None
+
+        if not decoded_corpus:
+            return None
+
+        if not all(isinstance(letter, str) for letter in decoded_corpus):
+            return None
+
+        if set(decoded_corpus) == {self._end_of_word_token}:
+            return None
+
+        text = " ".join(decoded_corpus)
+        text = text.replace(f" {self._end_of_word_token}", ".")
+
+        sentences = text.split(". ")
+        text = ". ".join(s.capitalize() for s in sentences)
+        if not text.endswith("."):
+            text += "."
+
+        return text
 
 class NGramLanguageModel:
     """
