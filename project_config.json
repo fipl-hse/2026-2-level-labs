@@ -56,7 +56,7 @@
         "pr_name_regex": "Laboratory work #\\d, \\w+ \\w+ - 2\\dFPL\\d"
     },
     "api_check": {
-        "upstream_url": "https://github.com/fipl-hse/2026-2-level-labs-admin"
+        "upstream_url": "https://github.com/fipl-hse/2026-2-level-labs"
     },
     "stubs_config": {
         "accepted_modules": {

@@ -1,6 +1,6 @@
 """
 Lab 4
-Summarize text using TextRank algorithm
+Summarize text using TextRank algorithm test
 
 .. py:class:: EncodedSentence
 
