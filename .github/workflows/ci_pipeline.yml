@@ -134,3 +134,26 @@ jobs:
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
           fiplconfig.check_flake8
+
+  api-correctness-check:
+    name: Check API correctness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    needs: [ install-dependencies ]
+    env:
+      SKIP_API_CHECK: ${{ contains(github.event.pull_request.title, '[STUBS]') || contains(github.event.head_commit.message, '[STUBS]') }}
+
+
+    steps:
+      - name: Checkout current PR
+        if: env.SKIP_API_CHECK == 'false'
+        uses: actions/checkout@v7
+      - name: Setup FIPL environment
+        if: env.SKIP_API_CHECK == 'false'
+        uses: fipl-hse/setup-env-action@v0.13.3
+      - name: API correctness check
+        if: env.SKIP_API_CHECK == 'false'
+        run: |
+          source venv/bin/activate
+          export PYTHONPATH=$(pwd)
+          fiplconfig.check_api_correctness
