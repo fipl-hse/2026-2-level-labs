@@ -1,1 +1,1 @@
-https://github.com/fipl-hse/quality-control.git@6b77485
+git+https://github.com/fipl-hse/quality-control.git@6b774859
