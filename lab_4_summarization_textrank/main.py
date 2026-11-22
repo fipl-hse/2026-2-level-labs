@@ -156,6 +156,7 @@ class SentencePreprocessor:
             punctuation (Sequence[str]): Punctuation symbols to remove during text cleaning.
         """
 
+
     def __str__(self) -> str:
         """
         Returns a string representation of the preprocessor.
