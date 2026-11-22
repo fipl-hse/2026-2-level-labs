@@ -23,6 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+
         self._end_of_word_token = end_of_word_token
         self._storage = {end_of_word_token: 0}
 
@@ -47,19 +48,18 @@ class TextProcessor:
 
         if text is None or not isinstance(text, str):
             return None
-            tokens = []
-            text_lower = text.lower()
-            for char in text_lower:
-                if char.isalpha():
-                    tokens.append(char)
-                else:
-                    if not tokens or tokens[-1] != self._end_of_word_token:
-                        tokens.append(self._end_of_word_token)
-            if tokens and tokens[-1] == self._end_of_word_token and text[-1].isalpha():
-                tokens.pop()
+        tokens = []
+
+        for char in text.lower():
+            if char.isalpha():
+                tokens.append(char)
+            else:
+                if tokens and tokens[-1] != self._end_of_word_token:
+                    tokens.append(self._end_of_word_token)
             if not tokens:
                 return None
-            return tuple(tokens)
+        return tuple(tokens)
+
 
 
     def get_id(self, element: str) -> int | None:
@@ -128,10 +128,11 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not text or text is None or not isinstance(text, str):
-            return None
+        if not isinstance(text, str):
+             return None
+
         tokens = self._tokenize(text)
-        if tokens is None:
+        if not tokens:
             return None
         encoded_text = []
         for token in tokens:
@@ -154,8 +155,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if element is None or not isinstance(element, str):
-            return
+        if not isinstance(element, str) or len(element) != 1:
+            return None
+
         if element not in self._storage:
             self._storage[element] = len(self._storage)
       
@@ -179,10 +181,13 @@ class TextProcessor:
         """
         if encoded_corpus is None or not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
-        decoded_text = self._decode(encoded_corpus)
-        if decoded_text is None:
+        if not all(isinstance(element, int) and not isinstance(element, bool) for element in encoded_corpus):
             return None
-        return self._postprocess_decoded_text(decoded_text)
+        decoded = self._decode(encoded_corpus)
+        if decoded is None:
+            return None
+        return self._postprocess_decoded_text(decoded)
+
 
 
     def fill_from_ngrams(self, content: dict) -> None:
@@ -209,13 +214,17 @@ class TextProcessor:
         """
         if corpus is None or not isinstance(corpus, tuple) or not corpus:
             return None
+        if not all(isinstance(el, int) and not isinstance(el, bool) for el in corpus):
+            return None
+
         decoded_text = []
-        for token_id in corpus:
-            token = self.get_token(token_id)
+        for element in corpus:
+            token = self.get_token(element)
             if token is None:
                 return None
             decoded_text.append(token)
         return tuple(decoded_text)
+
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
@@ -234,12 +243,17 @@ class TextProcessor:
         """
         if decoded_corpus is None or not decoded_corpus or not isinstance(decoded_corpus, tuple):
             return None
-        text = "".join(decoded_corpus)
-        text = text.replace(self._end_of_word_token, " ")
-        text = " ".join(text.split()).capitalize()
+        text = ''.join(decoded_corpus)
+        text = text.replace(self._end_of_word_token, ' ')
+        text = ' '.join(text.split())
         if not text:
-            return ""
-        return text + "."
+            return None
+        text = text[0].upper() + text[1:]
+
+        if text[-1] != '.':
+            text += '.'
+
+        return text
 
 
 
