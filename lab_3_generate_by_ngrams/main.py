@@ -48,19 +48,21 @@ class TextProcessor:
 
         end_of_word_token = self.get_end_of_word_token()
 
-        preprocessed_text = "".join(
-            token for token in text.lower()
-            if token.isalpha() or token == " "
+        cleaned = "".join(
+        sym if sym.isalpha() or sym.isspace() else " "
+        for sym in text.lower()
         ).split()
 
-        if not preprocessed_text:
+        if not cleaned:
             return None
 
         sym_tokens = []
-        for token in preprocessed_text:
-            sym_tokens.extend(sym for sym in token)
-            if not(token is preprocessed_text[-1] and text[-1].isalpha()):
-                sym_tokens.append(end_of_word_token)
+        for token in cleaned:
+            sym_tokens.extend(token)
+            sym_tokens.append(end_of_word_token)
+
+        if text[-1].isalpha():
+            sym_tokens.pop()
 
         return tuple(sym_tokens)
 
