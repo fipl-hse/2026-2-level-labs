@@ -74,6 +74,10 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        self._text = text
+        self._position = position
+        self._preprocessed = ()
+        self._encoded = ()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -86,6 +90,9 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, Sentence):
+            return False
+        return self._text == other._text and self._position == other._position
 
     def __hash__(self) -> int:
         """
@@ -94,6 +101,7 @@ class Sentence:
         Returns:
             int: Hash value based on the text and position.
         """
+        return hash((self._text, self._position))
 
     def __str__(self) -> str:
         """
@@ -102,6 +110,7 @@ class Sentence:
         Returns:
             str: String representation of the sentence.
         """
+        return self._text
 
     def get_encoded(self) -> EncodedSentence:
         """
@@ -110,6 +119,7 @@ class Sentence:
         Returns:
             EncodedSentence: Encoded sequence of integers.
         """
+        return self._encoded
 
     def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
         """
@@ -126,6 +136,7 @@ class Sentence:
         Returns:
             PreprocessedSentence: Preprocessed sequence of tokens.
         """
+        return self._preprocessed
 
     def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
         """
@@ -134,6 +145,7 @@ class Sentence:
         Args:
             preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
         """
+        self._preprocessed = preprocessed_sentence
 
     def get_position(self) -> int:
         """
@@ -142,6 +154,7 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
+        return self._position
 
     def get_text(self) -> str:
         """
@@ -150,6 +163,7 @@ class Sentence:
         Returns:
             str: Text of the sentence.
         """
+        return self._text
 
 
 class SentencePreprocessor:
