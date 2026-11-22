@@ -3,7 +3,8 @@ TextRank summarizer starter
 """
 
 # pylint:disable=unused-variable, unused-import, duplicate-code
-from main import (SentenceEncoder, SentencePreprocessor)
+from main import SentenceEncoder, SentencePreprocessor
+
 
 def main() -> None:
     """

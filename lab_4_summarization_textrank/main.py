@@ -12,8 +12,9 @@ Summarize text using TextRank algorithm
 """
 
 # pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
-from typing import Sequence
 import re
+from typing import Sequence
+
 
 PreprocessedSentence = tuple[str, ...]
 EncodedSentence = tuple[int, ...]
