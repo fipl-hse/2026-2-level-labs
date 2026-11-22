@@ -58,6 +58,9 @@ class TextProcessor:
             elif text_tokenized and text_tokenized[-1] != self._end_of_word_token:
                 text_tokenized += self._end_of_word_token
 
+        if text_tokenized and text_tokenized[-1] != self._end_of_word_token:
+            text_tokenized += self._end_of_word_token
+
         return tuple(text_tokenized) if text_tokenized else None
 
     def get_id(self, element: str) -> int | None:
