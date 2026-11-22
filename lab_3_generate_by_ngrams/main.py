@@ -43,6 +43,11 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if (
+            not text
+            or not isinstance(text, str)
+        ):
+            return None
         text = text.lower()
         tokens = []
         current_word = ""
