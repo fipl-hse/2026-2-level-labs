@@ -136,15 +136,18 @@ class TextProcessor:
         ):
             return None
 
-        if not self._tokenize(text):
-            return None
-
         tokens = self._tokenize(text)
 
+        if not tokens:
+            return None
+
+        result = []
         for t in tokens:
             self._put(t)
-
-        result = [self.get_id(t) for t in tokens]
+            token_id = self.get_id(t)
+            if token_id is None:
+                return None
+            result.append(token_id)
 
         return tuple(result) if None not in result else None
 
@@ -192,7 +195,7 @@ class TextProcessor:
         for token_id in encoded_corpus:
             if not self.get_token(token_id):
                 return None
-            "".join(resulting_text, self.get_token(token_id))
+            resulting_text += self.get_token(token_id)
 
         return resulting_text
 
@@ -284,7 +287,7 @@ class TextProcessor:
         if not text:
             return None
 
-        text = text[0].upper() + text[1:]
+        text = text.capitalize()
 
         if text[-1] != '.':
             text += '.'
