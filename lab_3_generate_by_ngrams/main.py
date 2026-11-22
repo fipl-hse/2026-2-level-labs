@@ -47,23 +47,19 @@ class TextProcessor:
 
         if text is None or not isinstance(text, str):
             return None
-        tokens = []
-        current_word = ""
-        text_lower = text.lower()
-        for char in text_lower:
-            if char.isalpha():
-                current_word += char
-            else:
-                if current_word:
-                    tokens.append(current_word)
-                    current_word = ""
-                if not tokens or tokens[-1] != self._end_of_word_token:
-                    tokens.append(self._end_of_word_token)
-        if current_word:
-            tokens.append(current_word)
-        if tokens and tokens[-1] == self._end_of_word_token and text[-1].isalpha():
-            tokens.pop()
-        return tuple(tokens)
+            tokens = []
+            text_lower = text.lower()
+            for char in text_lower:
+                if char.isalpha():
+                    tokens.append(char)
+                else:
+                    if not tokens or tokens[-1] != self._end_of_word_token:
+                        tokens.append(self._end_of_word_token)
+            if tokens and tokens[-1] == self._end_of_word_token and text[-1].isalpha():
+                tokens.pop()
+            if not tokens:
+                return None
+            return tuple(tokens)
 
 
     def get_id(self, element: str) -> int | None:
@@ -132,7 +128,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if text is None or not isinstance(text, str):
+        if not text or text is None or not isinstance(text, str):
             return None
         tokens = self._tokenize(text)
         if tokens is None:
@@ -236,10 +232,10 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if decoded_corpus is None or not isinstance(decoded_corpus, tuple):
+        if decoded_corpus is None or not decoded_corpus or not isinstance(decoded_corpus, tuple):
             return None
         text = "".join(decoded_corpus)
-        text = text.replace(self._end_of_word_token, "")
+        text = text.replace(self._end_of_word_token, " ")
         text = " ".join(text.split()).capitalize()
         if not text:
             return ""
