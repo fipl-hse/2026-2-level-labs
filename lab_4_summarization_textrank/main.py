@@ -12,6 +12,8 @@ Summarize text using TextRank algorithm
 """
 
 # pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
+import re
+
 from typing import Sequence
 
 PreprocessedSentence = tuple[str, ...]
@@ -61,6 +63,9 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, Sentence):
+            return False
+        return self._text == other._text and self._position == other._position
 
     def __hash__(self) -> int:
         """
@@ -69,6 +74,7 @@ class Sentence:
         Returns:
             int: Hash value based on the text and position.
         """
+        return hash((self._text, self._position))
 
     def __str__(self) -> str:
         """
@@ -161,6 +167,20 @@ class SentencePreprocessor:
             stop_words (Sequence[str]): Insignificant words to remove from tokens.
             punctuation (Sequence[str]): Punctuation symbols to remove during text cleaning.
         """
+        if (
+            not isinstance(stop_words, Sequence)
+            or isinstance(stop_words, (str, bytes, bytearray))
+            or not all(isinstance(word, str) for word in stop_words)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        if (
+            not isinstance(punctuation, Sequence)
+            or isinstance(punctuation, (str, bytes, bytearray))
+            or not all(isinstance(char, str) for char in punctuation)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        self._stop_words = tuple(stop_words)
+        self._punctuation = tuple(punctuation)
 
     def __str__(self) -> str:
         """
@@ -169,6 +189,10 @@ class SentencePreprocessor:
         Returns:
             str: String representation of the preprocessor.
         """
+        return (
+            f"SentencePreprocessor(stop_words={len(self._stop_words)}, "
+            f"punctuation={len(self._punctuation)})"
+        )
 
     def _clean_and_tokenize(self, text: str) -> tuple[str, ...]:
         """
@@ -180,6 +204,11 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+        lowered = text.lower()
+        cleaned_text = "".join(char for char in lowered if char not in self._punctuation)
+        return tuple(cleaned_text.split())
 
     def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -188,6 +217,14 @@ class SentencePreprocessor:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
         """
+        if (
+            not isinstance(sentences, Sequence)
+            or isinstance(sentences, (str, bytes, bytearray))
+            or any(not isinstance(sentence, Sentence) for sentence in sentences)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        for sentence in sentences:
+            sentence.set_preprocessed(self.preprocess_text(sentence.get_text()))
 
     def _remove_stop_words(self, tokens: Sequence[str]) -> tuple[str, ...]:
         """
@@ -199,6 +236,13 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Sequence of tokens without stop words.
         """
+        if (
+            not isinstance(tokens, Sequence)
+            or isinstance(tokens, (str, bytes, bytearray))
+            or not all(isinstance(token, str) for token in tokens)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        return tuple(token for token in tokens if token not in self._stop_words)
 
     def _split_by_sentence(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -210,6 +254,18 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        normalized_text = re.sub(r"\s+", " ", text).strip()
+        raw_sentences = re.split(r"(?<=[.!?])\s+(?=[A-ZА-ЯЁ])", normalized_text)
+
+        return tuple(
+            Sentence(sentence, position)
+            for position, sentence in enumerate(
+                s for s in raw_sentences if s
+            )
+        )
 
     def get_sentences(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -221,6 +277,11 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of preprocessed sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+        sentences = self._split_by_sentence(text)
+        self._preprocess_sentences(sentences)
+        return sentences
 
     def preprocess_text(self, text: str) -> tuple[str, ...]:
         """
@@ -232,6 +293,10 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens without stop words.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+        tokens = self._clean_and_tokenize(text)
+        return self._remove_stop_words(tokens)
 
 
 class SentenceEncoder:
