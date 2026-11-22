@@ -95,7 +95,7 @@ class Sentence:
         Returns:
             EncodedSentence: Encoded sequence of integers.
         """
-         return self._encoded
+        return self._encoded
     def get_position(self) -> int:
         """
         Returns the position of the sentence in the text.
