@@ -476,3 +476,4 @@ class TextRankSummarizer(NaiveSummarizer):
         """
         Iteratively calculates significance scores for all vertices until convergence.
         """
+print ("hello")
