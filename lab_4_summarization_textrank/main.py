@@ -10,11 +10,10 @@ Summarize text using TextRank algorithm
 
    Type alias representing a preprocessed sentence as a tuple of strings.
 """
+import re
 
 # pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
-import re
 from typing import Sequence
-
 
 PreprocessedSentence = tuple[str, ...]
 EncodedSentence = tuple[int, ...]
