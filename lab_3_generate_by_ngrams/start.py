@@ -13,7 +13,7 @@ def main() -> None:
     In any case returns, None is returned
     """
     with open(
-        "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
+        "./assets/Harry_Potter.txt", "r", encoding="utf-8"
     ) as text_file:
         text = text_file.read()
     result = None
@@ -21,6 +21,7 @@ def main() -> None:
 
     processor = TextProcessor("_")
     _result = processor.encode(text)
+    print(_result)
     result = processor.decode(_result)
     print(result)
     assert result
