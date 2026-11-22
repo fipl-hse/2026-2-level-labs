@@ -19,17 +19,12 @@ def main() -> None:
         text = text_file.read()
 
     text_processor = TextProcessor("_")
-
     encoded_corpus = text_processor.encode(text)
 
     language_model = NGramLanguageModel(encoded_corpus, 7)
+    language_model.build()
 
-    result = language_model.build()
-
-    greedy_generator = GreedyTextGenerator(
-        language_model, text_processor
-    )
-
+    greedy_generator = GreedyTextGenerator(language_model, text_processor)
     result = greedy_generator.run("Vernon", 51)
 
     print("Generated text:")
