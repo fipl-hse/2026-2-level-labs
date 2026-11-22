@@ -220,8 +220,7 @@ class SentencePreprocessor:
         """
         if not (
             isinstance(sentences, tuple)
-            and all(isinstance(sentence, str) and isinstance(idx, int)
-                for sentence, idx in Sentence)
+            and all(isinstance(sentence, Sentence) for sentence in sentences)
         ):
             raise IncorrectArgumentError("Incorrect input value")
 
@@ -359,7 +358,7 @@ class SentenceEncoder:
             raise IncorrectArgumentError("Incorrect input value")
 
         for sentence in sentences:
-            tokens = sentence.get_preprocessed() #
+            tokens = sentence.get_preprocessed()
             self._learn_indices(tokens)
             encoded = tuple(self._word2id[token] for token in tokens)
             sentence.set_encoded(encoded)
