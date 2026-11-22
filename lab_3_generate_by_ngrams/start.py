@@ -29,26 +29,26 @@ def main() -> None:
 
     encoded_text = processor.encode(text)
     assert encoded_text, "Text can not be encoded"
-    print("Закодированный текст: ", encoded_text[:101])
+    print("Encoded text: ", encoded_text[:101])
 
     decoded_text =  processor.decode(encoded_text)
     assert decoded_text, "Text can not be decoded"
-    print("Раскодированный текст: ", decoded_text[:101])
+    print("Decoded text: ", decoded_text[:101])
 
     n_gram_lang_model = NGramLanguageModel(encoded_text, 7)
     n_gram_freq = n_gram_lang_model.build()
-    print("Построенная модель: ", n_gram_lang_model.build())
+    print("Builded model: ", n_gram_lang_model.build())
     assert n_gram_freq, "Model can not be build"
 
     greedy_text_generator = GreedyTextGenerator(n_gram_lang_model, processor)
     result_greedy_generator = greedy_text_generator.run("Vernon", 51)
     assert result_greedy_generator, "Impossible to generate text"
-    print("Результат GreedyGenerator: ", result_greedy_generator)
+    print("Result of GreedyGenerator: ", result_greedy_generator)
 
     beam_search_generator = BeamSearchTextGenerator(n_gram_lang_model, processor, 7)
     result_beam_generator = beam_search_generator.run("Vernon", 56)
     assert result_beam_generator, "Impossible to generate text"
-    print("Результат BeamSearchGenerator: ", result_beam_generator)
+    print("Result of BeamSearchGenerator: ", result_beam_generator)
 
     reader = NGramLanguageModelReader("./lab_3_generate_by_ngrams/assets/en_own.json", "_")
     language_models_lst = []
@@ -63,39 +63,40 @@ def main() -> None:
     back_off_generator = BackOffGenerator(language_models, reader.get_text_processor())
     result_backoff_generator = back_off_generator.run("Vernon", 100)
     assert result_backoff_generator, "Text can not be generated"
-    print("Результат BackOffGenerator: ", result_backoff_generator)
+    print("Result BackOffGenerator: ", result_backoff_generator)
+    print("Statistics: ", back_off_generator.freq_of_size_model)
 
     word_processor = WordProcessor("<eos>")
     encoded_words = word_processor.encode(text)
 
     word_models = []
-    for n_gram_size in (2, 3, 4):
+    for n_gram_size in (2, 3, 4, 5, 6):
         word_model = NGramLanguageModel(encoded_words, n_gram_size)
         assert word_model.build() is not None, "Model can not be build"
         print(
-            f"Построенная по словам модель({n_gram_size}): ",
+            f"Model, builded by words ({n_gram_size}): ",
             word_model.build(),
         )
         word_models.append(word_model)
 
-    prompt = "Harry looked at"
+    prompt = "Harry looked"
 
     greedy_text_generator_word = GreedyTextGenerator(word_models[-1], word_processor)
     result_greedy_generator_word = greedy_text_generator_word.run(prompt, 12)
-    print("Результат GreedyGenerator (слова): ", result_greedy_generator_word)
+    print("Result GreedyGenerator by words: ", result_greedy_generator_word)
 
     beam_search_generator_words = BeamSearchTextGenerator(
         word_models[-1], word_processor, 3
     )
     result_beam_generator_words = beam_search_generator_words.run(prompt, 12)
-    print("Результат BeamSearchGenerator (слова): ", result_beam_generator_words)
+    print("Result BeamSearchGenerator by words: ", result_beam_generator_words)
 
     back_off_generator_words = BackOffGenerator(tuple(word_models), word_processor)
     result_backoff_generator_words = back_off_generator_words.run(prompt, 12)
-    print("Результат BackOffGenerator (слова): ", result_backoff_generator_words)
+    print("Result BackOffGenerator by words: ", result_backoff_generator_words)
 
     result_greedy_letters = greedy_text_generator.run(prompt, 60)
-    print("Результат GreedyGenerator (буквы): ", result_greedy_letters)
+    print("Result GreedyGenerator by letters: ", result_greedy_letters)
 
 if __name__ == "__main__":
 

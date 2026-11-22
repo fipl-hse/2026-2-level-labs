@@ -937,6 +937,7 @@ class BackOffGenerator:
         """
         self._language_models = {model.get_n_gram_size(): model for model in language_models}
         self._text_processor = text_processor
+        self.freq_of_size_model = {}
 
     def run(self, prompt: str, seq_len: int) -> str | None:
         """
@@ -995,5 +996,7 @@ class BackOffGenerator:
                 sequence_to_continue
             )
             if candidates:
+                self.freq_of_size_model[n_gram_size] = self.freq_of_size_model.get(n_gram_size, 0) + 1
                 return candidates
+
         return None
