@@ -48,24 +48,26 @@ class TextProcessor:
             or not isinstance(text, str)
         ):
             return None
+
         text = text.lower()
         tokens = []
-        current_word = ""
+        words = text.split()
 
-        for char in text:
-            if char.isalpha():
-                current_word += char
-            else:
-                if current_word:
-                    tokens.extend(current_word)
+        for i, word in enumerate(words):
+            processed_word = ''.join(char for char in word if char.isalpha())
+            if not processed_word:
+                continue
+
+            tokens.extend(processed_word)
+
+            if i < len(words) - 1 or text[-1].isspace() or not text[-1].isalnum():
+                if tokens[-1] != self._end_of_word_token:
                     tokens.append(self._end_of_word_token)
-                    current_word = ""
 
-        if current_word:
-            tokens.extend(current_word)
-            tokens.append(self._end_of_word_token)
+        if not tokens:
+            return None
 
-        return tuple(tokens) if tokens else None
+        return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
         """
