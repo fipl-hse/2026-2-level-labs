@@ -4,7 +4,11 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import (
+    GreedyTextGenerator,
+    NGramLanguageModel,
+    TextProcessor,
+)
 
 
 def main() -> None:
@@ -19,13 +23,38 @@ def main() -> None:
         text = text_file.read()
 
     text_processor = TextProcessor("_")
+
+    tokens = text_processor._tokenize(text)
+    assert tokens is not None
+
     encoded_corpus = text_processor.encode(text)
+    assert encoded_corpus is not None
+
+    decoded_text = text_processor.decode(encoded_corpus)
+    assert decoded_text is not None
+
+    result = (
+        tokens is not None
+        and encoded_corpus is not None
+        and decoded_text is not None
+    )
+    assert result
+
+    print("Tokens:", tokens[:50])
+    print("Encoded corpus:", encoded_corpus[:50])
+    print("Decoded text:", decoded_text[:200])
 
     language_model = NGramLanguageModel(encoded_corpus, 7)
-    language_model.build()
 
-    greedy_generator = GreedyTextGenerator(language_model, text_processor)
+    result = language_model.build()
+    assert result
+
+    greedy_generator = GreedyTextGenerator(
+        language_model, text_processor
+    )
+
     result = greedy_generator.run("Vernon", 51)
+    assert result
 
     print("Generated text:")
     print(result)
