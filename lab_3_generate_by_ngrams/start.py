@@ -4,8 +4,7 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 
-from main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
-
+from main import GreedyTextGenerator, NGramLanguageModel, TextProcessor, find_the_most_different_context
 
 def main() -> None:
     """
@@ -44,6 +43,11 @@ def main() -> None:
 
     result = language_model.build()
     assert result
+
+    context = find_the_most_different_context(language_model)
+    print("The strangest context: ", context)
+    if context is not None:
+        print ("Frequencies: ", language_model.generate_next_token(context))
 
     greedy_generator = GreedyTextGenerator(
         language_model, text_processor
