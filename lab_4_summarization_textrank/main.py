@@ -12,6 +12,7 @@ Summarize text using TextRank algorithm
 """
 
 # pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
+import re
 from typing import Sequence
 
 PreprocessedSentence = tuple[str, ...]
@@ -66,6 +67,7 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        return (self._text, self._position) == (other._text, other._position)
 
     def __hash__(self) -> int:
         """
@@ -74,6 +76,7 @@ class Sentence:
         Returns:
             int: Hash value based on the text and position.
         """
+        return hash((self._text, self._position))
 
     def __str__(self) -> str:
         """
@@ -100,12 +103,7 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
-        if not isinstance(encoded_sentence, tuple):
-            raise IncorrectArgumentError('Incorrect input value')
-        if any(not isinstance(i, int) for i in encoded_sentence):
-            raise IncorrectArgumentError('Incorrect input value')
-
-        self._encoded = encoded_sentence
+        return self._position
 
     def get_preprocessed(self) -> PreprocessedSentence:
         """
@@ -132,6 +130,12 @@ class Sentence:
         Args:
             encoded_sentence (EncodedSentence): Encoded sequence of integers.
         """
+        if not isinstance(encoded_sentence, tuple):
+            raise IncorrectArgumentError('Incorrect input value')
+        if any(not isinstance(i, int) for i in encoded_sentence):
+            raise IncorrectArgumentError('Incorrect input value')
+
+        self._encoded = encoded_sentence
 
     def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
         """
@@ -140,6 +144,12 @@ class Sentence:
         Args:
             preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
         """
+        if not isinstance(preprocessed_sentence, tuple):
+            raise IncorrectArgumentError('Incorrect input value')
+        if any(not isinstance(s, str) for s in preprocessed_sentence):
+            raise IncorrectArgumentError('Incorrect input value')
+
+        self._preprocessed = preprocessed_sentence
 
 
 class SentencePreprocessor:
@@ -212,6 +222,15 @@ class SentencePreprocessor:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
         """
+        if not isinstance(sentences, (list, tuple)):
+            raise IncorrectArgumentError('Incorrect input value')
+        if not all(isinstance(s, Sentence) for s in sentences):
+            raise IncorrectArgumentError('Incorrect input value')
+
+        for sentence in sentences:
+            text = sentence.get_text()
+            preprocessed = self.preprocess_text(text)
+            sentence.set_preprocessed(preprocessed)
 
     def _remove_stop_words(self, tokens: Sequence[str]) -> tuple[str, ...]:
         """
@@ -316,6 +335,7 @@ class SentenceEncoder:
         Returns:
             str: String representation of the encoder.
         """
+        return f'SentenceEncoder(vocabulary_size={len(self._word2id)}'
 
     def _learn_indices(self, tokens: Sequence[str]) -> None:
         """
@@ -364,6 +384,19 @@ def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
     Returns:
         float: Jaccard similarity score between the two sequences.
     """
+    if not all((
+        isinstance(sequence, (list, tuple)),
+        isinstance(other_sequence, (list, tuple)),
+    )):
+        raise IncorrectArgumentError('Incorrect input argument')
+    if not sequence or not other_sequence:
+        return 0.0
+
+    set_sequence = set(sequence)
+    set_other_sequence = set(other_sequence)
+
+    return (len(set_sequence & set_other_sequence) /
+            len(set_sequence | set_other_sequence))
 
 
 class TextGraph:
@@ -379,6 +412,8 @@ class TextGraph:
         """
         Initializes an empty similarity graph.
         """
+        self._vertices = []
+        self._matrix = []
 
     def __len__(self) -> int:
         """
@@ -412,6 +447,12 @@ class TextGraph:
         Args:
             vertex (Sentence): Vertex to add to the graph.
         """
+        if not isinstance(vertex, Sentence):
+            raise IncorrectArgumentError('Incorrect input argument')
+
+        if vertex not in self._vertices:
+            self._vertices.append(vertex)
+            self._matrix.append([0.0])
 
     def build(self, sentences: Sequence[Sentence]) -> None:
         """
