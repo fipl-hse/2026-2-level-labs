@@ -456,8 +456,6 @@ class NGramLanguageModel:
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
                 next_tokens_freq[n_gram[-1]] = freq
-        if next_tokens_freq is None:
-            return None
 
         return next_tokens_freq
 
@@ -477,7 +475,6 @@ class NGramLanguageModel:
         if (
             not isinstance(encoded_corpus, tuple)
             or not encoded_corpus
-            or not self._n_gram_frequencies
             or self.__n_gram_size > len(encoded_corpus)
         ):
             return None
