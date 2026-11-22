@@ -44,6 +44,16 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Text must be a string.")
+
+        if not isinstance(position, int) or isinstance(position, bool):
+            raise IncorrectArgumentError("Position must be an integer.")
+
+        self._text = text
+        self._position = position
+        self._preprocessed: PreprocessedSentence = ()
+        self._encoded: EncodedSentence = ()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -56,6 +66,14 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, Sentence):
+            return False
+
+        return (
+            self._text == other._text
+            and self._position == other._position
+        )
+
 
     def __hash__(self) -> int:
         """
@@ -64,6 +82,7 @@ class Sentence:
         Returns:
             int: Hash value based on the text and position.
         """
+        return hash((self._text, self._position))
 
     def __str__(self) -> str:
         """
@@ -72,6 +91,7 @@ class Sentence:
         Returns:
             str: String representation of the sentence.
         """
+        return self._text
 
     def get_encoded(self) -> EncodedSentence:
         """
@@ -80,6 +100,7 @@ class Sentence:
         Returns:
             EncodedSentence: Encoded sequence of integers.
         """
+        return self._encoded
 
     def get_position(self) -> int:
         """
@@ -88,6 +109,7 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
+        return self._position
 
     def get_preprocessed(self) -> PreprocessedSentence:
         """
@@ -96,6 +118,7 @@ class Sentence:
         Returns:
             PreprocessedSentence: Preprocessed sequence of tokens.
         """
+        return self._preprocessed
 
     def get_text(self) -> str:
         """
@@ -104,6 +127,7 @@ class Sentence:
         Returns:
             str: Text of the sentence.
         """
+        return self._text
 
     def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
         """
@@ -112,6 +136,10 @@ class Sentence:
         Args:
             encoded_sentence (EncodedSentence): Encoded sequence of integers.
         """
+        if not isinstance(encoded_sentence, tuple) or not all(isinstance(token, int) for token in encoded_sentence):
+            raise IncorrectArgumentError("Encoded sentence must be a tuple of integers.")
+
+        self._encoded = encoded_sentence
 
     def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
         """
@@ -120,7 +148,10 @@ class Sentence:
         Args:
             preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
         """
+        if not isinstance(preprocessed_sentence, tuple) or not all(isinstance(letter, str) for letter in preprocessed_sentence):
+            raise IncorrectArgumentError("Preprocessed sentence must be a tuple of strings.")
 
+        self._preprocessed = preprocessed_sentence
 
 class SentencePreprocessor:
     """
