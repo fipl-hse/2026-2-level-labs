@@ -104,8 +104,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
         if (
-            not element_id
-            or not isinstance(element_id, int)
+            not isinstance(element_id, int)
             or not any(value == element_id for _, value in self._storage.items())
         ):
             return None
@@ -190,14 +189,11 @@ class TextProcessor:
         ):
             return None
 
-        resulting_text = ""
+        decoded = self._decode(encoded_corpus)
+        if decoded is None:
+            return None
 
-        for token_id in encoded_corpus:
-            if not self.get_token(token_id):
-                return None
-            resulting_text += self.get_token(token_id)
-
-        return resulting_text
+        return self._postprocess_decoded_text(decoded)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
