@@ -21,6 +21,7 @@ def main() -> None:
         stop_words = tuple(text_file.read().split("\n"))
     result = None
     assert result
+    print(result)
 
 
 if __name__ == "__main__":
