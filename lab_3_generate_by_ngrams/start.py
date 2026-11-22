@@ -3,8 +3,9 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-from main import TextProcessor
 from pathlib import Path
+
+from main import TextProcessor
 
 def main() -> None:
     """
