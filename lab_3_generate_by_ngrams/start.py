@@ -3,6 +3,7 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
+
 from lab_3_generate_by_ngrams.main import (
     BackOffGenerator,
     BeamSearchTextGenerator,
@@ -21,127 +22,104 @@ def main() -> None:
     In any case returns, None is returned
     """
     with open(
-    "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r",
-    encoding="utf-8") as file:
-        text = file.read()
-    # result = None
-    # assert result
+        "./lab_3_generate_by_ngrams/assets/Harry_Potter.txt", "r", encoding="utf-8"
+    ) as text_file:
+        text = text_file.read()
 
-    processor = TextProcessor('_')
+    print('Mark 4 task')
 
-    encoded_text = processor.encode(text)
-    assert encoded_text is not None
-    print(f"Encoded text: {encoded_text}")
+    text_processor = TextProcessor('_')
+    encoded_text = text_processor.encode(text)
+    if encoded_text is None:
+        return
 
-    decoded_text = processor.decode(encoded_text)
-    assert decoded_text is not None
-    print(f"Decoded text: {decoded_text}")
+    decoded_text = text_processor.decode(encoded_text)
+    if decoded_text is None:
+        return
 
-    language_model = NGramLanguageModel(
-        encoded_corpus=encoded_text,
-        n_gram_size=7)
+    print(
+        f'Encoded text:\n{encoded_text[-100:]}\n\n'
+        f'Decoded text:\n{decoded_text[-100:]}'
+    )
 
-    build_model = language_model.build()
-    assert build_model, "The language model hasn't built"
+    print('\nNGram LM check task')
 
-    greedy_generator = GreedyTextGenerator(
-        language_model=language_model,
-        text_processor=processor)
+    model = NGramLanguageModel(encoded_text, 7)
+    print('Model built:', model.build())
 
-    greedy_generated_text = greedy_generator.run(
-        prompt="Vernon",
-        seq_len=51)
-    print(f"Greedy generated text: {greedy_generated_text}")
+    print('\nMark 6 task')
 
-    greedy_generated_text = greedy_generator.run(
-        prompt="Harry looked at",
-        seq_len=60)
-    print(f"Letter-level Greedy generated text: {greedy_generated_text}")
+    greedy_generator = GreedyTextGenerator(model, text_processor)
+    generated_text = greedy_generator.run('Vernon', 51)
+    print('Generated text:')
+    print(generated_text)
 
-    beam_generator = BeamSearchTextGenerator(
-        language_model=language_model,
-        text_processor=processor,
-        beam_width=7)
+    print('\nMark 8 task')
+    generator = BeamSearchTextGenerator(
+        language_model=model,
+        text_processor=text_processor,
+        beam_width=3,
+    )
+    generated = generator.run('Vernon', 56)
+    print('Generated text:')
+    print(generated)
 
-    beam_generated_text = beam_generator.run(
-        prompt="Vernon",
-        seq_len=56)
-    print(f"Beam generated text: {beam_generated_text}")
-
+    print('\nMark 10 task 1')
     reader = NGramLanguageModelReader(
-    json_path="./lab_3_generate_by_ngrams/assets/en_own.json",
-    eow_token="_",)
+        "./lab_3_generate_by_ngrams/assets/en_own.json", '_'
+    )
+    models = []
+    for ngram_size in (2, 3, 4):
+        loaded_model = reader.load(ngram_size)
+        if loaded_model is not None:
+            models.append(loaded_model)
 
-    model_2 = reader.load(2)
-    model_3 = reader.load(3)
-    model_4 = reader.load(4)
+    backoff_generator = BackOffGenerator(
+        tuple(models),
+        reader.get_text_processor(),
+    )
+    backoff_generated = backoff_generator.run('Vernon', 100)
+    print(backoff_generated)
 
-    assert model_2 is not None
-    assert model_3 is not None
-    assert model_4 is not None
+    print('\nMark 10 task 2')
+    prompt = 'Harry looked at'
 
-    back_off_generator = BackOffGenerator(
-        language_models=(model_2, model_3, model_4),
-        text_processor=reader.get_text_processor())
+    word_processor = WordProcessor('<eos>')
+    encoded_text_2 = word_processor.encode(text)
+    if encoded_text_2 is None:
+        return
 
-    back_off_generated_text = back_off_generator.run(
-        prompt="Vernon",
-        seq_len=100)
-    print(f"BackOff generated text: {back_off_generated_text}")
-    result = back_off_generated_text
-    assert result
+    word_models = {}
+    for ngram_size in (2, 3, 4):
+        word_model = NGramLanguageModel(encoded_text_2, ngram_size)
+        word_model.build()
+        word_models[ngram_size] = word_model
 
-    # Word-level generation
+    print(
+        '\nGreedy algorithm continue:\n'
+        f'{GreedyTextGenerator(word_models[4], word_processor).run(prompt, 12)}'
+    )
 
-    word_processor = WordProcessor("<eos>")
-    encoded_words = word_processor.encode(text)
-    assert encoded_words is not None
-
-    word_model_2 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=2)
-    word_model_2.build()
-
-    word_model_3 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=3)
-    word_model_3.build()
-
-    word_model_4 = NGramLanguageModel(
-        encoded_corpus=encoded_words,
-        n_gram_size=4)
-    word_model_4.build()
-
-    # Greedy generation
-    word_greedy_generator = GreedyTextGenerator(
-        language_model=word_model_4,
-        text_processor=word_processor)
-
-    word_greedy_text = word_greedy_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level Greedy: {word_greedy_text}")
-
-    # Beam Search generation
-    word_beam_generator = BeamSearchTextGenerator(
-        language_model=word_model_4,
+    beam_continue = BeamSearchTextGenerator(
+        language_model=word_models[4],
         text_processor=word_processor,
-        beam_width=3)
+        beam_width=3,
+    )
+    print(f'\nBeam Search algorithm continue:\n{beam_continue.run(prompt, 12)}')
 
-    word_beam_text = word_beam_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level Beam Search: {word_beam_text}")
+    backoff_continue = BackOffGenerator(
+        tuple(word_models.values()),
+        word_processor,
+    )
+    print(f'\nBackOff algorithm continue:\n{backoff_continue.run(prompt, 12)}')
 
-    # BackOff generation
-    word_backoff_generator = BackOffGenerator(
-        language_models=(word_model_2, word_model_3, word_model_4),
-        text_processor=word_processor)
+    print(
+        '\nComparison to greedy generated text at the level of letters:\n'
+        f'{greedy_generator.run(prompt, 60)}'
+    )
 
-    word_backoff_text = word_backoff_generator.run(
-        prompt="Harry looked at",
-        seq_len=12)
-    print(f"Word-level BackOff: {word_backoff_text}")
+    result = backoff_generated
+    assert result
 
 
 if __name__ == "__main__":
