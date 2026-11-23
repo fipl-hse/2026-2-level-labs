@@ -45,6 +45,16 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError
+
+        if not isinstance(position, int):
+            raise IncorrectArgumentError
+
+        self._text = text
+        self._position = position
+        self._preprocessed = ()
+        self._encoded = ()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -57,6 +67,10 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, str):
+            return False
+
+        return self._text == other._text and self._position == other._position
 
     def __hash__(self) -> int:
         """

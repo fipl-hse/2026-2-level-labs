@@ -49,8 +49,8 @@ class TextProcessor:
         end_of_word_token = self.get_end_of_word_token()
 
         cleaned = "".join(
-        sym if sym.isalpha() or sym.isspace() else " "
-        for sym in text.lower()
+            sym for sym in text.lower()
+            if sym if sym.isalpha() or sym.isspace()
         ).split()
 
         if not cleaned:
