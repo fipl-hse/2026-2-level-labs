@@ -284,7 +284,6 @@ class SentencePreprocessor:
         text = ' '.join(text.split())
         sentences = []
         start = 0
-
         for i, char in enumerate(text):
             if char in '.!?':
                 next_pos = i + 1
