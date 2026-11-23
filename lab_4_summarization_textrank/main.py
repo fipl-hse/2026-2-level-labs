@@ -45,6 +45,16 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+        if not isinstance(position, int) or isinstance(position, bool):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        self._text = text
+        self._position = position
+        self._preprocessed: PreprocessedSentence = ()
+        self._encoded: EncodedSentence = ()
+
 
     def __eq__(self, other: object) -> bool:
         """
