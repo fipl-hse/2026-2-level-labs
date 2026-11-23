@@ -176,6 +176,12 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens.
         """
+        syms = []
+        for sym in text.lower():
+            if sym not in self._punctuation:
+                syms.append(sym)
+        cleaned_text = "".join(syms)
+        return tuple(cleaned_text.split())
 
     def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -195,6 +201,7 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Sequence of tokens without stop words.
         """
+        return tuple(token for token in tokens if token not in self._stop_words)
 
     def _split_by_sentence(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -228,6 +235,8 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens without stop words.
         """
+        tokenized_text = self._clean_and_tokenize(text)
+        return self._remove_stop_words(tokenized_text)
 
 
 class SentenceEncoder:
