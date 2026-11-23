@@ -69,6 +69,7 @@ class Sentence:
         """
         if not isinstance(other, str):
             return False
+        #проверка позиции
 
         return self._text == other._text and self._position == other._position
 
@@ -87,6 +88,7 @@ class Sentence:
         Returns:
             str: String representation of the sentence.
         """
+        return f"Sentence(text = '{self._text}', position = {self._position})"
 
     def get_encoded(self) -> EncodedSentence:
         """
@@ -103,6 +105,7 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
+        return self._position
 
     def get_preprocessed(self) -> PreprocessedSentence:
         """
@@ -119,6 +122,7 @@ class Sentence:
         Returns:
             str: Text of the sentence.
         """
+        return self._text
 
     def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
         """
