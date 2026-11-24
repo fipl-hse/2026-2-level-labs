@@ -3,7 +3,12 @@ TextRank summarizer starter
 """
 
 # pylint:disable=unused-variable, unused-import, duplicate-code
-from main import NaiveSummarizer, SentenceEncoder, SentencePreprocessor, TextGraph
+from lab_4_summarization_textrank.main import (
+    NaiveSummarizer,
+    SentenceEncoder,
+    SentencePreprocessor,
+    TextGraph,
+)
 
 
 def main() -> None:

@@ -54,8 +54,8 @@ class Sentence:
 
         self._text = text
         self._position = position
-        self._preprocessed = ()
-        self._encoded = ()
+        self._preprocessed: PreprocessedSentence = ()
+        self._encoded: EncodedSentence = ()
 
 
     def __eq__(self, other: object) -> bool:
@@ -192,7 +192,10 @@ class SentencePreprocessor:
         Returns:
             str: String representation of the preprocessor.
         """
-        return f"SentencePreprocessor(stop_words={len(self._stop_words)}, punctuation={len(self._punctuation)}"
+        return (
+            f"SentencePreprocessor(stop_words={len(self._stop_words)},"
+            f"punctuation={len(self._punctuation)}"
+        )
 
     def _clean_and_tokenize(self, text: str) -> tuple[str, ...]:
         """
@@ -403,7 +406,7 @@ class TextGraph:
         Initializes an empty similarity graph.
         """
         self._vertices = []
-        self._matrix = []
+        self._matrix: list[list[float]] = []
 
     def __len__(self) -> int:
         """
@@ -467,7 +470,7 @@ class TextGraph:
             raise IncorrectArgumentError("Incorrect input value")
 
         if vertex not in self._vertices:
-            self._vertex = self._vertices.append(vertex)
+            self._vertices.append(vertex)
             self._matrix.append([0.0] * len(self._vertices))
             for row in self._matrix[:-1]:
                 row.append(0.0)
@@ -489,11 +492,8 @@ class TextGraph:
         for sentence in sentences:
             self._add_vertex(sentence)
 
-        for i in range(len(sentences)):
-            for j in range(i + 1, len(sentences)):
-                sentence1 = sentences[i]
-                sentence2 = sentences[j]
-
+        for i, sentence1 in enumerate(sentences):
+            for sentence2 in sentences[i + 1:]:
                 if sentence1 != sentence2:
                     self._add_edge(sentence1, sentence2)
 
