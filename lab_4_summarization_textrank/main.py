@@ -51,8 +51,8 @@ class Sentence:
             raise IncorrectArgumentError("Incorrect input value")
         self._text = text
         self._position = position
-        self._preprocessed: PreprocessedSentence = ()
-        self._encoded: EncodedSentence = ()
+        self._preprocessed = tuple()
+        self._encoded = tuple()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -308,8 +308,8 @@ class SentenceEncoder:
         """
         Initializes the sentence encoder.
         """
-        self._word2id: dict[str, int] = {}
-        self._id2word: dict[int, str] = {}
+        self._word2id = {}
+        self._id2word = {}
         self.last = 999
 
     def __str__(self) -> str:
@@ -370,7 +370,14 @@ def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
     Returns:
         float: Jaccard similarity score between the two sequences.
     """
-
+    if not isinstance(sequence, Sequence) or not isinstance(other_sequence, Sequence):
+        raise IncorrectArgumentError("Incorrect input value")
+    if not sequence or not other_sequence:
+        return 0.0
+    first = set(sequence)
+    second = set(other_sequence)
+    union = first | second
+    return len(first & second) / len(union)
 
 class TextGraph:
     """
@@ -385,6 +392,8 @@ class TextGraph:
         """
         Initializes an empty similarity graph.
         """
+        self._vertices = []
+        self._matrix = []
 
     def __len__(self) -> int:
         """
@@ -393,6 +402,7 @@ class TextGraph:
         Returns:
             int: Number of vertices.
         """
+        return len(self._vertices)
 
     def __str__(self) -> str:
         """
@@ -401,6 +411,7 @@ class TextGraph:
         Returns:
             str: Description of the graph.
         """
+        return f"TextGraph(vertices={len(self._vertices)})"
 
     def _add_edge(self, vertex1: Sentence, vertex2: Sentence) -> None:
         """
@@ -410,6 +421,17 @@ class TextGraph:
             vertex1 (Sentence): First vertex.
             vertex2 (Sentence): Second vertex.
         """
+        if not isinstance(vertex1, Sentence) or not isinstance(vertex2, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+        if vertex1 == vertex2:
+            raise TextGraphError("Cannot add an edge from a vertex to itself")
+        self._add_vertex(vertex1)
+        self._add_vertex(vertex2)
+        first_index = self._vertices.index(vertex1)
+        second_index = self._vertices.index(vertex2)
+        score = calculate_similarity(vertex1.get_encoded(), vertex2.get_encoded())
+        self._matrix[first_index][second_index] = score
+        self._matrix[second_index][first_index] = score
 
     def _add_vertex(self, vertex: Sentence) -> None:
         """
@@ -418,6 +440,16 @@ class TextGraph:
         Args:
             vertex (Sentence): Vertex to add to the graph.
         """
+        if not isinstance(vertex, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+        if vertex in self._vertices:
+            return
+        for row in self._matrix:
+            row.append(0.0)
+        self._vertices.append(vertex)
+        new_row = [0.0] * len(self._vertices)
+        new_row[-1] = 1.0
+        self._matrix.append(new_row)
 
     def build(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -426,6 +458,19 @@ class TextGraph:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to add.
         """
+        if (
+            not isinstance(sentences, Sequence)
+            or isinstance(sentences, (str, bytes, bytearray))
+            or not sentences
+            or any(not isinstance(sentence, Sentence) for sentence in sentences)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        for sentence in sentences:
+            self._add_vertex(sentence)
+        for first_index, first_sentence in enumerate(sentences):
+            for second_sentence in sentences[first_index + 1:]:
+                if first_sentence != second_sentence:
+                    self._add_edge(first_sentence, second_sentence)
 
     def calculate_inout_score(self, vertex: Sentence) -> int:
         """
@@ -437,6 +482,16 @@ class TextGraph:
         Returns:
             int: Number of similar vertices.
         """
+        if not isinstance(vertex, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+        if vertex not in self._vertices:
+            raise TextGraphError("Vertex is not in the graph")
+        vertex_index = self._vertices.index(vertex)
+        return sum(
+            score > 0.0 and index != vertex_index
+            for index, score in enumerate(self._matrix[vertex_index])
+        )
+
 
     def get_vertices(self) -> tuple[Sentence, ...]:
         """
@@ -445,6 +500,7 @@ class TextGraph:
         Returns:
             tuple[Sentence, ...]: Sequence of vertices in the graph.
         """
+        return tuple(self._vertices)
 
     def get_similarity_score(self, vertex1: Sentence, vertex2: Sentence) -> float:
         """
@@ -457,6 +513,13 @@ class TextGraph:
         Returns:
             float: Similarity score between the two vertices.
         """
+        if not isinstance(vertex1, Sentence) or not isinstance(vertex2, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+        if vertex1 not in self._vertices or vertex2 not in self._vertices:
+            raise TextGraphError("Vertex is not in the graph")
+        first_index = self._vertices.index(vertex1)
+        second_index = self._vertices.index(vertex2)
+        return float(self._matrix[first_index][second_index])
 
     def get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
         """
@@ -468,6 +531,16 @@ class TextGraph:
         Returns:
             tuple[Sentence, ...]: Top n sentences with the highest similarity score sum.
         """
+        if not self._vertices:
+            raise TextGraphError("Graph is empty")
+        if not isinstance(n, int) or isinstance(n, bool) or n <= 0:
+            raise IncorrectArgumentError("Incorrect input value")
+        ranked_indices = sorted(
+            range(len(self._vertices)),
+            key=lambda index: sum(self._matrix[index]),
+            reverse=True,
+        )
+        return tuple(self._vertices[index] for index in ranked_indices[:n])
 
 
 class NaiveSummarizer:
@@ -485,6 +558,9 @@ class NaiveSummarizer:
         Args:
             graph (TextGraph): Built graph of encoded sentences.
         """
+        if not isinstance(graph, TextGraph):
+            raise IncorrectArgumentError("Incorrect input value")
+        self._graph = graph
 
     def __str__(self) -> str:
         """
@@ -493,6 +569,7 @@ class NaiveSummarizer:
         Returns:
             str: String representation of the summarizer.
         """
+        return f"NaiveSummarizer(graph={self._graph})"
 
     def _get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
         """
@@ -504,6 +581,7 @@ class NaiveSummarizer:
         Returns:
             tuple[Sentence, ...]: Top n sentences with the highest significance scores.
         """
+        return self._graph.get_top_n_sentences(n)
 
     def summarize(self, n_sentences: int) -> str:
         """
@@ -515,6 +593,12 @@ class NaiveSummarizer:
         Returns:
             str: Selected sentences in source order.
         """
+        top_sentences = self._get_top_n_sentences(n_sentences)
+        ordered_sentences = sorted(
+            top_sentences,
+            key=lambda sentence: sentence.get_position(),
+        )
+        return "\n".join(sentence.get_text() for sentence in ordered_sentences)
 
 
 class TextRankSummarizer(NaiveSummarizer):
