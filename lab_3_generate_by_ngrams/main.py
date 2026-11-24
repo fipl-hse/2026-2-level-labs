@@ -524,33 +524,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-def find_the_most_different_context(model):
-    contexts = {}
-
-    for n_gram, probability in model._n_gram_frequencies.items():
-        context = n_gram[:-1]
-
-        if context not in contexts:
-            contexts[context] = []
-        contexts[context].append(probability)
-
-    good_context = None
-    smallest_max_frequency = None
-
-    for context in contexts:
-        frequencies = contexts[context]
-
-        if len(frequencies) < 2:
-            continue
-
-        max_frequency = max(frequencies)
-
-        if smallest_max_frequency is None or max_frequency < smallest_max_frequency:
-            smallest_max_frequency = max_frequency
-            good_context = context
-
-    return good_context
-
 
 class GreedyTextGenerator:
     """
