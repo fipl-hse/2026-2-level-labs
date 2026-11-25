@@ -3,6 +3,10 @@ TextRank summarizer starter
 """
 
 # pylint:disable=unused-variable, unused-import, duplicate-code
+from lab_4_summarization_textrank.main import (
+    SentenceEncoder,
+    SentencePreprocessor,
+)
 
 
 def main() -> None:
@@ -20,7 +24,16 @@ def main() -> None:
     ) as text_file:
         stop_words = tuple(text_file.read().split("\n"))
     result = None
-    assert result
+
+    # mark 6
+    preprocessor = SentencePreprocessor(stop_words, punctuation=tuple(".,!?;:()[]{}\"'"))
+    sentences = preprocessor.get_sentences(text)
+    encoder = SentenceEncoder()
+    encoder.encode_sentences(sentences)
+    print(f"Encoded sentences: {sentences}")
+    print(f"Encoder: {encoder}")
+    print(f"Vocabulary size: {len(encoder._word2id)}")
+    assert encoder
 
 
 if __name__ == "__main__":
