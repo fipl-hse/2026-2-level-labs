@@ -26,7 +26,7 @@
         },
         {
             "name": "lab_4_summarization_textrank",
-            "coverage": 76,
+            "coverage": 100,
             "stubs": [
                 "main.py",
                 "start.py"
@@ -50,7 +50,8 @@
             "AnPruch",
             "Evgraff2005",
             "notBlueSpaceThinker",
-            "kaizerova-a"
+            "kaizerova-a",
+            "alexgiving"
         ],
         "pr_name_example": "Laboratory work #1, Name Surname - 25FPL1",
         "pr_name_regex": "Laboratory work #\\d, \\w+ \\w+ - 2\\dFPL\\d"

@@ -29,7 +29,7 @@ def test_calculate_similarity_ideal() -> None:
 @pytest.mark.mark10
 def test_calculate_similarity_non_iterable() -> None:
     """
-    Checks that non-iterable inputs raise ValueError
+    Checks that non-iterable inputs raise IncorrectArgumentError
     """
     sequence = [1, 2, 3, 4]
     for wrong_input in [4, 4.0, True]:
@@ -37,3 +37,5 @@ def test_calculate_similarity_non_iterable() -> None:
             calculate_similarity(wrong_input, sequence)
         with pytest.raises(IncorrectArgumentError):
             calculate_similarity(sequence, wrong_input)
+        with pytest.raises(IncorrectArgumentError):
+            calculate_similarity(wrong_input, wrong_input)

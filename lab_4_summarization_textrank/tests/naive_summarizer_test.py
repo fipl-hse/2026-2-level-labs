@@ -8,9 +8,9 @@ import pytest
 from lab_4_summarization_textrank.main import (
     IncorrectArgumentError,
     NaiveSummarizer,
-    SentenceEncoder,
-    SentencePreprocessor,
+    TextGraph,
 )
+from lab_4_summarization_textrank.tests.conftest import InvalidInput
 
 EXTRACT = (
     "Юрий Алексеевич Гагарин является первым космонавтом земли.\n",
@@ -36,11 +36,112 @@ SUMMARY = "".join(EXTRACT)
 @pytest.mark.lab_4_summarization_textrank
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_naive_summarizer_initialization_value_error() -> None:
+def test_naive_summarizer_initialization_incorrect_argument_error(
+    invalid_inputs: list[InvalidInput],
+) -> None:
     """
-    Checks NaiveSummarizer initialization with invalid input
+    Checks that NaiveSummarizer initialization with invalid input raises IncorrectArgumentError
+
+    Args:
+        invalid_inputs (list[InvalidInput]): Invalid inputs
     """
-    wrong_inputs = [True, 1, "dlsk;l", SentenceEncoder(), SentencePreprocessor((), ())]
-    for wrong_input in wrong_inputs:
+    for wrong_input in invalid_inputs:
         with pytest.raises(IncorrectArgumentError):
             NaiveSummarizer(wrong_input)
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_naive_summarizer_initialization_ideal() -> None:
+    """
+    Checks NaiveSummarizer initialization
+    """
+    sim_graph = TextGraph()
+    summarizer = NaiveSummarizer(sim_graph)
+    assert hasattr(summarizer, "_graph")
+    assert summarizer._graph is sim_graph
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_naive_summarizer_str_ideal() -> None:
+    """
+    Checks the __str__ method of NaiveSummarizer
+    """
+    sim_graph = TextGraph()
+    summarizer = NaiveSummarizer(sim_graph)
+    assert str(summarizer) == f"NaiveSummarizer(graph={sim_graph})"
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_naive_summarizer_get_top_sentences(graph: TextGraph) -> None:
+    """
+    Checks NaiveSummarizer sentence ranking pipeline
+
+    Args:
+        graph (TextGraph): An instance of TextGraph
+    """
+    summarizer = NaiveSummarizer(graph)
+    top = summarizer._get_top_n_sentences(10)
+    assert isinstance(top, tuple)
+    assert len(top) == 10
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_get_top_n_sentences_incorrect_argument_error(
+    graph: TextGraph, invalid_inputs: list[InvalidInput]
+) -> None:
+    """
+    Checks that _get_top_n_sentences with invalid input raises IncorrectArgumentError
+
+    Args:
+        graph (TextGraph): An instance of TextGraph
+        invalid_inputs (list[InvalidInput]): Invalid inputs
+    """
+    summarizer = NaiveSummarizer(graph)
+    wrong_inputs = [item for item in invalid_inputs if not isinstance(item, int)] + [0, -1]
+    for wrong_input in wrong_inputs:
+        with pytest.raises(IncorrectArgumentError):
+            summarizer._get_top_n_sentences(wrong_input)
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_summarize(graph: TextGraph) -> None:
+    """
+    Checks summary generation from top-ranked sentences
+
+    Args:
+        graph (TextGraph): An instance of TextGraph
+    """
+    summarizer = NaiveSummarizer(graph)
+    summary = summarizer.summarize(10)
+    assert isinstance(summary, str)
+    assert len(summary.split("\n")) == 10
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_summarize_incorrect_argument_error(
+    graph: TextGraph, invalid_inputs: list[InvalidInput]
+) -> None:
+    """
+    Checks that summarize with invalid input raises IncorrectArgumentError
+
+    Args:
+        graph (TextGraph): An instance of TextGraph
+        invalid_inputs (list[InvalidInput]): Invalid inputs
+    """
+    summarizer = NaiveSummarizer(graph)
+    wrong_inputs = [item for item in invalid_inputs if not isinstance(item, int)] + [0, -1]
+    for wrong_input in wrong_inputs:
+        with pytest.raises(IncorrectArgumentError):
+            summarizer.summarize(wrong_input)

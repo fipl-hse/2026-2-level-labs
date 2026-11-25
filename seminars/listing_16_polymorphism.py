@@ -4,6 +4,9 @@ Programming 2026.
 Seminar 13.
 
 Polymorphism.
+
+Your task is to implement the classes described below.
+Pay attention to inheritance and method overriding.
 """
 
 # Animal
@@ -18,7 +21,7 @@ Polymorphism.
 ## Magic Methods
 ### __str__
 
-# Dog
+# Dog (inherits from Animal)
 ## Attributes
 ### eating_type (predator)
 ### tamed (wild, domesticated)
@@ -26,35 +29,25 @@ Polymorphism.
 ### habitat
 ### moving_type
 ## Methods
-### breathe
-### eat
-### sleep
+### breathe (inherited)
+### eat (overridden)
+### sleep (inherited)
 ## Magic Methods
-### __str__
+### __str__ (overridden)
 
-# Cat
+# Cat (inherits from Animal)
 ## Attributes
 ### eating_type (predator)
 ### habitat
 ### moving_type
 ### character
-### fluffyness
+### fluffiness
 ## Methods
-### breathe
-### eat
-### sleep
+### breathe (inherited)
+### eat (overridden)
+### sleep (inherited)
 ## Magic Methods
-### __str__
-
-# AnimalCollection
-## Magic Methods
-### __str__
-### __len__
-### __getitem__
-## Advanced
-### __setitem__
-### __next__
-### __iter__
+### __str__ (overridden)
 
 # One code to process different types
 
@@ -62,6 +55,7 @@ Polymorphism.
 
 # animals = [pug, bubble]
 # for animal in animals:
+#     print(animal)
 #     animal.eat('meat')
 
 
@@ -69,6 +63,7 @@ def main() -> None:
     """
     Launch listing.
     """
+    # student implementation goes here
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ from lab_4_summarization_textrank.main import (
 
 PATH_TO_ASSETS = Path(__file__).parent.parent / "assets"
 
+type InvalidInput = None | int | float | bool | str | list[int] | tuple[int, ...] | dict[int, int]
+
 
 @pytest.fixture
 def sentence() -> Sentence:
@@ -87,7 +89,7 @@ def graph() -> TextGraph:
     Returns:
         TextGraph: Filled similarity graph
     """
-    with open(PATH_TO_ASSETS / "texts" / "article_701.txt", "r", encoding="utf-8") as file:
+    with open(PATH_TO_ASSETS / "article_701.txt", "r", encoding="utf-8") as file:
         text = file.read()
     with open(PATH_TO_ASSETS / "stop_words.txt", "r", encoding="utf-8") as file:
         stop_words = tuple(file.read().split("\n"))
@@ -98,3 +100,14 @@ def graph() -> TextGraph:
     sim_graph = TextGraph()
     sim_graph.build(sentences)
     return sim_graph
+
+
+@pytest.fixture
+def invalid_inputs() -> list[InvalidInput]:
+    """
+    Returns a unified list of sample values of various types for invalid-input tests
+
+    Returns:
+        list[InvalidInput]: Sample values of various types
+    """
+    return [None, 1, 1.0, True, "a", [1], (1,), {1: 1}]

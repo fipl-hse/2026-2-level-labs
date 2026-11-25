@@ -18,6 +18,7 @@ capturefixture
 centos
 config
 curr
+invalidinput
 dont
 encodedsentence
 entrypoint
