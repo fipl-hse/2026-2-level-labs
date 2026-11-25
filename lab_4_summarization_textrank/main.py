@@ -45,6 +45,16 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError
+
+        if not isinstance(position, int) or isinstance(position, bool):
+            raise IncorrectArgumentError
+
+        self._text = text
+        self._position = position
+        self._preprocessed = ()
+        self._encoded = ()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -73,6 +83,7 @@ class Sentence:
         Returns:
             str: String representation of the sentence.
         """
+        return f"Sentence(text='{self._text}', position={self._position})"
 
     def get_encoded(self) -> EncodedSentence:
         """
@@ -81,6 +92,7 @@ class Sentence:
         Returns:
             EncodedSentence: Encoded sequence of integers.
         """
+        return self._encoded
 
     def get_position(self) -> int:
         """
@@ -89,6 +101,12 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
+        if(
+        not isinstance(encoded_sentence, Sequence)
+        or not all(
+            isinstance(token, int) for token in encoded_sentence)
+        ):
+            raise IncorrectArgumentError
 
     def get_preprocessed(self) -> PreprocessedSentence:
         """
@@ -97,7 +115,36 @@ class Sentence:
         Returns:
             PreprocessedSentence: Preprocessed sequence of tokens.
         """
+        return self._preprocessed
 
+<<<<<<< HEAD
+    def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
+        """
+        Sets the preprocessed representation of the sentence.
+
+        Args:
+            preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
+        """
+        if(
+        not isinstance(preprocessed_sentence, Sequence)
+        or not all(
+            isinstance(token, str) for token in preprocessed_sentence)
+        ):
+            raise IncorrectArgumentError
+
+        self._preprocessed = preprocessed_sentence
+
+    def get_position(self) -> int:
+        """
+        Returns the position of the sentence in the text.
+
+        Returns:
+            int: Position of the sentence.
+        """
+        return self._position
+
+=======
+>>>>>>> ab6322891be9267356b1036681fc49c3b3f16acc
     def get_text(self) -> str:
         """
         Returns the text of the sentence.
@@ -105,6 +152,7 @@ class Sentence:
         Returns:
             str: Text of the sentence.
         """
+        return self._text
 
     def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
         """
@@ -140,6 +188,16 @@ class SentencePreprocessor:
             stop_words (Sequence[str]): Insignificant words to remove from tokens.
             punctuation (Sequence[str]): Punctuation symbols to remove during text cleaning.
         """
+        if(
+        not isinstance(stop_words, Sequence)
+        or not all(isinstance(word, str) for word in stop_words)
+        or not isinstance(punctuation, Sequence)
+        or not all(isinstance(symbol, str) for symbol in punctuation)
+        ):
+            raise IncorrectArgumentError
+
+        self._stop_words = stop_words
+        self._punctuation = punctuation
 
     def __str__(self) -> str:
         """
@@ -148,6 +206,10 @@ class SentencePreprocessor:
         Returns:
             str: String representation of the preprocessor.
         """
+        return(
+            f"SentencePreprocessor("
+            f"stop_words={len(self._stop_words)}, "
+            f"punctuation={len(self._punctuation)})")
 
     def _clean_and_tokenize(self, text: str) -> tuple[str, ...]:
         """
@@ -159,6 +221,10 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens.
         """
+        for punctuation in self._punctuation:
+            cleaned_text = text.replace(punctuation, '')
+
+        return tuple(cleaned_text.lower().split())
 
     def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -178,7 +244,31 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Sequence of tokens without stop words.
         """
+        return tuple(
+        token for token in tokens
+        if token not in self._stop_words)
 
+<<<<<<< HEAD
+    def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
+        """
+        Preprocesses a sequence of sentences and stores their token representations.
+
+        Args:
+            sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
+        """
+        if(
+        not isinstance(sentences, Sequence)
+        or not all(
+        isinstance(sentence, Sentence) for sentence in sentences)
+        ):
+            raise IncorrectArgumentError
+
+        for sentence in sentences:
+            preprocessed = self.preprocess_text(sentence.get_text())
+            sentence.set_preprocessed(preprocessed)
+
+=======
+>>>>>>> ab6322891be9267356b1036681fc49c3b3f16acc
     def _split_by_sentence(self, text: str) -> tuple[Sentence, ...]:
         """
         Splits the provided text into sentences.
@@ -189,6 +279,29 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError
+
+        text = ' '.join(text.split())
+        sentences = []
+        start = 0
+        for i, char in enumerate(text):
+            if char in '.!?':
+                next_pos = i + 1
+
+                while next_pos < len(text) and text[next_pos].isspace():
+                    next_pos += 1
+
+                if next_pos < len(text) and text[next_pos].isupper():
+                    sentences.append(text[start:i + 1])
+                    start = next_pos
+
+        if start < len(text):
+            sentences.append(text[start:])
+
+        return tuple(
+        Sentence(sentence, position)
+        for position, sentence in enumerate(sentences))
 
     def get_sentences(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -200,6 +313,12 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of preprocessed sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError
+
+        sentences = self._split_by_sentence(text)
+        self._preprocess_sentences(sentences)
+        return sentences
 
     def preprocess_text(self, text: str) -> tuple[str, ...]:
         """
@@ -211,6 +330,7 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens without stop words.
         """
+        return self._remove_stop_words(self._clean_and_tokenize(text))
 
 
 class SentenceEncoder:
