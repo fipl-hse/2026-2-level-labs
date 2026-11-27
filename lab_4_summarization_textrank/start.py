@@ -4,8 +4,10 @@ TextRank summarizer starter
 
 # pylint:disable=unused-variable, unused-import, duplicate-code
 from lab_4_summarization_textrank.main import (
+    NaiveSummarizer,
     SentenceEncoder,
     SentencePreprocessor,
+    TextGraph,
 )
 
 def main() -> None:
@@ -23,7 +25,6 @@ def main() -> None:
     ) as text_file:
         stop_words = tuple(text_file.read().split("\n"))
 
-    stop_words = ('в', 'на', 'и')
     punctuation = ('.', ',', '!', '?')
     sentence_preprocessor = SentencePreprocessor(stop_words, punctuation)
     preprocessed_sentences = sentence_preprocessor.get_sentences(text)
@@ -31,12 +32,16 @@ def main() -> None:
     print('Preprocessed sentences:', preprocessed_sentences)
 
     sentence_encoder = SentenceEncoder()
-    encoded_sentences = sentence_encoder.encode_sentences(preprocessed_sentences)
-    assert encoded_sentences, 'Encoding failed'
-    print('Encoded sentences:', encoded_sentences)
+    sentence_encoder.encode_sentences(preprocessed_sentences)
 
-    # assert result
-    # it's for me not to forget assert result
+    graph = TextGraph()
+    graph.build(preprocessed_sentences)
+
+    summarizer = NaiveSummarizer(graph)
+    result = summarizer.summarize(5)
+    print(result)
+
+    assert result
 
 
 if __name__ == "__main__":
