@@ -420,6 +420,25 @@ def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
     Returns:
         float: Jaccard similarity score between the two sequences.
     """
+    if (
+        not isinstance(sequence, Sequence)
+        or isinstance(sequence, str)
+        or not isinstance(other_sequence, Sequence)
+        or isinstance(other_sequence, str)
+    ):
+        raise IncorrectArgumentError("Incorrect input value")
+
+    set1 = set(sequence)
+    set2 = set(other_sequence)
+
+    union = set1 | set2
+
+    if not union:
+        return 0.0
+
+    intersection = set1 & set2
+
+    return len(intersection) / len(union)
 
 
 class TextGraph:
