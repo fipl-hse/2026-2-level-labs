@@ -20,10 +20,15 @@ EncodedSentence = tuple[int, ...]
 
 class IncorrectArgumentError(ValueError):
     """Raised when a provided input has an invalid type or value."""
+    if not isinstance(text, str):
+        raise IncorrectArgumentError("Incorrect input value")
 
 
 class TextGraphError(IncorrectArgumentError):
     """Raised when an invalid graph operation or vertex lookup occurs."""
+    if not isinstance(position, int) or isinstance(position, bool):
+        raise IncorrectArgumentError("Incorrect input value")
+
 
 
 class Sentence:
@@ -45,6 +50,16 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str):
+            return None
+
+        if not isinstance(position, int):
+            return None
+
+        self._text = text
+        self._position = position
+        self._preprocessed = ()
+        self._encoded = ()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -57,6 +72,8 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, object):
+            return "Not gonna working"
 
     def __hash__(self) -> int:
         """
