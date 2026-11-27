@@ -11,8 +11,9 @@ Summarize text using TextRank algorithm
    Type alias representing a preprocessed sentence as a tuple of strings.
 """
 
-# pylint:disable=too-few-public-methods, unused-argument
-from typing import Any, Sequence
+# pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
+from typing import Sequence
+
 PreprocessedSentence = tuple[str, ...]
 EncodedSentence = tuple[int, ...]
 
@@ -67,7 +68,7 @@ class Sentence:
               otherwise False.
         """
         if not isinstance(other, Sentence):
-            return False
+            raise IncorrectArgumentError("Incorrect input value")
 
         return (
             self._text == other._text
@@ -239,6 +240,10 @@ class SentencePreprocessor:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
         """
+
+        if not isinstance(sentences, Sequence) or isinstance(sentences, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
         for sentence in sentences:
             tokens = self._clean_and_tokenize(sentence.get_text())
             tokens = self._remove_stop_words(tokens)
@@ -304,6 +309,9 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of preprocessed sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
         sentences = self._split_by_sentence(text)
         self._preprocess_sentences(sentences)
         return sentences
@@ -318,6 +326,9 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens without stop words.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
         tokens = self._clean_and_tokenize(text)
         return self._remove_stop_words(tokens)
 
