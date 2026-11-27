@@ -454,6 +454,9 @@ class TextGraph:
         """
         Initializes an empty similarity graph.
         """
+        self._vertices = []
+        self._matrix = []
+
 
     def __len__(self) -> int:
         """
@@ -462,6 +465,8 @@ class TextGraph:
         Returns:
             int: Number of vertices.
         """
+        return len(self._vertices)
+
 
     def __str__(self) -> str:
         """
@@ -470,6 +475,11 @@ class TextGraph:
         Returns:
             str: Description of the graph.
         """
+        return (
+            f"TextGraph(vertices={len(self._vertices)}, "
+            f"matrix={self._matrix})"
+        )
+
 
     def _add_edge(self, vertex1: Sentence, vertex2: Sentence) -> None:
         """
@@ -479,6 +489,19 @@ class TextGraph:
             vertex1 (Sentence): First vertex.
             vertex2 (Sentence): Second vertex.
         """
+        if vertex1 not in self._vertices or vertex2 not in self._vertices:
+            raise TextGraphError("Vertex not found")
+
+        index1 = self._vertices.index(vertex1)
+        index2 = self._vertices.index(vertex2)
+
+        similarity = calculate_similarity(
+            vertex1.get_encoded(),
+            vertex2.get_encoded()
+        )
+
+        self._matrix[index1][index2] = similarity
+        self._matrix[index2][index1] = similarity
 
     def _add_vertex(self, vertex: Sentence) -> None:
         """
