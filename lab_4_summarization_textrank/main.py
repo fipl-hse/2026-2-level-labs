@@ -347,6 +347,9 @@ class SentenceEncoder:
         """
         Initializes the sentence encoder.
         """
+        self._word2id = {}
+        self._id2word = {}
+        self.last = -1
 
     def __str__(self) -> str:
         """
@@ -355,6 +358,12 @@ class SentenceEncoder:
         Returns:
             str: String representation of the encoder.
         """
+        return (
+            f"SentenceEncoder("
+            f"word2id={self._word2id}, "
+            f"id2word={self._id2word}, "
+            f"last={self.last})"
+        )
 
     def _learn_indices(self, tokens: Sequence[str]) -> None:
         """
@@ -363,6 +372,18 @@ class SentenceEncoder:
         Args:
             tokens (Sequence[str]): Sequence of string tokens.
         """
+        if not isinstance(tokens, Sequence) or isinstance(tokens, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        if not all(isinstance(token, str) for token in tokens):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        for token in tokens:
+            if token not in self._word2id:
+                self.last += 1
+                self._word2id[token] = self.last
+                self._id2word[self.last] = token
+
 
     def encode_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -371,6 +392,21 @@ class SentenceEncoder:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to encode.
         """
+        if not isinstance(sentences, Sequence) or isinstance(sentences, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        if not all(isinstance(sentence, Sentence) for sentence in sentences):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        for sentence in sentences:
+            self._learn_indices(sentence.get_preprocessed())
+
+        for sentence in sentences:
+            encoded = tuple(
+                self._word2id[token]
+                for token in sentence.get_preprocessed()
+            )
+            sentence.set_encoded(encoded)
 
 
 def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
