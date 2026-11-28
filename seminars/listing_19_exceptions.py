@@ -166,10 +166,17 @@ def safe_divide(a: float, b: float) -> float:
         - ALWAYS print "Operation finished" using finally.
     """
     # student implementation goes here
+    try:
+        res = a / b
+    except ZeroDivisionError:
+        return float('inf')
+    else:
+        return res
+    finally:
+        print('Operation finished')
 
-
-# safe_divide(10, 2) → 5.0
-# safe_divide(5, 0) → inf
+print(safe_divide(10, 2))
+print(safe_divide(5, 0))
 
 
 # Task 2:
@@ -183,11 +190,16 @@ def get_element(lst: list, index: int) -> int | None:
         - Print args of the exception.
     """
     # student implementation goes here
+    try:
+        return lst[index]
+    except IndexError:
+        return None
+    except TypeError:
+        return None
 
-
-# get_element([1, 2, 3], 1) → 2
-# get_element([1, 2, 3], 10) → None
-# get_element("hello", 0) → None
+print(get_element([1, 2, 3], 1))
+print(get_element([1, 2, 3], 10))
+print(get_element("hello", 0))
 
 
 # Task 3:

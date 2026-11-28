@@ -5,6 +5,11 @@ TextRank summarizer starter
 # pylint:disable=unused-variable, unused-import, duplicate-code
 
 
+import string
+
+
+from lab_4_summarization_textrank.main import SentenceEncoder, SentencePreprocessor, calculate_similarity
+
 def main() -> None:
     """
     Launches an implementation.
@@ -19,6 +24,15 @@ def main() -> None:
         "lab_4_summarization_textrank/assets/stop_words.txt", "r", encoding="utf-8"
     ) as text_file:
         stop_words = tuple(text_file.read().split("\n"))
+
+    punctuation = tuple(string.punctuation)
+
+    preprocessor = SentencePreprocessor(stop_words, punctuation)
+    sentences = preprocessor.get_sentences(text)
+
+    encoder = SentenceEncoder()
+    encoder.encode_sentences(sentences)
+
     result = None
     assert result
 

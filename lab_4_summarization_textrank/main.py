@@ -12,7 +12,8 @@ Summarize text using TextRank algorithm
 """
 
 # pylint:disable=too-few-public-methods, unused-argument, super-init-not-called
-from typing import Sequence
+from typing import  Any, Sequence
+
 
 PreprocessedSentence = tuple[str, ...]
 EncodedSentence = tuple[int, ...]
@@ -20,10 +21,45 @@ EncodedSentence = tuple[int, ...]
 
 class IncorrectArgumentError(ValueError):
     """Raised when a provided input has an invalid type or value."""
+    pass
 
 
 class TextGraphError(IncorrectArgumentError):
     """Raised when an invalid graph operation or vertex lookup occurs."""
+
+
+def check_sequence(user_input: Any, elements_type: type, can_be_empty: bool) -> bool:
+    """
+    Checks the type of an object and its elements.
+
+    Args:
+        user_input (Any): Object to check.
+        elements_type (type): Required type of its elements.
+        can_be_empty (bool): Whether the sequence can be empty.
+
+    Returns:
+        bool: True if the object is a valid sequence, otherwise False.
+    """
+    if not isinstance(user_input, (list, tuple)):
+        return False
+    if not user_input and not can_be_empty:
+        return False
+    return all(isinstance(el, elements_type) and not isinstance(el, bool) for el in user_input)
+
+
+def check_dict(user_input: dict, key_type: type, value_type: type, can_be_empty: bool) -> bool:
+    """
+    Checks whether an object is a dictionary with keys and values of specified types.
+
+    Args:
+        user_input (dict): Object to check.
+        key_type (type): Required type of dictionary keys.
+        value_type (type): Required type of dictionary values.
+        can_be_empty (bool): Whether the dictionary can be empty.
+
+    Returns:
+        bool: True if the object is a valid dictionary, otherwise False.
+    """
 
 
 class Sentence:
@@ -45,6 +81,14 @@ class Sentence:
             text (str): Text of the sentence.
             position (int): Position of the sentence in the text.
         """
+        if not isinstance(text, str) or not isinstance(position, int) or isinstance(position, bool):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        self._text = text
+        self._position = position
+        self._preprocessed = ()
+        self._encoded = ()
+
 
     def __eq__(self, other: object) -> bool:
         """
@@ -57,6 +101,10 @@ class Sentence:
             bool: True if both are Sentence instances with the same text and position,
               otherwise False.
         """
+        if not isinstance(other, Sentence):
+            return False
+        return self._text == other.get_text() and self._position == other.get_position()
+
 
     def __hash__(self) -> int:
         """
@@ -65,6 +113,8 @@ class Sentence:
         Returns:
             int: Hash value based on the text and position.
         """
+        return hash((self._text, self._position))
+
 
     def __str__(self) -> str:
         """
@@ -81,6 +131,8 @@ class Sentence:
         Returns:
             EncodedSentence: Encoded sequence of integers.
         """
+        return self._encoded
+
 
     def get_position(self) -> int:
         """
@@ -89,6 +141,8 @@ class Sentence:
         Returns:
             int: Position of the sentence.
         """
+        return self._position
+
 
     def get_preprocessed(self) -> PreprocessedSentence:
         """
@@ -97,6 +151,8 @@ class Sentence:
         Returns:
             PreprocessedSentence: Preprocessed sequence of tokens.
         """
+        return self._preprocessed
+
 
     def get_text(self) -> str:
         """
@@ -105,6 +161,8 @@ class Sentence:
         Returns:
             str: Text of the sentence.
         """
+        return self._text
+
 
     def set_encoded(self, encoded_sentence: EncodedSentence) -> None:
         """
@@ -113,6 +171,13 @@ class Sentence:
         Args:
             encoded_sentence (EncodedSentence): Encoded sequence of integers.
         """
+        if not isinstance(encoded_sentence, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        for token in encoded_sentence:
+            if not isinstance(token, int) or isinstance(token, bool):
+                raise IncorrectArgumentError("Incorrect input value")
+        self._encoded = tuple(encoded_sentence)
+
 
     def set_preprocessed(self, preprocessed_sentence: PreprocessedSentence) -> None:
         """
@@ -121,6 +186,12 @@ class Sentence:
         Args:
             preprocessed_sentence (PreprocessedSentence): Preprocessed sequence of tokens.
         """
+        if not isinstance(preprocessed_sentence, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        for token in preprocessed_sentence:
+            if not isinstance(token, str):
+                raise IncorrectArgumentError("Incorrect input value")
+        self._preprocessed = tuple(preprocessed_sentence)
 
 
 class SentencePreprocessor:
@@ -140,6 +211,15 @@ class SentencePreprocessor:
             stop_words (Sequence[str]): Insignificant words to remove from tokens.
             punctuation (Sequence[str]): Punctuation symbols to remove during text cleaning.
         """
+        if not (
+            check_sequence(stop_words, str, can_be_empty=True)
+            and check_sequence(punctuation, str, can_be_empty=True)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        self._stop_words = stop_words
+        self._punctuation = punctuation
+
 
     def __str__(self) -> str:
         """
@@ -148,6 +228,12 @@ class SentencePreprocessor:
         Returns:
             str: String representation of the preprocessor.
         """
+        return (
+            f"SentencePreprocessor("
+            f"stop_words={len(self._stop_words)}, "
+            f"punctuation={len(self._punctuation)})"
+        )
+
 
     def _clean_and_tokenize(self, text: str) -> tuple[str, ...]:
         """
@@ -159,14 +245,14 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
 
-    def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
-        """
-        Preprocesses a sequence of sentences and stores their token representations.
+        text = text.lower()
+        for punct in self._punctuation:
+            text = text.replace(punct, " ")
+        return tuple(word for word in text.split() if word)
 
-        Args:
-            sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
-        """
 
     def _remove_stop_words(self, tokens: Sequence[str]) -> tuple[str, ...]:
         """
@@ -178,6 +264,29 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Sequence of tokens without stop words.
         """
+        if not isinstance(tokens, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        return tuple(token for token in tokens if token not in self._stop_words)
+
+
+    def _preprocess_sentences(self, sentences: Sequence[Sentence]) -> None:
+        """
+        Preprocesses a sequence of sentences and stores their token representations.
+
+        Args:
+            sentences (Sequence[Sentence]): Sequence of sentences to preprocess.
+        """
+        if not isinstance(sentences, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        for sentence in sentences:
+            if not isinstance(sentence, Sentence):
+                raise IncorrectArgumentError("Incorrect input value")
+
+        for sentence in sentences:
+            original_text = sentence.get_text()
+            clean_tokens = self.preprocess_text(original_text)
+            sentence.set_preprocessed(clean_tokens)
+
 
     def _split_by_sentence(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -189,6 +298,22 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        text = " ".join(text.split())
+        sentences = []
+        start = 0
+
+        for i in range(len(text) - 1):
+            if text[i] in ".!?" and text[i + 1] == ' ' and i + 2 < len(text) and text[i + 2].isupper():
+                sentences.append(Sentence(text[start:i+1].strip(), len(sentences)))
+                start = i + 2
+        if start < len(text):
+            sentences.append(Sentence(text[start:].strip(), len(sentences)))
+
+        return tuple(sentences)
+
 
     def get_sentences(self, text: str) -> tuple[Sentence, ...]:
         """
@@ -200,6 +325,13 @@ class SentencePreprocessor:
         Returns:
             tuple[Sentence, ...]: Sequence of preprocessed sentences extracted from the text.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        sentences = self._split_by_sentence(text)
+        self._preprocess_sentences(sentences)
+        return sentences
+
 
     def preprocess_text(self, text: str) -> tuple[str, ...]:
         """
@@ -211,6 +343,10 @@ class SentencePreprocessor:
         Returns:
             tuple[str, ...]: Clean lowercase tokens without stop words.
         """
+        if not isinstance(text, str):
+            raise IncorrectArgumentError("Incorrect input value")
+        tokens = self._clean_and_tokenize(text)
+        return self._remove_stop_words(tokens)
 
 
 class SentenceEncoder:
@@ -227,6 +363,10 @@ class SentenceEncoder:
         """
         Initializes the sentence encoder.
         """
+        self._word2id = {}
+        self._id2word = {}
+        self.last = 999
+
 
     def __str__(self) -> str:
         """
@@ -235,6 +375,8 @@ class SentenceEncoder:
         Returns:
             str: String representation of the encoder.
         """
+        return f"SentenceEncoder(vocabulary_size={len(self._word2id)})"
+
 
     def _learn_indices(self, tokens: Sequence[str]) -> None:
         """
@@ -243,6 +385,18 @@ class SentenceEncoder:
         Args:
             tokens (Sequence[str]): Sequence of string tokens.
         """
+        if not isinstance(tokens, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        for token in tokens:
+            if not isinstance(token, str):
+                raise IncorrectArgumentError("Incorrect input value")
+
+        for token in tokens:
+            if token not in self._word2id:
+                self.last += 1
+                self._word2id[token] = self.last
+                self._id2word[self.last] = token
+
 
     def encode_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -251,6 +405,17 @@ class SentenceEncoder:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to encode.
         """
+        if not isinstance(sentences, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+        for sentence in sentences:
+            if not isinstance(sentence, Sentence):
+                raise IncorrectArgumentError("Incorrect input value")
+
+        for sentence in sentences:
+            preprocessed = sentence.get_preprocessed()
+            self._learn_indices(preprocessed)
+            encoded = tuple(self._word2id[token] for token in preprocessed)
+            sentence.set_encoded(encoded)
 
 
 def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
@@ -264,6 +429,19 @@ def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
     Returns:
         float: Jaccard similarity score between the two sequences.
     """
+    if not isinstance(sequence, (tuple, list)) or not isinstance(other_sequence, (tuple, list)):
+        raise IncorrectArgumentError("Incorrect input value")
+
+    if not sequence or not other_sequence:
+        return 0.0
+
+    set1 = set(sequence)
+    set2 = set(other_sequence)
+
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+
+    return intersection / union
 
 
 class TextGraph:
@@ -279,6 +457,9 @@ class TextGraph:
         """
         Initializes an empty similarity graph.
         """
+        self._vertices = []
+        self._matrix = []
+
 
     def __len__(self) -> int:
         """
@@ -287,6 +468,8 @@ class TextGraph:
         Returns:
             int: Number of vertices.
         """
+        return len(self._vertices)
+
 
     def __str__(self) -> str:
         """
@@ -295,6 +478,8 @@ class TextGraph:
         Returns:
             str: Description of the graph.
         """
+        return f"TextGraph(vertices={len(self._vertices)})"
+
 
     def _add_edge(self, vertex1: Sentence, vertex2: Sentence) -> None:
         """
@@ -304,6 +489,25 @@ class TextGraph:
             vertex1 (Sentence): First vertex.
             vertex2 (Sentence): Second vertex.
         """
+        if not isinstance(vertex1, Sentence) or not isinstance(vertex2, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        if vertex1 == vertex2:
+            raise TextGraphError("Loops are not allowed")
+
+        if vertex1 not in self._vertices:
+            self._add_vertex(vertex1)
+        if vertex2 not in self._vertices:
+            self._add_vertex(vertex2)
+
+        idx1 = self._vertices.index(vertex1)
+        idx2 = self._vertices.index(vertex2)
+
+        score = calculate_similarity(vertex1.get_encoded(), vertex2.get_encoded())
+
+        self._matrix[idx1][idx2] = score
+        self._matrix[idx2][idx1] = score
+
 
     def _add_vertex(self, vertex: Sentence) -> None:
         """
@@ -312,6 +516,15 @@ class TextGraph:
         Args:
             vertex (Sentence): Vertex to add to the graph.
         """
+        if not isinstance(vertex, Sentence):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        if vertex not in self._vertices:
+            self._vertices.append(vertex)
+            self._matrix.append([0.0] * len(self._vertices))
+            for row in self._matrix[:-1]:
+                row.append(0.0)
+
 
     def build(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -320,6 +533,22 @@ class TextGraph:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to add.
         """
+        if not isinstance(sentences, (tuple, list)):
+            raise IncorrectArgumentError("Incorrect input value")
+
+        if not sentences:
+            raise IncorrectArgumentError("Incorrect input value")
+
+        for sentence in sentences:
+            if not isinstance(sentence, Sentence):
+                raise IncorrectArgumentError("Incorrect input value")
+            self._add_vertex(sentence)
+
+        for i in range(len(sentences)):
+            for j in range(i + 1, len(sentences)):
+                if sentences[i] != sentences[j]:
+                    self._add_edge(sentences[i], sentences[j])
+
 
     def calculate_inout_score(self, vertex: Sentence) -> int:
         """
@@ -339,6 +568,8 @@ class TextGraph:
         Returns:
             tuple[Sentence, ...]: Sequence of vertices in the graph.
         """
+        return tuple(self._vertices)
+
 
     def get_similarity_score(self, vertex1: Sentence, vertex2: Sentence) -> float:
         """
@@ -351,6 +582,14 @@ class TextGraph:
         Returns:
             float: Similarity score between the two vertices.
         """
+        if vertex1 not in self._vertices or vertex2 not in self._vertices:
+            raise TextGraphError("Vertex is not in the graph")
+
+        idx1 = self._vertices.index(vertex1)
+        idx2 = self._vertices.index(vertex2)
+
+        return self._matrix[idx1][idx2]
+
 
     def get_top_n_sentences(self, n: int) -> tuple[Sentence, ...]:
         """
@@ -362,6 +601,20 @@ class TextGraph:
         Returns:
             tuple[Sentence, ...]: Top n sentences with the highest similarity score sum.
         """
+        if not isinstance(n, int) or isinstance(n, bool) or n <= 0:
+            raise IncorrectArgumentError("Incorrect input value")
+        if not self._vertices:
+            raise TextGraphError("Graph is empty")
+
+        scores = []
+        for i, vertex in enumerate(self._vertices):
+            total_score = sum(self._matrix[i])
+            scores.append((vertex, total_score))
+
+        scores.sort(key=lambda x: x[1], reverse=True)
+        top_vertices = tuple(item[0] for item in scores[:n])
+
+        return top_vertices
 
 
 class NaiveSummarizer:
