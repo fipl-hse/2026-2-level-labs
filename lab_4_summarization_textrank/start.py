@@ -22,11 +22,17 @@ def main() -> None:
     ) as text_file:
         stop_words = tuple(text_file.read().split("\n"))
     result = None
+
     sentence_processor = SentencePreprocessor(stop_words, '.!?')
     sentences = sentence_processor.get_sentences(text)
     sentence_encoder = SentenceEncoder()
-    result = sentence_encoder.encode_sentences(sentences)
+    sentence_encoder.encode_sentences(sentences)
 
+    for sentence in sentences:
+        print(sentence.get_preprocessed())
+        print(sentence.get_encoded())
+
+    result = sentence_encoder
     assert result
 
 
