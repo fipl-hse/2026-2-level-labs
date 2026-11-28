@@ -47,7 +47,14 @@ class Fraction:
 
     def __init__(self, numerator: int, denominator: int = 1) -> None:
         """
-        Initialize a fraction.
+        Initialize a reduced fraction with a positive denominator.
+
+        Args:
+            numerator (int): Numerator of the fraction.
+            denominator (int): Denominator of the fraction. Defaults to 1.
+
+        Raises:
+            ZeroDivisionError: If the denominator is zero.
 
         Examples:
             Fraction(1, 2)
@@ -55,46 +62,178 @@ class Fraction:
         """
 
     def __str__(self) -> str:
-        """Return a human-readable representation."""
+        """
+        Return a human-readable representation.
+
+        Returns:
+            str: The fraction in numerator/denominator form.
+        """
 
     def __repr__(self) -> str:
-        """Return an unambiguous representation."""
+        """
+        Return an unambiguous representation.
+
+        Returns:
+            str: A constructor-style representation of the fraction.
+        """
 
     def __add__(self, other: Any) -> Any:
-        """Return the sum of two fractions."""
+        """
+        Add another number to this fraction.
+
+        Args:
+            other (Any): Number to add.
+
+        Returns:
+            Fraction: The sum,
+                or NotImplemented if the operand is unsupported.
+        """
 
     def __sub__(self, other: Any) -> Any:
-        """Return the difference between two fractions."""
+        """
+        Subtract another number from this fraction.
+
+        Args:
+            other (Any): Number to subtract.
+
+        Returns:
+            Fraction: The difference,
+                or NotImplemented if the operand is unsupported.
+        """
 
     def __mul__(self, other: Any) -> Any:
-        """Return the product of two fractions."""
+        """
+        Multiply this fraction by another number.
+
+        Args:
+            other (Any): Number to multiply by.
+
+        Returns:
+            Fraction: The product,
+                or NotImplemented if the operand is unsupported.
+        """
 
     def __truediv__(self, other: Any) -> Any:
-        """Return the quotient of two fractions."""
+        """
+        Divide this fraction by another number.
+
+        Args:
+            other (Any): Divisor.
+
+        Returns:
+            Fraction: The quotient,
+                or NotImplemented if the operand is unsupported.
+
+        Raises:
+            ZeroDivisionError: If the divisor is zero.
+        """
 
     def __eq__(self, other: Any) -> Any:
-        """Check whether two fractions are equal."""
+        """
+        Check whether this fraction equals another number.
+
+        Args:
+            other (Any): Number to compare against.
+
+        Returns:
+            bool: True if the values are equal, otherwise False,
+                or NotImplemented if the operand is unsupported.
+        """
 
     def __lt__(self, other: Any) -> Any:
-        """Check whether this fraction is less than another: Any."""
+        """
+        Check whether this fraction is less than another number.
+
+        Args:
+            other (Any): Number to compare against.
+
+        Returns:
+            bool: True if this fraction is smaller, otherwise False,
+                or NotImplemented if the operand is unsupported.
+        """
+
+    def __le__(self, other: Any) -> Any:
+        """
+        Check whether this fraction is less than or equal to another number.
+
+        Args:
+            other (Any): Number to compare against.
+
+        Returns:
+            bool: True if this fraction is smaller or equal, otherwise False.
+
+        Raises:
+            TypeError: If the operand does not support ordering with a fraction.
+        """
 
     def __int__(self) -> int:
-        """Convert the fraction to an integer."""
+        """
+        Convert the fraction to an integer.
+
+        Returns:
+            int: The quotient truncated toward zero.
+        """
 
     def __float__(self) -> float:
-        """Convert the fraction to a floating-point number."""
+        """
+        Convert the fraction to a floating-point number.
+
+        Returns:
+            float: The numerator divided by the denominator.
+        """
 
     def __bool__(self) -> bool:
-        """Check whether the fraction is non-zero."""
+        """
+        Check whether the fraction is non-zero.
+
+        Returns:
+            bool: True if the numerator is non-zero, otherwise False.
+        """
 
     def __floordiv__(self, other: Any) -> Any:
-        """Return the integer quotient."""
+        """
+        Divide this fraction and round the quotient down.
+
+        Args:
+            other (Fraction or int): Divisor.
+
+        Returns:
+            int: The quotient rounded down,
+                or NotImplemented if the operand is unsupported.
+
+        Raises:
+            ZeroDivisionError: If the divisor is zero.
+        """
 
     def __mod__(self, other: Any) -> Any:
-        """Return the remainder."""
+        """
+        Return the remainder after floor division.
+
+        Args:
+            other (Any): Divisor.
+
+        Returns:
+            Fraction: The remainder,
+                or NotImplemented if the operand is unsupported.
+
+        Raises:
+            ZeroDivisionError: If the divisor is zero.
+        """
 
     def __pow__(self, power: int) -> Any:
-        """Raise the fraction to an integer power."""
+        """
+        Raise the fraction to an integer power.
+
+        Args:
+            power (int): Exponent.
+
+        Returns:
+            Fraction: The resulting fraction, or NotImplemented if the exponent
+                is unsupported.
+
+        Raises:
+            ZeroDivisionError: If zero is raised to a negative power.
+        """
 
 
 # =============================================================================

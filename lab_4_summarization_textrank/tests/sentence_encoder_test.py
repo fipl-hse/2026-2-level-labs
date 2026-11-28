@@ -6,6 +6,7 @@ Checks the fourth lab SentenceEncoder abstraction
 import pytest
 
 from lab_4_summarization_textrank.main import IncorrectArgumentError, Sentence, SentenceEncoder
+from lab_4_summarization_textrank.tests.conftest import InvalidInput
 
 ENCODED_SENTENCES = [
     (1011, 1014, 1010, 1015, 1006, 1008, 1007, 1002, 1003, 1001, 1012, 1009, 1004, 1005, 1013),
@@ -26,7 +27,7 @@ def test_sentence_encoder_initialization_ideal(sentence_encoder: SentenceEncoder
     Args:
         sentence_encoder (SentenceEncoder): An instance of SentenceEncoder
     """
-    for attribute in ["_word2id", "_id2word"]:
+    for attribute in ["_word2id", "_id2word", "last"]:
         assert hasattr(
             sentence_encoder, attribute
         ), f"Sentence encoder misses {attribute} attribute"
@@ -36,19 +37,31 @@ def test_sentence_encoder_initialization_ideal(sentence_encoder: SentenceEncoder
 @pytest.mark.mark6
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_encode_sentences_value_error(sentence_encoder: SentenceEncoder) -> None:
+def test_sentence_encoder_str_ideal(sentence_encoder: SentenceEncoder) -> None:
+    """
+    Checks the __str__ method of SentenceEncoder
+
+    Args:
+        sentence_encoder (SentenceEncoder): An instance of SentenceEncoder
+    """
+    assert str(sentence_encoder) == "SentenceEncoder(vocabulary_size=0)"
+
+
+@pytest.mark.lab_4_summarization_textrank
+@pytest.mark.mark6
+@pytest.mark.mark8
+@pytest.mark.mark10
+def test_encode_sentences_incorrect_argument_error(
+    sentence_encoder: SentenceEncoder, invalid_inputs: list[InvalidInput]
+) -> None:
     """
     Checks that invalid input to encode_sentences raises IncorrectArgumentError
 
     Args:
         sentence_encoder (SentenceEncoder): An instance of SentenceEncoder
+        invalid_inputs (list[InvalidInput]): Invalid inputs
     """
-    for wrong_input in [
-        "text",
-        1,
-        4.0,
-        ["word1", "word2"],
-    ]:
+    for wrong_input in invalid_inputs:
         with pytest.raises(IncorrectArgumentError):
             sentence_encoder.encode_sentences(wrong_input)
 
@@ -92,14 +105,17 @@ def test_encode_sentences_repeated_tokens(sentence_encoder: SentenceEncoder) -> 
 @pytest.mark.mark6
 @pytest.mark.mark8
 @pytest.mark.mark10
-def test_learn_indices_return_value(sentence_encoder: SentenceEncoder) -> None:
+def test_learn_indices_incorrect_argument_error(
+    sentence_encoder: SentenceEncoder, invalid_inputs: list[InvalidInput]
+) -> None:
     """
-    Checks that invalid input to _learn_indices raises ValueError
+    Checks that invalid input to _learn_indices raises IncorrectArgumentError
 
     Args:
         sentence_encoder (SentenceEncoder): An instance of SentenceEncoder
+        invalid_inputs (list[InvalidInput]): Invalid inputs
     """
-    invalid_inputs = [[123], True, 1, 0.0, {6: 5}]
-    for invalid_input in invalid_inputs:
+    wrong_inputs = [item for item in invalid_inputs if not isinstance(item, str)]
+    for invalid_input in wrong_inputs:
         with pytest.raises(IncorrectArgumentError):
             sentence_encoder._learn_indices(invalid_input)

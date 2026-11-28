@@ -140,6 +140,11 @@ config/_trial_temp
 config/test_tmp
 test_tmp
 
+# Lab artifacts
+lab_1_classify_profile/assets/profiles/de.json
+lab_1_classify_profile/assets/profiles/en.json
+lab_1_classify_profile/assets/profiles/unk.json
+
 # pyspelling
 dictionary.dic
 build
