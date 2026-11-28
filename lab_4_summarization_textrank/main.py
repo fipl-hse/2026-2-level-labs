@@ -87,7 +87,7 @@ class Sentence:
         Returns:
             str: String representation of the sentence.
         """
-        return f"Sentence(text='{self._text}', position='{self._position}')"
+        return f"Sentence(text='{self._text}', position={self._position})"
 
     def get_encoded(self) -> EncodedSentence:
         """
@@ -189,7 +189,7 @@ class SentencePreprocessor:
         Returns:
             str: String representation of the preprocessor.
         """
-        return f"SentencePreprocessor(stop_words={self._stop_words}, punctuation={self._punctuation})"
+        return f"SentencePreprocessor(stop_words={len(self._stop_words)}, punctuation={len(self._punctuation)})"
 
     def _clean_and_tokenize(self, text: str) -> tuple[str, ...]:
         """

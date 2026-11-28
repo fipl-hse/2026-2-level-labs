@@ -23,7 +23,8 @@ def main() -> None:
         stop_words = tuple(text_file.read().split("\n"))
     result = None
 
-    sentence_processor = SentencePreprocessor(stop_words, '.!?')
+    punctuation = (",", "!", "?")
+    sentence_processor = SentencePreprocessor(stop_words, punctuation)
     sentences = sentence_processor.get_sentences(text)
     sentence_encoder = SentenceEncoder()
     sentence_encoder.encode_sentences(sentences)
