@@ -316,6 +316,9 @@ class SentenceEncoder:
         """
         Initializes the sentence encoder.
         """
+        self._word2id = {}
+        self._id2word = {}
+        self.last = 999
 
     def __str__(self) -> str:
         """
@@ -324,6 +327,7 @@ class SentenceEncoder:
         Returns:
             str: String representation of the encoder.
         """
+        return f"SentenceEncoder(vocabulary_size={len(self._word2id)})"
 
     def _learn_indices(self, tokens: Sequence[str]) -> None:
         """
@@ -332,6 +336,18 @@ class SentenceEncoder:
         Args:
             tokens (Sequence[str]): Sequence of string tokens.
         """
+        if (
+            not isinstance(tokens, Sequence)
+            or isinstance(tokens, (str, bytes, bytearray))
+            or not all(isinstance(token, str) for token in tokens)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        for token in tokens:
+            if token in self._word2id:
+                continue
+            self.last += 1
+            self._word2id[token] = self.last
+            self._id2word[self.last] = token
 
     def encode_sentences(self, sentences: Sequence[Sentence]) -> None:
         """
@@ -340,6 +356,17 @@ class SentenceEncoder:
         Args:
             sentences (Sequence[Sentence]): Sequence of sentences to encode.
         """
+        if (
+            not isinstance(sentences, Sequence)
+            or isinstance(sentences, (str, bytes, bytearray))
+            or any(not isinstance(sentence, Sentence) for sentence in sentences)
+        ):
+            raise IncorrectArgumentError("Incorrect input value")
+        for sentence in sentences:
+            preprocessed = sentence.get_preprocessed()
+            self._learn_indices(preprocessed)
+            encoded = tuple(self._word2id[token] for token in preprocessed)
+            sentence.set_encoded(encoded)
 
 
 def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
@@ -353,7 +380,16 @@ def calculate_similarity(sequence: Sequence, other_sequence: Sequence) -> float:
     Returns:
         float: Jaccard similarity score between the two sequences.
     """
-
+    if (
+        not isinstance(sequence, Sequence)
+        or not isinstance(other_sequence, Sequence)
+    ):
+        raise IncorrectArgumentError("Incorrect input value")
+    if not sequence or not other_sequence:
+        return 0.0
+    set_a = set(sequence)
+    set_b = set(other_sequence)
+    return len(set_a & set_b) / len(set_a | set_b)
 
 class TextGraph:
     """
@@ -368,6 +404,8 @@ class TextGraph:
         """
         Initializes an empty similarity graph.
         """
+        self._vertices = []
+        self._matrix = []
 
     def __len__(self) -> int:
         """
@@ -376,6 +414,7 @@ class TextGraph:
         Returns:
             int: Number of vertices.
         """
+        return len(self._vertices)
 
     def __str__(self) -> str:
         """
@@ -384,6 +423,7 @@ class TextGraph:
         Returns:
             str: Description of the graph.
         """
+        return f"TextGraph(vertices={len(self._vertices)})"
 
     def _add_edge(self, vertex1: Sentence, vertex2: Sentence) -> None:
         """
@@ -393,6 +433,17 @@ class TextGraph:
             vertex1 (Sentence): First vertex.
             vertex2 (Sentence): Second vertex.
         """
+        if vertex1 == vertex2:
+            raise TextGraphError("Loops are not allowed")
+        if vertex1 not in self._vertices:
+            self._add_vertex(vertex1)
+        if vertex2 not in self._vertices:
+            self._add_vertex(vertex2)
+        index1 = self._vertices.index(vertex1)
+        index2 = self._vertices.index(vertex2)
+        score = calculate_similarity(vertex1.get_encoded(), vertex2.get_encoded())
+        self._matrix[index1][index2] = score
+        self._matrix[index2][index1] = score
 
     def _add_vertex(self, vertex: Sentence) -> None:
         """
