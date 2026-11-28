@@ -4,6 +4,8 @@ TextRank summarizer starter
 
 # pylint:disable=unused-variable, unused-import, duplicate-code
 
+from main import SentenceEncoder, SentencePreprocessor
+
 
 def main() -> None:
     """
@@ -20,6 +22,18 @@ def main() -> None:
     ) as text_file:
         stop_words = tuple(text_file.read().split("\n"))
     result = None
+
+    punctuation = (",", "!", "?")
+    sentence_processor = SentencePreprocessor(stop_words, punctuation)
+    sentences = sentence_processor.get_sentences(text)
+    sentence_encoder = SentenceEncoder()
+    sentence_encoder.encode_sentences(sentences)
+
+    for sentence in sentences:
+        print(sentence.get_preprocessed())
+        print(sentence.get_encoded())
+
+    result = sentence_encoder
     assert result
 
 
